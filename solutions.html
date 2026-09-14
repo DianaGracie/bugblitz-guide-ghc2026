@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BugBlitz Solutions</title>
+<style>
+  :root {
+    --font-display: 'Avenir Next Condensed', 'Arial Narrow', 'Trebuchet MS', sans-serif;
+    --font-body: 'Charter', 'Georgia', 'Times New Roman', serif;
+    --font-mono: 'SF Mono', 'Menlo', 'Consolas', 'Liberation Mono', monospace;
+    --ground: #FAFBFF; --surface: #F0E6FF;
+    --text-primary: #1B0A2E; --text-secondary: #4A3A5C; --text-muted: #7A6B8A;
+    --accent: #7B2FBE; --accent-bright: #E040A0; --accent-glow: rgba(123, 47, 190, 0.12);
+    --border: #D8C8EE; --border-light: #EDE4F7;
+    --card-bg: #FFFFFF; --card-shadow: rgba(27, 10, 46, 0.08);
+    --code-bg: #F5F0FA;
+    --success: #16A34A;
+    --diff-add-bg: #E6F9EC; --diff-add-text: #166534;
+    --diff-remove-bg: #FFF0F1; --diff-remove-text: #991B1B;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0D0815; --surface: #1A1230; --text-primary: #F0E6FF;
+      --text-secondary: #C4B5D8; --text-muted: #8A7A9E;
+      --accent: #A855F7; --accent-bright: #F472B6; --accent-glow: rgba(168, 85, 247, 0.15);
+      --border: #2D2050; --border-light: #251A40;
+      --card-bg: #161028; --card-shadow: rgba(0, 0, 0, 0.3);
+      --code-bg: #1A1230;
+      --diff-add-bg: #0F2A18; --diff-add-text: #86EFAC;
+      --diff-remove-bg: #2A0F13; --diff-remove-text: #FCA5A5;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0D0815; --surface: #1A1230; --text-primary: #F0E6FF;
+    --text-secondary: #C4B5D8; --text-muted: #8A7A9E;
+    --accent: #A855F7; --accent-bright: #F472B6; --accent-glow: rgba(168, 85, 247, 0.15);
+    --border: #2D2050; --border-light: #251A40;
+    --card-bg: #161028; --card-shadow: rgba(0, 0, 0, 0.3);
+    --code-bg: #1A1230;
+    --diff-add-bg: #0F2A18; --diff-add-text: #86EFAC;
+    --diff-remove-bg: #2A0F13; --diff-remove-text: #FCA5A5;
+  }
+  html { scroll-behavior: smooth; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .solution[id] { scroll-margin-top: 1rem; }
+  body { background: var(--ground); color: var(--text-primary); font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); }
+  code { font-family: var(--font-mono); font-size: 0.85em; background: var(--code-bg); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+  pre { font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; background: var(--code-bg); color: var(--text-primary); padding: 0.9rem 1rem; border-radius: 6px; overflow-x: auto; margin: 0.5rem 0; }
+  pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+  .diff-add { background: var(--diff-add-bg); color: var(--diff-add-text); display: block; padding: 0 0.4em; }
+  .diff-remove { background: var(--diff-remove-bg); color: var(--diff-remove-text); display: block; padding: 0 0.4em; text-decoration: line-through; text-decoration-color: rgba(0,0,0,0.2); }
+  .content { max-width: 60rem; margin: 0 auto; padding: 0 1.5rem 4rem; }
+  .masthead { padding: 3rem 1.5rem 2rem; text-align: center; border-bottom: 1px solid var(--border-light); }
+  .masthead-eyebrow { font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+  .masthead h1 { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.15; color: var(--text-primary); margin-bottom: 0.5rem; }
+  .masthead-sub { font-size: 1.125rem; color: var(--text-secondary); max-width: 42rem; margin: 0 auto 1.25rem; }
+  .masthead-nav { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+  .masthead-nav a { font-family: var(--font-display); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; padding: 0.4rem 0.85rem; border: 1px solid var(--border); border-radius: 100px; }
+  .masthead-nav a:hover, .masthead-nav a[aria-current="page"] { color: var(--accent); border-color: var(--accent); }
+
+  .notice { margin: 2rem 0; padding: 1rem 1.25rem; background: var(--surface); border-left: 3px solid var(--accent); border-radius: 6px; font-size: 0.92rem; color: var(--text-secondary); }
+  .notice strong { color: var(--accent); }
+
+  .toc { margin: 2rem 0 3rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 8px; box-shadow: 0 1px 3px var(--card-shadow); }
+  .toc h2 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+  .toc ol { padding-left: 1.5rem; margin: 0; }
+  .toc li { font-size: 0.95rem; color: var(--text-secondary); padding: 0.35rem 0; }
+  .toc a { text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  .solution { margin: 3rem 0; padding: 2rem; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 8px; box-shadow: 0 1px 3px var(--card-shadow); border-top: 3px solid var(--accent); }
+  .solution-tag { display: inline-block; font-family: var(--font-display); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 4px; background: var(--surface); color: var(--accent); margin-bottom: 0.5rem; }
+  .solution h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem; }
+  .solution-bug-link { font-size: 0.88rem; color: var(--text-muted); text-decoration: none; }
+  .solution-bug-link:hover { color: var(--accent); }
+  .solution-section-label { font-family: var(--font-display); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin: 1.5rem 0 0.35rem; }
+  .solution p { color: var(--text-secondary); font-size: 0.98rem; margin: 0.35rem 0; }
+  .solution ul { padding-left: 1.25rem; margin: 0.5rem 0; }
+  .solution ul li { color: var(--text-secondary); font-size: 0.95rem; padding: 0.15rem 0; }
+  .solution .file-path { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; }
+
+  @media (max-width: 600px) {
+    .masthead { padding: 2rem 1rem 1.5rem; }
+    .content { padding: 0 1rem 3rem; }
+    .solution { padding: 1.25rem; }
+  }
+</style>
+
+<div class="masthead">
+  <div class="masthead-eyebrow">BugBlitz · Workshop Materials</div>
+  <h1>Solutions &amp; Best Practices</h1>
+  <p class="masthead-sub">Root cause, the fix, and why it works — for every bug in the guide. Use this as a reference after your team has attempted the fix themselves.</p>
+  <div class="masthead-nav">
+    <a href="index.html">Workshop Guide</a>
+    <a href="bugs.html">Bug Guide</a>
+    <a href="solutions.html" aria-current="page">Solutions</a>
+  </div>
+</div>
+
+<div class="content">
+
+  <nav class="toc" aria-label="Solutions table of contents">
+    <h2>Solutions</h2>
+    <ol>
+      <li><a href="#welcome-offer-mobile">Welcome offer cannot be dismissed on mobile</a></li>
+      <li><a href="#duplicate-order-placed">"Charged twice for the same order?"</a></li>
+      <li><a href="#generic-error">Checkout error message is unhelpful — hurting conversion</a></li>
+      <li><a href="#international-postal-code">International customers can't check out</a></li>
+      <li><a href="#stale-state">State/Province carries over on country change</a></li>
+      <li><a href="#promo-duplicate">The same promo code can be applied multiple times</a></li>
+      <li><a href="#sold-out-feedback">"The Add to Cart button is broken on some plants"</a></li>
+      <li><a href="#broken-image">One of the product cards has a missing image</a></li>
+      <li><a href="#dialog-bug">Clear Cart dialog locks the page</a></li>
+      <li><a href="#stale-search">Stale header-search results</a></li>
+      <li><a href="#sale-price-not-honored">Cart and checkout totals ignore the sale price</a></li>
+    </ol>
+  </nav>
+
+  <div class="solution" id="welcome-offer-mobile">
+    <span class="solution-tag">CSS · Device-Specific</span>
+    <h2>1. Welcome offer cannot be dismissed on mobile</h2>
+    <a class="solution-bug-link" href="bugs.html#welcome-offer-mobile">← back to bug</a>
+
+    <div class="solution-section-label">Root Cause</div>
+    <p>On narrow viewports (≤768px), <code>.offer-popover</code> is positioned with <code>bottom: 84px</code>. Its close button (<code>.offer-close</code>) sits near the bottom-right corner of the card, and its <code>.offer-cta</code> button sits in normal flow above the card's bottom padding. <code>.cookie-banner</code> switches to a stacked column layout on mobile (message row, then a full-width button row) with <code>padding: 16px 16px 40px</code>, making its rendered height greater than the 84px of clearance the offer card reserves for it. The banner has a higher stacking order (<code>z-index: 1000</code> vs. the offer's <code>z-index: 900</code>), so its box covers the bottom region of the offer card: the close button is fully behind it, and the "Start shopping" CTA's lower edge is also covered.</p>
+
+    <div class="solution-section-label">The Fix</div>
+    <p>Increase the offer's bottom clearance so the card clears the banner's rendered height. Both the close button and the CTA are positioned relative to the card, so raising the card's clearance addresses both at once:</p>
+    <pre><code>/* welcome-offer.component.scss */
+@media (max-width: 768px) {
+  .offer-popover {
+<span class="diff-remove">    bottom: 84px;</span>
+<span class="diff-add">    bottom: 148px;   /* clears the stacked mobile cookie banner */</span>
+  }
+}</code></pre>
+
+    <div class="solution-section-label">Why This Works</div>
+    <ul>
+      <li><strong>Clearance is set against the banner's actual rendered height</strong> rather than a value that happened to match its previous size.</li>
+      <li><strong>One root cause covers both symptoms.</strong> The invisible × and the clipped CTA are both a consequence of the same undersized clearance value on the parent card, not two independent overlaps.</li>
+    </ul>
+
+    <div class="solution-section-label">Related Pitfalls</div>
+    <ul>
+      <li>If you have multiple fixed or absolutely-positioned elements, ensure their positioning and sizing are coordinated to avoid overlap.</li>
+      <li>Don't forget to test your work in the mobile viewport because some issues only appear on smaller screens.</li>
+    </ul>
+  </div>
+
+  <div class="solution" id="duplicate-order-placed">
+    <span class="solution-tag">Interaction</span>
+    <h2>2. "Charged twice for the same order?"</h2>
+    <a class="solution-bug-link" href="bugs.html#duplicate-order-placed">← back to bug</a>
+
+    <div class="solution-section-label">Root Cause</div>
+    <p>
+      When a user clicks <strong>Place Order</strong>, the browser starts processing the payment. However, because there is no safety lock (an "in-flight guard") preventing additional clicks, the user can click the button multiple times while waiting. This triggers multiple payment requests to the backend for a single order, resulting in duplicate charges.
+    </p>
+
+    <div class="solution-section-label">The Fix</div>
+    <p>
+      We use a boolean <code>submitting</code> signal as a state guard. This creates a two-layer defense: it visually disables the button in the template and programmatically blocks duplicate submissions inside the Angular component.
+    </p>
+
+    <div class="solution-section-label">How to Reproduce</div>
+    <p>On the checkout page, rapidly click the <strong>Place Order</strong> button while observing the browser DevTools Network tab to confirm duplicate requests were sent.</p>
+    <ul>
+      <li>Open DevTools → <strong>Network</strong> and enable <em>Preserve log</em>.</li>
+      <li>Click <strong>Place Order</strong> multiple times in quick succession.</li>
+      <li>Verify multiple identical <strong>POST</strong> requests to the payment/order endpoint appear (same payload or order id), showing duplicate submissions.</li>
+    </ul>
+      <div class="solution-section-label">Confirming the Fix</div>
+      <p>After applying the fix, rapid-click the <strong>Place Order</strong> button and verify the app only sends a single order request.</p>
+      <ul>
+        <li>With DevTools → <strong>Network</strong> open and <em>Preserve log</em> enabled, rapid-click the button.</li>
+        <li>Confirm only one <strong>POST</strong> to the payment/order endpoint is recorded.</li>
+        <li>Optionally, check the response or order id in the request/response to ensure only one order was created.</li>
+      </ul>
+
+    <pre><code>// src/app/checkout/checkout.component.ts
+export class CheckoutComponent {
+  // Simple object-backed form used in this workshop app
+  form = {
+    fullName: '',
+    email: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: '',
+    country: '',
+  };
+
+<span class="diff-add">  // Tracks whether a request is currently in-flight
+  submitting = signal(false);</span>
+
+  async onSubmit(event: Event) {
+    event.preventDefault();
+    this.errorMessage.set('');
+
+<span class="diff-add">    // 1. Guard: Stop execution immediately if already processing
+    if (this.submitting()) return;
+
+    // 2. Lock: Set submitting state to true
+    this.submitting.set(true);</span>
+
+    try {
+      // Perform payment / order write (omitted)
+    } finally {
+<span class="diff-add">      // 3. Unlock: Always reset guard, even if the request fails
+      this.submitting.set(false);</span>
+    }
+  }
+}</code></pre>
+
+    <pre><code>&lt;!-- src/app/checkout/checkout.component.html --&gt;
+<span class="diff-remove">&lt;button type="submit" class="place-order-btn"&gt;</span>
+<span class="diff-add">&lt;!-- Bind [disabled] to the submitting state to prevent UI interaction --&gt;
+&lt;button type="submit" class="place-order-btn" [disabled]="submitting()"&gt;</span>
+  @if (submitting()) {
+    &lt;span class="spinner" aria-hidden="true"&gt;&lt;/span&gt; Placing Order...
+  } @else {
+    Place Order - ${{ total().toFixed(2) }}
+  }
+&lt;/button&gt;</code></pre>
+
+    <div class="solution-section-label">Why This Works</div>
+    <ul>
+      <li>
+        <strong>Template Guardrail:</strong> Disabling the HTML button prevents mouse clicks and browser-level submit events from reaching our code once a request starts.
+      </li>
+      <li>
+        <strong>Component Logic Guardrail:</strong> Checking <code>if (this.submitting()) return;</code> acts as a fallback guard in case the user triggers submission via keyboard shortcuts or custom scripts.
+      </li>
+    </ul>
+
+    <div class="solution-section-label">Key Takeaways &amp; Pitfalls</div>
+    <ul>
+      <li>
+        <strong>Spinners aren't safeguards:</strong> Showing a loading spinner provides helpful visual feedback, but unless the button is disabled or guarded in code, users can still click it.
+      </li>
+      <li>
+        <strong>Always clean up state:</strong> Placing <code>this.submitting.set(false)</code> inside a <code>finally</code> block ensures the button unlocks if the payment fails, preventing the user from getting permanently stuck.
+      </li>
+      <li>
+        <strong>Defense in depth:</strong> Web apps should guard actions at both the interface level (disabling buttons) and the backend API level (for example, by checking a unique order id to see if the order has already been processed).
+      </li>
+    </ul>
+  </div>
+
+  <div class="solution" id="generic-error">
+    <span class="solution-tag">Form Validation</span>
+    <h2>3. Checkout error message is unhelpful — hurting conversion</h2>
+    <a class="solution-bug-link" href="bugs.html#generic-error">← back to bug</a>
+
+    <div class="solution-section-label">Root Cause</div>
+    <p>The submit handler in <code>checkout.component.ts</code> checks all required fields in a single boolean expression and, if any are missing, sets one generic error string. Users can't tell which field failed.</p>
+    <p class="file-path">src/app/checkout/checkout.component.ts:123–134</p>
+
+    <div class="solution-section-label">The Fix</div>
+    <p>Collect the specific missing fields, then show a targeted message (and, ideally, per-field inline errors driven by Angular's form state):</p>
+    <pre><code>// checkout.component.ts
+<span class="diff-add">fieldErrors = signal&lt;Record&lt;string, string&gt;&gt;({});
+
+private validate(): boolean {
+  const errors: Record&lt;string, string&gt; = {};
+  if (!this.form.fullName) errors['fullName'] = 'Full name is required.';
+  if (!this.form.email)    errors['email']    = 'Email is required.';
+  if (!this.form.address)  errors['address']  = 'Address is required.';
+  if (!this.form.country)  errors['country']  = 'Please select a country.';
+  if (!this.form.city)     errors['city']     = 'City is required.';
+  if (!this.form.state)    errors['state']    = `${this.stateLabel} is required.`;
+  if (!this.form.zip)      errors['zip']      = `${this.zipLabel} is required.`;
+  this.fieldErrors.set(errors);
+  return Object.keys(errors).length === 0;
+}</span>
+
+async onSubmit(event: Event) {
+  event.preventDefault();
+  this.errorMessage.set('');
+<span class="diff-remove">  if (!this.form.fullName || !this.form.email || /* … */ !this.form.country) {
+    this.errorMessage.set('Please fill in all fields.');
+    return;
+  }</span>
+<span class="diff-add">  if (!this.validate()) return;</span>
+  // … rest unchanged
+}</code></pre>
+    <pre><code>&lt;!-- checkout.component.html — repeat per field --&gt;
+&lt;div class="form-group full" [class.has-error]="fieldErrors()['email']"&gt;
+  &lt;label for="email"&gt;Email&lt;/label&gt;
+  &lt;input id="email" type="email" [(ngModel)]="form.email" name="email" /&gt;
+<span class="diff-add">  @if (fieldErrors()['email']) {
+    &lt;p class="field-error"&gt;{{ fieldErrors()['email'] }}&lt;/p&gt;
+  }</span>
+&lt;/div&gt;</code></pre>
+
+    <div class="solution-section-label">Why This Works</div>
+    <ul>
+      <li><strong>Field-level errors</strong> put the message next to the offending input, cutting the cognitive load to zero.</li>
+      <li><strong>Errors as data</strong> (a signal/record) is easier to test than an imperative error string, and it composes cleanly with form-state validators later.</li>
+      <li><strong>Name the field and the expectation</strong> — "Email is required" beats "Invalid input"; "Enter a valid Canadian postal code (e.g., M5V 3A8)" beats "Invalid ZIP".</li>
+    </ul>
+
+    <div class="solution-section-label">Related Pitfalls</div>
+    <ul>
+      <li>Don't clear all errors on every keystroke — only clear a field's error once the user has changed that field.</li>
+      <li>For accessibility, associate error text with the input via <code>aria-describedby</code> and mark the input <code>aria-invalid="true"</code>.</li>
+    </ul>
+  </div>
+
+  <div class="solution" id="international-postal-code">
+    <span class="solution-tag">Form Validation</span>
+    <h2>4. International customers can't check out</h2>
+    <a class="solution-bug-link" href="bugs.html#international-postal-code">← back to bug</a>
+
+    <div class="solution-section-label">Root Cause</div>
+    <p>The submit handler always tests the ZIP against <code>US_ZIP_PATTERN</code>, regardless of the selected country. Any valid Canadian, UK, or other international postal code is rejected as "invalid".</p>
+    <p class="file-path">src/app/checkout/checkout.component.ts:7, 136–139</p>
+
+    <div class="solution-section-label">The Fix</div>
+    <p>Look up the appropriate pattern per country, and fall back to a permissive check when the country's format is unknown:</p>
+    <pre><code>// checkout.component.ts
+<span class="diff-remove">const US_ZIP_PATTERN = /^\d{5}(-\d{4})?$/;</span>
+<span class="diff-add">const POSTAL_PATTERNS: Record&lt;string, { pattern: RegExp; example: string }&gt; = {
+  'United States':  { pattern: /^\d{5}(-\d{4})?$/,                  example: '97201' },
+  'Canada':         { pattern: /^[A-Za-z]\d[A-Za-z] ?\d[A-Za-z]\d$/, example: 'M5V 3A8' },
+  'United Kingdom': { pattern: /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i, example: 'SW1A 1AA' },
+  'Germany':        { pattern: /^\d{5}$/,                            example: '10115' },
+  'France':         { pattern: /^\d{5}$/,                            example: '75008' },
+  'Japan':          { pattern: /^\d{3}-?\d{4}$/,                     example: '150-0001' },
+  'Australia':      { pattern: /^\d{4}$/,                            example: '2000' },
+  // …extend as needed. Unknown countries fall through to the permissive check.
+};
+const FALLBACK_POSTAL = /^[A-Za-z0-9 \-]{3,10}$/;   // any reasonable postal code</span>
+
+// inside onSubmit:
+<span class="diff-remove">if (!US_ZIP_PATTERN.test(this.form.zip)) {
+  this.errorMessage.set('Invalid ZIP code. Please enter a valid 5-digit US ZIP code.');
+  return;
+}</span>
+<span class="diff-add">const rule = POSTAL_PATTERNS[this.form.country];
+const pattern = rule?.pattern ?? FALLBACK_POSTAL;
+if (!pattern.test(this.form.zip.trim())) {
+  const hint = rule ? ` (e.g., ${rule.example})` : '';
+  this.errorMessage.set(`Please enter a valid ${this.zipLabel.toLowerCase()} for ${this.form.country}${hint}.`);
+  return;
+}</span></code></pre>
+
+    <div class="solution-section-label">Why This Works</div>
+    <ul>
+      <li><strong>Country-aware validation</strong> is the smallest correct fix — you keep client-side format checking without hard-coding US.</li>
+      <li><strong>A permissive fallback</strong> means adding a new country doesn't require a code change on day one — the order still goes through and format can be added later.</li>
+      <li><strong>The error message names the country and shows an example</strong> — users understand exactly what format is expected.</li>
+    </ul>
+
+    <div class="solution-section-label">Related Pitfalls</div>
+    <ul>
+      <li>Regex is a client-side convenience, not authoritative validation. Always re-validate on the server / at order write, and don't reject a real order just because the pattern list is incomplete.</li>
+      <li>Consider libraries like <code>i18n-postal-address</code> or Google's <code>libphonenumber</code>-equivalent for postal codes if the country list grows.</li>
+    </ul>
+  </div>
+
+  <div class="solution" id="stale-state">
+    <span class="solution-tag">Form Validation</span>
+    <h2>5. State/Province carries over on country change</h2>
+    <a class="solution-bug-link" href="bugs.html#stale-state">← back to bug</a>
+
+    <div class="solution-section-label">Root Cause</div>
+    <p>The <code>onCountryChange</code> handler updates the region list, label, and ZIP label — but never clears <code>form.state</code>. A previous value (e.g., <code>"CA"</code>) silently persists and passes the required-field check.</p>
+    <p class="file-path">src/app/checkout/checkout.component.ts:112–118</p>
+
+    <div class="solution-section-label">The Fix</div>
+    <pre><code>onCountryChange(): void {
+  const country = this.form.country;
+<span class="diff-add">  this.form.state = '';                    // reset dependent field
+  this.fieldErrors.update(e =&gt; ({ ...e, state: '' }));  // clear stale error too</span>
+  this.stateOptions = REGIONS[country] ?? [];
+  this.hasRegions = this.stateOptions.length &gt; 0;
+  this.stateLabel = STATE_LABELS[country] ?? 'State / Province';
+  this.zipLabel = country === 'United States' ? 'ZIP Code' : 'Postal Code';
+}</code></pre>
+
+    <div class="solution-section-label">Why This Works</div>
+    <ul>
+      <li><strong>Dependent fields must be reset when their parent changes.</strong> This is a universal form pattern — country → state, category → subcategory, product → variant, and so on.</li>
+      <li><strong>Clearing the error alongside the value</strong> avoids showing a stale "State is required" message before the user has even touched the new state input.</li>
+      <li><strong>Prefer reactive forms with <code>updateOn: 'change'</code></strong> and a <code>valueChanges</code> subscription on the country control if you're refactoring — it makes this cascade declarative.</li>
+    </ul>
+
+    <div class="solution-section-label">Related Pitfalls</div>
+    <ul>
+      <li>Don't reset silently in a way the user can't tell — if the state was already valid, consider preserving it when the new country has the same code (rare, but noticeable if you're switching between US/CA which both have <code>"CA"</code>).</li>
+      <li>ZIP validation also depends on country now — clear the ZIP error on country change too.</li>
+    </ul>
+  </div>
+
+  <div class="solution" id="promo-duplicate">
+    <span class="solution-tag">Data · Logic</span>
+    <h2>6. The same promo code can be applied multiple times</h2>
+    <a class="solution-bug-link" href="bugs.html#promo-duplicate">← back to bug</a>
+
+    <div class="solution-section-label">Root Cause</div>
+    <p><code>applyCoupon()</code> in <code>cart.service.ts</code> validates that a code exists and is not expired, then unconditionally appends it to <code>appliedCoupons</code> and persists to <code>localStorage</code> (<code>cart_coupons</code>). There is no check for an already-applied code, so each click of <strong>Apply</strong> stacks another copy and the discount total grows.</p>
+    <p class="file-path">src/lib/cart.service.ts:112–116</p>
+
+    <div class="solution-section-label">The Fix</div>
+    <p>Reject duplicate codes before mutating state. Normalize input so casing and whitespace cannot bypass the guard:</p>
+    <pre><code>// cart.service.ts — inside applyCoupon(), after fetching coupon
+<span class="diff-add">const alreadyApplied = this.appliedCoupons().some(
+  (entry) =&gt; entry.coupon.code === coupon.code
+);
+if (alreadyApplied) {
+  return { success: false, message: 'This promo code is already applied.' };
+}</span>
+
+this.appliedCoupons.set([
+  ...this.appliedCoupons(),
+  { coupon },
+]);</code></pre>
+
+    <div class="solution-section-label">Why This Works</div>
+    <ul>
+      <li><strong>Guard before write.</strong> Checking the in-memory signal stops duplicate entries before they reach <code>localStorage</code> or the UI.</li>
+      <li><strong>Code-level comparison</strong> (not raw input) handles the fact that lookup already uppercases the code server-side.</li>
+      <li><strong>User feedback</strong> on the second apply tells the shopper why nothing changed, instead of silently stacking discounts.</li>
+    </ul>
+
+    <div class="solution-section-label">Related Pitfalls</div>
+    <ul>
+      <li>Client-only guards can be bypassed — for production, enforce uniqueness in the order-write path and respect <code>max_uses</code> in the database.</li>
+      <li>After fixing, verify <code>discountTotal</code> does not exceed <code>subtotal</code> and that reloading the page restores at most one entry per code.</li>
+      <li>Inspect <code>cart_coupons</code> in DevTools → Application → Local Storage to confirm the stored array shape during debugging.</li>
+    </ul>
+  </div>
+
+  <div class="solution" id="sold-out-feedback">
+    <span class="solution-tag">Interaction</span>
+    <h2>7. "The Add to Cart button is broken on some plants"</h2>
+    <a class="solution-bug-link" href="bugs.html#sold-out-feedback">← back to bug</a>
+
+    <div class="solution-section-label">Root Cause</div>
+    <p>The button is correctly disabled with <code>[disabled]="!product.in_stock"</code>, but the only sold-out signal is a small "Out of Stock" badge on the image. On mobile or in quick scans the badge is easy to miss — so users perceive the button as broken.</p>
+    <p class="file-path">src/app/product-card/product-card.component.html:24–30</p>
+
+    <div class="solution-section-label">The Fix</div>
+    <p>Make the button itself carry the message, and expose the state to assistive tech:</p>
+    <pre><code>&lt;!-- product-card.component.html --&gt;
+&lt;button
+  class="add-btn"
+  (click)="addToCart()"
+  [disabled]="!product.in_stock"
+<span class="diff-add">  [attr.aria-label]="!product.in_stock
+    ? product.name + ' is sold out'
+    : 'Add ' + product.name + ' to cart'"
+  [title]="!product.in_stock ? 'This item is currently out of stock' : null"&gt;
+  {{ product.in_stock ? 'Add to Cart' : 'Sold Out' }}</span>
+<span class="diff-remove">&gt;
+  Add to Cart</span>
+&lt;/button&gt;</code></pre>
+    <pre><code>/* product-card.component.scss */
+.add-btn[disabled] {
+<span class="diff-add">  background: var(--surface-alt);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 1;   /* the label change is the signal — don't hide it behind opacity */</span>
+}</code></pre>
+
+    <div class="solution-section-label">Why This Works</div>
+    <ul>
+      <li><strong>The label is the truth.</strong> A button that reads "Sold Out" cannot be misinterpreted — no badge required.</li>
+      <li><strong>Cursor and color reinforce disabled state</strong> without dimming the label to unreadable.</li>
+      <li><strong><code>aria-label</code> + <code>title</code></strong> covers screen-reader and hover-tooltip users.</li>
+    </ul>
+
+    <div class="solution-section-label">Related Pitfalls</div>
+    <ul>
+      <li>Don't remove the "Out of Stock" image badge — it's still useful at a glance across a grid of many cards.</li>
+      <li>If you offer restock notifications, the label becomes an actionable "Notify Me" and the button re-enables — plan for that state.</li>
+    </ul>
+  </div>
+
+  <div class="solution" id="broken-image">
+    <span class="solution-tag">Data</span>
+    <h2>8. One of the product cards has a missing image</h2>
+    <a class="solution-bug-link" href="bugs.html#broken-image">← back to bug</a>
+
+    <div class="solution-section-label">Root Cause</div>
+    <p>One product's <code>image_url</code> in the starter data references a non-existent Pexels asset (typo, deleted photo, or wrong slug mapping). The image tag renders but the network request 404s.</p>
+    <p class="file-path">supabase/migrations/20260626145013_sync_product_image_urls.sql</p>
+
+    <div class="solution-section-label">The Fix</div>
+    <p>Two-part: patch the bad URL <em>and</em> harden the UI against future breakage.</p>
+    <p><strong>1. Patch the data.</strong> Add a new migration (never edit an old one that's been run):</p>
+    <pre><code>-- supabase/migrations/YYYYMMDDHHMMSS_fix_broken_image.sql
+UPDATE products
+SET image_url = 'https://images.pexels.com/photos/&lt;correct-id&gt;/pexels-photo-&lt;correct-id&gt;.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800'
+WHERE slug = '&lt;affected-slug&gt;';</code></pre>
+    <p><strong>2. Harden the component.</strong> Fall back to a placeholder when the image fails to load, so no user ever sees a broken icon:</p>
+    <pre><code>&lt;!-- product-card.component.html --&gt;
+&lt;img
+  [src]="product.image_url"
+  [alt]="product.name"
+  loading="lazy"
+<span class="diff-add">  (error)="onImageError($event)"</span> /&gt;</code></pre>
+    <pre><code>// product-card.component.ts
+<span class="diff-add">onImageError(event: Event) {
+  const img = event.target as HTMLImageElement;
+  if (img.src.endsWith('/placeholder.svg')) return;   // avoid infinite loop
+  img.src = '/assets/placeholder.svg';
+}</span></code></pre>
+
+    <div class="solution-section-label">Why This Works</div>
+    <ul>
+      <li><strong>Migrations are additive.</strong> A new migration patches the URL and preserves history — editing an old file breaks reproducibility for anyone who has already run it.</li>
+      <li><strong>An <code>onerror</code> fallback</strong> means one bad URL never ships a broken card — a small placeholder tells the user the product exists, just without a photo yet.</li>
+      <li><strong>Verify in DevTools' Network tab</strong> after the fix — <em>no</em> 404s for product images.</li>
+    </ul>
+
+    <div class="solution-section-label">Related Pitfalls</div>
+    <ul>
+      <li>Don't hotlink to third-party CDNs (Pexels, Unsplash) without a caching layer — they can rotate or remove images at any time.</li>
+      <li>Consider a build-time or test-time crawl over all <code>image_url</code>s to catch dead links before they ship.</li>
+    </ul>
+  </div>
+
+  <div class="solution" id="dialog-bug">
+    <span class="solution-tag">DOM &amp; Overlays</span>
+    <h2>9. Clear Cart dialog locks the page</h2>
+    <a class="solution-bug-link" href="bugs.html#dialog-bug">← back to bug</a>
+
+    <div class="solution-section-label">Root Cause</div>
+    <p>Dismissing the Clear Cart dialog hides the dialog box, but leaves the invisible backdrop overlay element active in the DOM with <code>pointer-events: auto</code>, blocking user interactions with the rest of the page.</p>
+
+    <div class="solution-section-label">The Fix</div>
+    <p>Ensure the dialog backdrop overlay is hidden or removed from pointer events when the dialog is dismissed:</p>
+    <pre><code>function closeClearCartDialog() {
+  const dialogOverlay = document.querySelector('.dialog-overlay');
+  if (dialogOverlay) {
+<span class="diff-add">    dialogOverlay.classList.remove('active');
+    dialogOverlay.style.display = 'none';
+    dialogOverlay.style.pointerEvents = 'none';</span>
+  }
+}</code></pre>
+
+    <div class="solution-section-label">Why This Works</div>
+    <ul>
+      <li><strong>Pointer Cleanup:</strong> Disabling <code>pointer-events</code> prevents invisible overlays from capturing mouse and touch input.</li>
+      <li><strong>DOM Synchronization:</strong> Ensures the backdrop visual state stays in sync with the modal visibility.</li>
+    </ul>
+    <div class="solution-section-label">Key Takeaway</div>
+    <ul>
+      <li><strong>Complete Lifecycle Cleanup:</strong> Whenever a component or temporary state is dismissed, ensure all related side effects—including overlay wrappers, global event listeners, body locks, and focus states—are fully torn down together.</li>
+    </ul>
+  </div>
+
+  <div class="solution" id="stale-search">
+    <span class="solution-tag">Search</span>
+    <h2>10. Stale search results</h2>
+    <a class="solution-bug-link" href="bugs.html#stale-search">← back to bug</a>
+
+    <div class="solution-section-label">Root Cause</div>
+    <p>Each keystroke fires a new search request, but responses are applied in the order they arrive — not the order they were requested. On a slow network, the response for <code>mon</code> can land <em>after</em> the response for <code>monstera</code>, overwriting the correct results.</p>
+
+    <div class="solution-section-label">The Fix</div>
+    <p>Use a request-id (sequence number) and discard any response that isn't for the latest request. Even better in RxJS: <code>switchMap</code>, which cancels the previous in-flight request automatically.</p>
+    <pre><code>// header.component.ts — plain-async version
+<span class="diff-add">private requestSeq = 0;</span>
+
+async onSearch(query: string) {
+<span class="diff-add">  const seq = ++this.requestSeq;</span>
+  const results = await this.searchService.suggest(query);
+<span class="diff-add">  if (seq !== this.requestSeq) return;   // a newer request has been issued
+</span>  this.suggestions.set(results);
+}</code></pre>
+    <pre><code>// or, the RxJS way — switchMap cancels the previous request
+<span class="diff-add">this.query$
+  .pipe(
+    debounceTime(150),           // don't hammer the network
+    distinctUntilChanged(),      // ignore no-op keystrokes
+    switchMap(q =&gt; this.searchService.suggest(q))
+  )
+  .subscribe(results =&gt; this.suggestions.set(results));</span></code></pre>
+
+    <div class="solution-section-label">Why This Works</div>
+    <ul>
+      <li><strong>The sequence guard</strong> is the simplest correct pattern — increment on request, compare on response, drop stale results.</li>
+      <li><strong><code>switchMap</code></strong> is the declarative version — it unsubscribes from the previous inner observable when a new one arrives, so stale requests are cancelled at the network layer too.</li>
+      <li><strong>Debounce + distinctUntilChanged</strong> reduces the number of requests to begin with — fewer races, less server load.</li>
+    </ul>
+
+    <div class="solution-section-label">Related Pitfalls</div>
+    <ul>
+      <li>Don't debounce so long that suggestions feel laggy — 100–200ms is the sweet spot for search-as-you-type.</li>
+      <li>Also handle the empty-query case: clear suggestions immediately rather than firing a network request for <code>""</code>.</li>
+      <li>If you need infinite-scroll or paginated results, switch to <code>concatMap</code> or <code>exhaustMap</code> — <code>switchMap</code>'s cancellation would drop the wrong requests.</li>
+    </ul>
+  </div>
+
+  <div class="solution" id="sale-price-not-honored">
+    <span class="solution-tag">Data · Logic</span>
+    <h2>11. Cart and checkout totals ignore the sale price</h2>
+    <a class="solution-bug-link" href="bugs.html#sale-price-not-honored">← back to bug</a>
+
+    <div class="solution-section-label">Root Cause</div>
+    <p>In the domain, <code>price</code> is the amount the shopper pays (the sale price when there is one), and <code>compare_at_price</code> is a display-only "was this much" reference — the crossed-out number shown next to the sale price on the product card. The presence of a <code>compare_at_price</code> is also what tags an item "on sale" in the shop filter.</p>
+    <p>The cart's <code>subtotal</code> computed signal reads <code>(item.product.compare_at_price || item.product.price) * item.quantity</code>. The order is inverted: when a product is on sale, <code>compare_at_price</code> is truthy, so the reduce uses the <em>higher</em> crossed-out price. <code>total()</code> derives from <code>subtotal()</code>, so both the summary Subtotal and the checkout Total inherit the same inflated number. Meanwhile every per-line template reads <code>item.product.price * item.quantity</code> directly, so line items look correct — which is exactly what makes the mismatch so confusing at first glance.</p>
+    <p class="file-path">src/lib/cart.service.ts:68–74</p>
+
+    <div class="solution-section-label">The Fix</div>
+    <p>Read the same price the templates read. One line:</p>
+    <pre><code>// src/lib/cart.service.ts
+subtotal = computed(() =&gt;
+  this.items().reduce(
+<span class="diff-remove">    (sum, item) =&gt;
+      sum + (item.product.compare_at_price || item.product.price) * item.quantity,</span>
+<span class="diff-add">    (sum, item) =&gt; sum + item.product.price * item.quantity,</span>
+    0
+  )
+);</code></pre>
+
+    <div class="solution-section-label">How to Reproduce</div>
+    <ul>
+      <li>Open the header <strong>Sale</strong> link (or sort the shop by <strong>On Sale</strong>) and add any product with a "Sale" badge.</li>
+      <li>In the cart modal, note the line-item price versus the modal's <strong>Total</strong> — the total will be higher.</li>
+      <li>Cross-check on the cart page: the line-item total uses the sale price, but <strong>Subtotal</strong> and <strong>Total</strong> jump up to the crossed-out price.</li>
+      <li>Continue to checkout — the <strong>Place Order - $…</strong> button carries the same inflated total.</li>
+    </ul>
+
+    <div class="solution-section-label">Confirming the Fix</div>
+    <ul>
+      <li>Repeat the sale-item flow: line-item price × quantity should equal the modal total, the cart Subtotal, and the checkout total.</li>
+      <li>Add a non-sale item alongside — the mixed cart's totals should still be the sum of each line's <code>price × quantity</code>.</li>
+      <li>Place a test order and inspect the <code>orders.subtotal</code> and <code>orders.total</code> columns — they should now match what the shopper saw at checkout.</li>
+    </ul>
+
+    <div class="solution-section-label">Why This Works</div>
+    <ul>
+      <li><strong>Non-sale items are unaffected.</strong> When <code>compare_at_price</code> is <code>null</code>, the old expression already fell through to <code>price</code>, so the numbers on plain items never depended on the buggy branch.</li>
+      <li><strong>The order write path is also corrected.</strong> <code>checkout.component.ts</code> passes <code>this.subtotal()</code> and <code>this.total()</code> straight into the <code>orders</code> INSERT — fixing the computed also fixes what gets persisted to the database.</li>
+    </ul>
+
+    <div class="solution-section-label">Related Pitfalls</div>
+    <ul>
+      <li><strong>Beware <code>a || b</code> as a "prefer <em>a</em>" fallback</strong> when <em>a</em> is the value you don't want in the common case. Here, <code>compare_at_price</code> is <em>set</em> precisely when there's a sale — so the truthiness check silently reversed the meaning of "which price to charge." When two fields both hold real values, name and pick explicitly (e.g., always <code>item.product.price</code>) instead of relying on truthy-fallback order.</li>
+      <li><strong>Percentage coupons compound the bug.</strong> <code>getCouponDiscount()</code> multiplies <code>subtotal()</code> by the discount rate — a wrong subtotal also inflates a percent discount, which can mask the total error by "coincidentally" bringing the number back close to the expected one. Verify with a fixed-amount coupon too.</li>
+      <li><strong>Line items in the DB were already correct.</strong> <code>order_items.price</code> is written from <code>item.product.price</code>, so historical <code>order_items</code> rows are trustworthy — but the aggregate <code>orders.subtotal</code> / <code>orders.total</code> for any shipped sale orders will be inflated.</li>
+    </ul>
+  </div>
+
+</div>

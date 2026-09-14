@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BugBlitz Bug Guide</title>
+<style>
+  :root {
+    --font-display: 'Avenir Next Condensed', 'Arial Narrow', 'Trebuchet MS', sans-serif;
+    --font-body: 'Charter', 'Georgia', 'Times New Roman', serif;
+    --font-mono: 'SF Mono', 'Menlo', 'Consolas', 'Liberation Mono', monospace;
+    --ground: #FAFBFF; --surface: #F0E6FF; --surface-alt: #E8DCF5;
+    --text-primary: #1B0A2E; --text-secondary: #4A3A5C; --text-muted: #7A6B8A;
+    --accent: #7B2FBE; --accent-bright: #E040A0; --accent-glow: rgba(123, 47, 190, 0.12);
+    --border: #D8C8EE; --border-light: #EDE4F7;
+    --card-bg: #FFFFFF; --card-shadow: rgba(27, 10, 46, 0.08);
+    --nav-bg: rgba(250, 251, 255, 0.92);
+    --severity-critical: #DC3545; --severity-major: #E8960C; --severity-minor: #0EA5A0;
+    --severity-critical-bg: #FFF0F1; --severity-major-bg: #FFF8E6; --severity-minor-bg: #E6FAF9;
+    --role-dev: #7B2FBE; --role-pm: #E040A0; --role-lead: #2563EB;
+    --role-qa: #0EA5A0; --role-director: #9333EA; --role-support: #D97706;
+    --code-bg: #F5F0FA;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0D0815; --surface: #1A1230; --text-primary: #F0E6FF;
+      --text-secondary: #C4B5D8; --text-muted: #8A7A9E;
+      --accent: #A855F7; --accent-bright: #F472B6; --accent-glow: rgba(168, 85, 247, 0.15);
+      --border: #2D2050; --border-light: #251A40;
+      --card-bg: #161028; --card-shadow: rgba(0, 0, 0, 0.3);
+      --nav-bg: rgba(13, 8, 21, 0.92);
+      --severity-critical-bg: #2A0A10; --severity-major-bg: #2A1E05; --severity-minor-bg: #0A2220;
+      --code-bg: #1A1230;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0D0815; --surface: #1A1230; --text-primary: #F0E6FF;
+    --text-secondary: #C4B5D8; --text-muted: #8A7A9E;
+    --accent: #A855F7; --accent-bright: #F472B6; --accent-glow: rgba(168, 85, 247, 0.15);
+    --border: #2D2050; --border-light: #251A40;
+    --card-bg: #161028; --card-shadow: rgba(0, 0, 0, 0.3);
+    --nav-bg: rgba(13, 8, 21, 0.92);
+    --severity-critical-bg: #2A0A10; --severity-major-bg: #2A1E05; --severity-minor-bg: #0A2220;
+    --code-bg: #1A1230;
+  }
+  html { scroll-behavior: smooth; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .bug-guide-card[id] { scroll-margin-top: 1rem; }
+  body { background: var(--ground); color: var(--text-primary); font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); }
+  code { font-family: var(--font-mono); font-size: 0.85em; background: var(--code-bg); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+  .content { max-width: 64rem; margin: 0 auto; padding: 0 1.5rem 4rem; }
+  .masthead { padding: 3rem 1.5rem 2rem; text-align: center; border-bottom: 1px solid var(--border-light); }
+  .masthead-eyebrow { font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+  .masthead h1 { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.15; color: var(--text-primary); margin-bottom: 0.5rem; }
+  .masthead-sub { font-size: 1.125rem; color: var(--text-secondary); max-width: 42rem; margin: 0 auto 1.25rem; }
+  .masthead-nav { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+  .masthead-nav a { font-family: var(--font-display); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; padding: 0.4rem 0.85rem; border: 1px solid var(--border); border-radius: 100px; transition: all 0.15s; }
+  .masthead-nav a:hover, .masthead-nav a[aria-current="page"] { color: var(--accent); border-color: var(--accent); }
+  h2 { font-family: var(--font-display); font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; }
+  .lead { font-size: 1.125rem; color: var(--text-secondary); max-width: 48rem; margin: 2rem 0 0.5rem; }
+
+  .bug-guide-filter-row { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap; }
+  .bug-guide-filter-row:first-of-type { margin-top: 1.25rem; }
+  .bug-guide-filter-label { font-family: var(--font-display); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); min-width: 4.5rem; }
+  .bug-guide-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .bug-guide-filter { font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.4rem 0.85rem; border-radius: 100px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-secondary); cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .bug-guide-filter:hover { border-color: var(--accent); color: var(--accent); }
+  .bug-guide-filter.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .bug-guide-empty { display: none; padding: 2rem 1rem; text-align: center; color: var(--text-muted); font-style: italic; background: var(--surface); border-radius: 8px; margin-top: 1rem; }
+  .bug-guide-empty.show { display: block; }
+  .bug-guide-card.hidden { display: none; }
+
+  .bug-guide-cards { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem; }
+  .bug-guide-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 8px; padding: 1.75rem; box-shadow: 0 1px 3px var(--card-shadow); border-top: 3px solid var(--bug-guide-color, var(--accent)); }
+  .bug-guide-card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+  .bug-guide-card-type { font-family: var(--font-display); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 4px; background: var(--bug-guide-bg, var(--severity-major-bg)); color: var(--bug-guide-color, var(--severity-major)); }
+  .bug-guide-card-type.severity { background: var(--surface); color: var(--accent); }
+  .reporter-line { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--text-secondary); margin: 0.35rem 0 0.75rem; }
+  .reporter-line strong { color: var(--text-primary); font-weight: 700; }
+  .reporter-dot { display: inline-block; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--reporter-color, var(--accent)); flex-shrink: 0; }
+  .bug-guide-card h3 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.15rem; }
+  .bug-guide-card-symptom { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem; font-style: italic; }
+  .bug-guide-repro { margin: 0 0 1rem; }
+  .bug-guide-repro img { display: block; width: 100%; height: auto; border: 1px solid var(--border-light); border-radius: 6px; }
+  .bug-guide-repro figcaption { margin-top: 0.35rem; color: var(--text-muted); font-size: 0.78rem; font-style: italic; }
+  .bug-guide-sub { font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin: 1rem 0 0.35rem; }
+  .bug-guide-sub:first-of-type { margin-top: 0; }
+  .bug-guide-card ol { padding-left: 1.25rem; margin: 0; }
+  .bug-guide-card ol li { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; padding: 0.1rem 0; }
+  .bug-guide-card .workshop-prompt { margin-top: 1rem; padding: 0.75rem 1rem; background: var(--accent-glow); border-radius: 6px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+  .bug-guide-card .workshop-prompt strong { color: var(--accent); }
+  .bug-guide-card-footer { display: flex; justify-content: flex-end; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-light); }
+  .solution-link { font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent); border-radius: 100px; transition: all 0.15s; }
+  .solution-link:hover { background: var(--accent); color: #fff; }
+
+  @media (max-width: 600px) {
+    .masthead { padding: 2rem 1rem 1.5rem; }
+    .content { padding: 0 1rem 3rem; }
+    .bug-guide-filter-label { min-width: auto; }
+  }
+
+  /* ── Section nav (sticky) ── */
+  .section-nav { position: sticky; top: 0; z-index: 100; background: var(--nav-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .section-nav-inner { display: flex; gap: 0; max-width: 64rem; margin: 0 auto; padding: 0 1rem; }
+  .section-nav a { font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; color: var(--text-muted); padding: 0.875rem 1rem; white-space: nowrap; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; flex: 1 0 auto; text-align: center; }
+  .section-nav a:hover, .section-nav a:focus-visible { color: var(--accent); border-bottom-color: var(--accent); outline: none; }
+
+  /* ── Sections ── */
+  section { padding: 3rem 0; border-bottom: 1px solid var(--border-light); scroll-margin-top: 4rem; }
+  section:last-child { border-bottom: none; }
+  .section-label { font-family: var(--font-display); font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+  section > h2 { font-family: var(--font-display); font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 700; line-height: 1.2; color: var(--text-primary); margin-bottom: 1rem; }
+  section > h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+
+  /* ── Role cards ── */
+  .roles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
+  .role-card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px var(--card-shadow); border-left: 4px solid var(--role-color, var(--accent)); }
+  .role-card-title { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--role-color, var(--accent)); margin-bottom: 0.15rem; }
+  .role-card-vibe { font-size: 0.85rem; font-style: italic; color: var(--text-muted); margin-bottom: 0.75rem; }
+  .role-card p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem; }
+  .role-card-focus { font-family: var(--font-display); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem; }
+  .role-card-focus-text { font-size: 0.88rem; color: var(--text-secondary); }
+  .role-card blockquote { margin-top: 0.75rem; padding: 0.6rem 0.85rem; background: var(--accent-glow); border-radius: 6px; font-size: 0.88rem; font-style: italic; color: var(--text-secondary); }
+  .role-card blockquote::before { content: '"'; font-size: 1.2rem; color: var(--accent); margin-right: 0.15rem; }
+
+  /* ── Severity guide + Priority × Effort matrix ── */
+  .severity-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+  .severity-row { display: flex; gap: 1rem; align-items: flex-start; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 8px; padding: 1.25rem; box-shadow: 0 1px 3px var(--card-shadow); }
+  .severity-badge { flex-shrink: 0; width: 5.5rem; padding: 0.3rem 0; text-align: center; font-family: var(--font-display); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; border-radius: 4px; }
+  .severity-badge.critical { background: var(--severity-critical-bg); color: var(--severity-critical); }
+  .severity-badge.major { background: var(--severity-major-bg); color: var(--severity-major); }
+  .severity-badge.minor { background: var(--severity-minor-bg); color: var(--severity-minor); }
+  .severity-content h3 { font-size: 0.95rem; margin-bottom: 0.25rem; }
+  .severity-content p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.55; }
+  .severity-content .examples { margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted); }
+  .effort-matrix { margin-top: 1.25rem; border-collapse: separate; border-spacing: 0.35rem; width: 100%; max-width: 40rem; }
+  .effort-matrix th, .effort-matrix td { padding: 0.6rem 0.75rem; text-align: center; font-size: 0.88rem; border-radius: 6px; }
+  .effort-matrix th { font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); background: transparent; font-weight: 600; }
+  .effort-matrix td { background: var(--surface); color: var(--text-secondary); font-size: 0.85rem; line-height: 1.35; }
+  .effort-matrix td.quick-win { background: var(--accent); color: #ffffff; font-weight: 600; }
+  .effort-matrix .row-label { background: transparent; color: var(--text-primary); font-family: var(--font-display); font-weight: 700; letter-spacing: 0.06em; text-align: right; padding-right: 0.9rem; }
+
+  /* ── Bug categories ── */
+  .bug-categories { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+  .bug-cat { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 8px; padding: 1.25rem; box-shadow: 0 1px 3px var(--card-shadow); text-align: center; }
+  .bug-cat-icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .bug-cat h3 { font-size: 0.95rem; text-align: center; margin-bottom: 0.35rem; }
+  .bug-cat p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+</style>
+
+<div class="masthead">
+  <div class="masthead-eyebrow">BugBlitz · Workshop Materials</div>
+  <h1>Bug Guide</h1>
+  <p class="masthead-sub">The bugs your team is tackling today. Each entry includes the reported symptom, reproduction steps, a working comparison case, and the acceptance criteria a fix must meet.</p>
+  <div class="masthead-nav">
+    <a href="index.html">Workshop Guide</a>
+    <a href="bugs.html" aria-current="page">Bug Guide</a>
+    <a href="solutions.html">Solutions</a>
+  </div>
+</div>
+
+<!-- Section Nav -->
+<nav class="section-nav" aria-label="Page sections">
+  <div class="section-nav-inner">
+    <a href="#roles">Roles</a>
+    <a href="#severity">Triage</a>
+    <a href="#bug-types">Bug Types</a>
+    <a href="#bug-list">Bug Report</a>
+  </div>
+</nav>
+
+<div class="content">
+
+  <!-- Roles -->
+  <section id="roles">
+    <div class="section-label">Know Your Team</div>
+    <h2>Choose Your Role</h2>
+    <p class="lead">Pick a role from the cards below. Each role brings a unique perspective to the War Room — the goal is to advocate for priorities through your role's lens.</p>
+
+    <div class="roles-grid">
+      <div class="role-card" style="--role-color: var(--role-dev)">
+        <div class="role-card-title">Software Engineer / Developer</div>
+        <div class="role-card-vibe">The builder, the fixer, and the realist.</div>
+        <p>You're the one in the console, reading stack traces, and actually writing the code to fix the issues. You know how hard a fix will actually be.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Technical health of the app, state management, errors in the console, and writing the actual fix.</div>
+      </div>
+
+      <div class="role-card" style="--role-color: var(--role-pm)">
+        <div class="role-card-title">Product Owner / Product Manager</div>
+        <div class="role-card-vibe">The voice of the business and the customer.</div>
+        <p>You care about protecting revenue, conversion rates, and the brand's reputation. Less about how the code works, more about the user's experience.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Business impact, customer experience, and how the bug makes the company look.</div>
+      </div>
+
+      <div class="role-card" style="--role-color: var(--role-lead)">
+        <div class="role-card-title">People Leader / Engineering Manager</div>
+        <div class="role-card-vibe">The shield, the translator, and the resource allocator.</div>
+        <p>You protect the engineering team from unnecessary panic, ensure projects are scoped correctly, and make sure the right people work on the right things.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Team capacity, project prioritization, and shielding engineers so they can actually focus on debugging.</div>
+      </div>
+
+      <div class="role-card" style="--role-color: var(--role-qa)">
+        <div class="role-card-title">QA Tester</div>
+        <div class="role-card-vibe">The gatekeeper of quality and the customer advocate.</div>
+        <p>You create comprehensive test plans, identify edge cases, and ensure that the bug slips through to production are caught. You validate new features and regressions.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Identifying edge cases, ensuring the fix doesn't create new bugs, and validating from the user's perspective.</div>
+      </div>
+
+      <div class="role-card" style="--role-color: var(--role-director)">
+        <div class="role-card-title">Leadership / Director</div>
+        <div class="role-card-vibe">The big picture and the bottom line.</div>
+        <p>Strategic impact, brand reputation, and timeline. Highly detached from technical details but focused on blast radius. You need answers fast.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Revenue impact, brand risk, and high-level status updates for stakeholders.</div>
+      </div>
+
+      <div class="role-card" style="--role-color: var(--role-support)">
+        <div class="role-card-title">Customer Support (Optional)</div>
+        <div class="role-card-vibe">The frontline voice, calming the waters.</div>
+        <p>Not typically in the War Room during a launch — but once the product is in production, you're the one fielding the issues customers report. You collect the details engineering needs, spot patterns across tickets, and keep shoppers informed while a fix is on its way.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Triaging incoming customer-reported issues, surfacing patterns to engineering, and keeping affected customers informed while a fix lands.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Severity Guide -->
+  <section id="severity">
+    <div class="section-label">Triage &amp; Prioritize</div>
+    <h2>Bug Severity Levels</h2>
+    <p class="lead">Not every bug is created equal. Use these severity levels to decide which bugs to tackle first as a team.</p>
+
+    <h3 style="font-size: 1rem; margin-top: 1.75rem;">Priority × Effort — the quick-triage matrix</h3>
+    <p style="font-size: 0.92rem; color: var(--text-secondary); margin-top: 0.25rem;">Once every ticket has a priority (P1 = critical, P3 = cosmetic) and a rough effort estimate, drop it on the grid. Top-left is your <strong>Quick Win</strong> — highest impact, lowest cost. Start there.</p>
+
+    <table class="effort-matrix" aria-label="Priority × Effort matrix">
+      <thead>
+        <tr>
+          <th></th>
+          <th scope="col">Low Effort</th>
+          <th scope="col">Medium Effort</th>
+          <th scope="col">High Effort</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row" class="row-label">P1</th>
+          <td class="quick-win">Quick Win — do first</td>
+          <td>Do now; assign your best debugger</td>
+          <td>Ship a workaround, schedule the real fix</td>
+        </tr>
+        <tr>
+          <th scope="row" class="row-label">P2</th>
+          <td>Slot in this sprint</td>
+          <td>Next sprint</td>
+          <td>Ship a workaround now; split the real fix across sprints</td>
+        </tr>
+        <tr>
+          <th scope="row" class="row-label">P3</th>
+          <td>Batch with the next release</td>
+          <td>Backlog</td>
+          <td>Assign an owner and revisit date</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 1.25rem; padding: 1rem 1.25rem; background: var(--surface); border-radius: 8px; font-size: 0.92rem; color: var(--text-secondary); line-height: 1.55;">
+      <strong style="color: var(--text-primary);">Workaround vs. root-cause fix — pick on purpose.</strong>
+      A workaround shrinks the blast radius today (a feature flag, a hidden button, a "we know" banner). A root-cause fix removes the bug for good but takes longer to land.
+    </div>
+
+    <div class="severity-list">
+      <div class="severity-row">
+        <div class="severity-badge critical">Critical</div>
+        <div class="severity-content">
+          <h3>Blocker — Feature Completely Broken</h3>
+          <p>No workaround exists. Prevents a primary user flow. Causes severe loss of revenue, data loss, security vulnerabilities, or widespread app crashes.</p>
+          <div class="examples"><strong>Example impact:</strong> Users can't check out, the cart total is wrong by orders of magnitude, or the app crashes on load.</div>
+        </div>
+      </div>
+
+      <div class="severity-row">
+        <div class="severity-badge major">Major</div>
+        <div class="severity-content">
+          <h3>Behavioral — Badly Frustrating UX</h3>
+          <p>A workaround exists but causes highly frustrating user experience. Frustrated users can still eventually check out, but something important is clearly wrong.</p>
+          <div class="examples"><strong>Example impact:</strong> The cart doesn't update correctly, a promotional code fails to apply, or a form rejects valid input.</div>
+        </div>
+      </div>
+
+      <div class="severity-row">
+        <div class="severity-badge minor">Minor</div>
+        <div class="severity-content">
+          <h3>Cosmetic — Polish &amp; Alignment</h3>
+          <p>Typographical errors or minor alignment issues with negligible impact. The app functions correctly but looks less polished. Users can still shop without friction.</p>
+          <div class="examples"><strong>Example impact:</strong> A button has the wrong shade of color, a label has a typo, or icons are slightly misaligned.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bug Types -->
+  <section id="bug-types">
+    <div class="section-label">What You'll Encounter</div>
+    <h2>Bug Categories</h2>
+    <p class="lead">The Bug Report contains a variety of issue types. Each requires different debugging tools and approaches.</p>
+
+    <div class="bug-categories">
+      <div class="bug-cat">
+        <div class="bug-cat-icon">🎨</div>
+        <h3>Visual / CSS</h3>
+        <p>Layout breaks, z-index conflicts, pop-ups that won't close, mobile responsiveness issues.</p>
+      </div>
+      <div class="bug-cat">
+        <div class="bug-cat-icon">🔢</div>
+        <h3>Logic &amp; Calculation</h3>
+        <p>Incorrect totals, wrong price references, off-by-one errors, string math instead of number math.</p>
+      </div>
+      <div class="bug-cat">
+        <div class="bug-cat-icon">📋</div>
+        <h3>Form Validation</h3>
+        <p>Overly strict regex, stale state carried between selections, generic error messages that don't help the user.</p>
+      </div>
+      <div class="bug-cat">
+        <div class="bug-cat-icon">🗄️</div>
+        <h3>Database / Data</h3>
+        <p>Incorrect data references, sale prices not honored, data fetching errors.</p>
+      </div>
+      <div class="bug-cat">
+        <div class="bug-cat-icon">🖱️</div>
+        <h3>Interaction &amp; State</h3>
+        <p>Buttons not responding, double-click registering twice, sold-out items silently added to cart.</p>
+      </div>
+      <div class="bug-cat">
+        <div class="bug-cat-icon">📱</div>
+        <h3>Device-Specific</h3>
+        <p>Touch targets too small on mobile, scroll bugs on iOS, viewport-specific rendering issues.</p>
+      </div>
+    </div>
+  </section>
+  <!-- Bug Report (the primary bug list) -->
+  <section id="bug-list">
+    <div class="section-label">The Bug Report</div>
+    <h2>Reported Bugs</h2>
+    <p class="lead">Each ticket was filed by a different role — some brief, some deeply technical. Part of your job is to weigh what's said, what's missing, and what the reporter's perspective is telling you. Filter by bug type or reporter, and follow the solution link once your team has attempted a fix.</p>
+
+  <div class="bug-guide-filter-row">
+    <span class="bug-guide-filter-label">Type</span>
+    <div class="bug-guide-filters" role="group" aria-label="Filter bugs by type">
+      <button class="bug-guide-filter active" data-group="type" data-filter="all" type="button">All</button>
+      <button class="bug-guide-filter" data-group="type" data-filter="css" type="button">CSS</button>
+      <button class="bug-guide-filter" data-group="type" data-filter="device" type="button">Device-Specific</button>
+      <button class="bug-guide-filter" data-group="type" data-filter="interaction" type="button">Interaction</button>
+      <button class="bug-guide-filter" data-group="type" data-filter="form" type="button">Form Validation</button>
+      <button class="bug-guide-filter" data-group="type" data-filter="search" type="button">Search</button>
+      <button class="bug-guide-filter" data-group="type" data-filter="data" type="button">Data</button>
+    </div>
+  </div>
+
+  <div class="bug-guide-filter-row">
+    <span class="bug-guide-filter-label">Reported by</span>
+    <div class="bug-guide-filters" role="group" aria-label="Filter bugs by reporter">
+      <button class="bug-guide-filter active" data-group="reporter" data-filter="all" type="button">All</button>
+      <button class="bug-guide-filter" data-group="reporter" data-filter="dev" type="button">Engineer</button>
+      <button class="bug-guide-filter" data-group="reporter" data-filter="qa" type="button">QA</button>
+      <button class="bug-guide-filter" data-group="reporter" data-filter="pm" type="button">Product Manager</button>
+      <button class="bug-guide-filter" data-group="reporter" data-filter="support" type="button">Customer Support</button>
+      <button class="bug-guide-filter" data-group="reporter" data-filter="director" type="button">Director</button>
+    </div>
+  </div>
+
+  <div class="bug-guide-empty" id="bug-guide-empty">No bugs match this filter.</div>
+
+  <div class="bug-guide-cards" id="bug-guide-cards">
+
+    <div class="bug-guide-card" id="welcome-offer-mobile" data-types="css device" data-reporter="qa" style="--bug-guide-color: var(--role-qa); --bug-guide-bg: rgba(14, 165, 160, 0.12);">
+      <div class="bug-guide-card-header">
+        <div class="bug-guide-card-type">CSS Bug</div>
+        <div class="bug-guide-card-type severity">Device-Specific</div>
+      </div>
+      <h3>Welcome offer cannot be dismissed on mobile</h3>
+      <div class="reporter-line" style="--reporter-color: var(--role-qa);"><span class="reporter-dot"></span>Reported by <strong>QA Tester</strong></div>
+      <p class="bug-guide-card-symptom">A shopper sees the "Take 10% off your first order" offer but cannot dismiss it on a phone.</p>
+      <div class="bug-guide-sub">Reproduction Steps</div>
+      <ol>
+        <li>Open the home page in a narrow viewport (or use a mobile device).</li>
+        <li>Refresh the page so the welcome offer and cookie notice are visible.</li>
+        <li>The close (x) button is not visible in the mobile viewport, but is visible on larger screens.</li>
+        <li>Notice that start shopping button may also be overlapped by the cookie notice.</li>
+        <li>This causes users to need to dismiss the cookie notice first before they can interact with the welcome offer.</li>
+      </ol>
+      <div class="bug-guide-sub">Comparison Case</div>
+      <ol>
+        <li>Open or resize the same page to a viewport wider than 768px.</li>
+        <li>Refresh the page.</li>
+        <li>Click the × in the welcome offer.</li>
+        <li>Observe that the offer closes normally.</li>
+      </ol>
+      <div class="bug-guide-sub">Acceptance Criteria</div>
+      <ol>
+        <li>The close (×) control is visible above the cookie notice on all supported mobile widths — not just tappable, but rendered without any part hidden.</li>
+        <li>The "Start shopping" call-to-action is fully visible and fully tappable, with no portion covered by the cookie notice.</li>
+        <li>The cookie notice remains fully visible and functional after the fix.</li>
+        <li>Behavior on viewports wider than 768px is unchanged.</li>
+      </ol>
+      <div class="workshop-prompt">
+        <strong>Your mission:</strong> Investigate why the visible close control does not receive mobile taps, and propose a fix that preserves the cookie notice and makes the close control easy to tap.
+      </div>
+      <div class="bug-guide-card-footer">
+        <a class="solution-link" href="solutions.html#welcome-offer-mobile">View solution →</a>
+      </div>
+    </div>
+
+    <div class="bug-guide-card" id="duplicate-order-placed" data-types="interaction" data-reporter="support" style="--bug-guide-color: var(--role-support); --bug-guide-bg: rgba(217, 119, 6, 0.12);">
+      <div class="bug-guide-card-header">
+        <div class="bug-guide-card-type">Interaction Bug</div>
+      </div>
+      <h3>"Charged twice for the same order?"</h3>
+      <div class="reporter-line" style="--reporter-color: var(--role-support);"><span class="reporter-dot"></span>Reported by <strong>Customer Support</strong></div>
+      <p class="bug-guide-card-symptom">Getting a wave of complaints from customers saying they placed a single order but were charged twice. A couple of them mentioned they "clicked the button twice because nothing happened the first time." Not sure if that's related — passing it to engineering to look at.</p>
+      <div class="workshop-prompt">
+        <strong>Your mission:</strong> Reproduce the duplicate charge yourself, trace the checkout submit flow, and propose a fix that prevents a second checkout request from firing while the first one is still processing.
+      </div>
+      <div class="bug-guide-card-footer">
+        <a class="solution-link" href="solutions.html#duplicate-order-placed">View solution →</a>
+      </div>
+    </div>
+
+    <div class="bug-guide-card" id="generic-error" data-types="form" data-reporter="pm" style="--bug-guide-color: var(--role-pm); --bug-guide-bg: rgba(224, 64, 160, 0.12);">
+      <div class="bug-guide-card-header">
+        <div class="bug-guide-card-type">Form Validation Bug</div>
+      </div>
+      <h3>Checkout error message is unhelpful — hurting conversion</h3>
+      <div class="reporter-line" style="--reporter-color: var(--role-pm);"><span class="reporter-dot"></span>Reported by <strong>Product Manager</strong></div>
+      <p class="bug-guide-card-symptom">When a shopper submits checkout with a missing or invalid field, they get one generic "Please fill in all fields" message with no indication of <em>which</em> field is the problem. Session replays show people re-checking every input in frustration; funnel data shows abandonment spikes at this step. Fixing this should be a straightforward conversion win.</p>
+      <div class="bug-guide-sub">What good looks like</div>
+      <ul>
+        <li>Each invalid field is called out inline, with a message that names the field and what's expected.</li>
+        <li>Valid fields don't get flagged as errors.</li>
+        <li>Successful submissions behave exactly as they do today.</li>
+      </ul>
+      <div class="workshop-prompt">
+        <strong>Your mission:</strong> Trace the current validation flow, then propose a fix that surfaces field-level errors so users know exactly what to fix.
+      </div>
+      <div class="bug-guide-card-footer">
+        <a class="solution-link" href="solutions.html#generic-error">View solution →</a>
+      </div>
+    </div>
+
+    <div class="bug-guide-card" id="international-postal-code" data-types="form" data-reporter="director" style="--bug-guide-color: var(--role-director); --bug-guide-bg: rgba(147, 51, 234, 0.12);">
+      <div class="bug-guide-card-header">
+        <div class="bug-guide-card-type">Form Validation Bug</div>
+      </div>
+      <h3>International customers can't check out</h3>
+      <div class="reporter-line" style="--reporter-color: var(--role-director);"><span class="reporter-dot"></span>Reported by <strong>Director</strong></div>
+      <p class="bug-guide-card-symptom">Sales flagged this — orders from non-US customers aren't going through. Canada, UK, and Japan all seeing it. Would like a triage plan by end of day: whether this is a same-day fix or something that needs a temporary workaround while a proper fix ships.</p>
+      <div class="workshop-prompt">
+        <strong>Your mission:</strong> Confirm the problem is real, then decide how to treat it — immediate fix, temporary workaround, or defer. If your answer isn't "fix it now, top priority," be ready to explain the reasoning.
+      </div>
+      <div class="bug-guide-card-footer">
+        <a class="solution-link" href="solutions.html#international-postal-code">View solution →</a>
+      </div>
+    </div>
+
+    <div class="bug-guide-card" id="stale-state" data-types="form" data-reporter="qa" style="--bug-guide-color: var(--role-qa); --bug-guide-bg: rgba(14, 165, 160, 0.12);">
+      <div class="bug-guide-card-header">
+        <div class="bug-guide-card-type">Form Validation Bug</div>
+      </div>
+      <h3>State/Province selection carries over when the country changes</h3>
+      <div class="reporter-line" style="--reporter-color: var(--role-qa);"><span class="reporter-dot"></span>Reported by <strong>QA Tester</strong></div>
+      <p class="bug-guide-card-symptom">A shopper changes the selected country in the checkout form, but a previously chosen state or province value silently carries over — so the form submits with a state that doesn't belong to the new country.</p>
+      <div class="bug-guide-sub">Reproduction Steps</div>
+      <ol>
+        <li>Add any item to the cart and navigate to the checkout page.</li>
+        <li>Select <strong>United States</strong> as the country and pick a state (e.g., <strong>California</strong>).</li>
+        <li>Change the country to a different one (e.g., <strong>Germany</strong> or <strong>United Kingdom</strong>).</li>
+        <li>Fill in the remaining fields and submit — or inspect the form data.</li>
+        <li>Observe that the state field still holds the previously chosen value ("CA") even though it makes no sense for the new country.</li>
+      </ol>
+      <div class="bug-guide-sub">Comparison Case</div>
+      <ol>
+        <li>Reload the page and pick a country only once before submitting.</li>
+        <li>Observe that the state value corresponds correctly to the selected country.</li>
+      </ol>
+      <div class="bug-guide-sub">Acceptance Criteria</div>
+      <ol>
+        <li>Changing the country clears any previously selected state/province value.</li>
+        <li>The state field re-renders correctly (select vs. free-text input) based on the new country's regions.</li>
+        <li>The required-field check catches the empty state after a country change instead of allowing a stale value to slip through.</li>
+        <li>No regressions to the initial country selection flow.</li>
+      </ol>
+      <div class="workshop-prompt">
+        <strong>Your mission:</strong> Investigate what happens to form state when the country changes, and propose a fix that resets the state whenever the country selection changes.
+      </div>
+      <div class="bug-guide-card-footer">
+        <a class="solution-link" href="solutions.html#stale-state">View solution →</a>
+      </div>
+    </div>
+
+    <div class="bug-guide-card" id="sold-out-feedback" data-types="interaction" data-reporter="support" style="--bug-guide-color: var(--role-support); --bug-guide-bg: rgba(217, 119, 6, 0.12);">
+      <div class="bug-guide-card-header">
+        <div class="bug-guide-card-type">Interaction Bug</div>
+      </div>
+      <h3>"The Add to Cart button is broken on some plants"</h3>
+      <div class="reporter-line" style="--reporter-color: var(--role-support);"><span class="reporter-dot"></span>Reported by <strong>Customer Support</strong></div>
+      <p class="bug-guide-card-symptom">Customers keep messaging in convinced the "Add to Cart" button is broken on certain products — they click it and nothing happens. When I look at those products they're actually sold out, but that's not obvious to shoppers. Can we make it more obvious? People shouldn't have to contact us to figure out that a plant is out of stock.</p>
+      <div class="workshop-prompt">
+        <strong>Your mission:</strong> The reporter has told you what shoppers <em>think</em> is happening; work out what's actually happening in the UI, then propose a fix that makes the sold-out state obvious without breaking normal Add to Cart behavior on in-stock items.
+      </div>
+      <div class="bug-guide-card-footer">
+        <a class="solution-link" href="solutions.html#sold-out-feedback">View solution →</a>
+      </div>
+    </div>
+
+    <div class="bug-guide-card" id="broken-image" data-types="data" data-reporter="pm" style="--bug-guide-color: var(--role-pm); --bug-guide-bg: rgba(224, 64, 160, 0.12);">
+      <div class="bug-guide-card-header">
+        <div class="bug-guide-card-type">Data Bug</div>
+      </div>
+      <h3>One of the product cards has a missing image</h3>
+      <div class="reporter-line" style="--reporter-color: var(--role-pm);"><span class="reporter-dot"></span>Reported by <strong>Product Manager</strong></div>
+      <p class="bug-guide-card-symptom">One of the product cards on the plant listing is showing a broken image — the rest of the card looks fine but there's no photo. Looks bad for something a shopper sees first. Low priority relative to the checkout issues, but let's not ship the release with a broken image visible on the homepage.</p>
+      <div class="workshop-prompt">
+        <strong>Your mission:</strong> Find the affected product, trace the bad URL back to where the data comes from, and propose a fix that both restores the image and hardens the UI against a future broken URL slipping through.
+      </div>
+      <div class="bug-guide-card-footer">
+        <a class="solution-link" href="solutions.html#broken-image">View solution →</a>
+      </div>
+    </div>
+
+    <div class="bug-guide-card" id="dialog-bug" data-reporter="pm" data-types="interaction css">
+      <div class="bug-guide-card-header">
+        <div class="bug-guide-card-type">Interaction Bug</div>
+        <div class="bug-guide-card-type severity">CSS</div>
+      </div>
+      <h3>Clear Cart dialog locks the page</h3>
+      <div class="reporter-line" style="--reporter-color: var(--role-pm);"><span class="reporter-dot"></span>Reported by <strong>Product Manager</strong></div>
+      <p class="bug-guide-card-symptom">After dismissing the Clear Cart dialog, customers are unable to click anything on the site and are forced to refresh the page to continue shopping.</p>
+      <div class="bug-guide-sub">Reproduction Steps</div>
+      <ol>
+        <li>Add an item to the cart to open the cart modal.</li>
+        <li>Click <strong>Clear Cart</strong> to open the confirmation prompt.</li>
+        <li>Click <strong>Keep Items</strong> or <strong>Clear Cart</strong> to close the prompt.</li>
+        <li>If you try to click any product or navigation link on the page, it has no effect.</li>
+      </ol>
+      <div class="bug-guide-sub">Acceptance Criteria</div>
+      <ol>
+        <li>Confirming "Clear Cart" successfully empties all items from the cart.</li>
+        <li>Closing or confirming the dialog leaves the page fully clickable so customers can keep browsing without refreshing.</li>
+      </ol>
+      <div class="workshop-prompt">
+        <strong>Your mission:</strong> Reproduce the issue by interacting with the confirmation dialog and restore normal page interaction.
+      </div>
+      <div class="bug-guide-card-footer">
+        <a class="solution-link" href="solutions.html#dialog-bug">View solution →</a>
+      </div>
+    </div>
+
+    <div class="bug-guide-card" id="promo-duplicate" data-types="data" data-reporter="qa" style="--bug-guide-color: var(--role-qa); --bug-guide-bg: rgba(14, 165, 160, 0.12);">
+      <div class="bug-guide-card-header">
+        <div class="bug-guide-card-type">Data Bug</div>
+      </div>
+      <h3>Same promo code can be applied multiple times</h3>
+      <div class="reporter-line" style="--reporter-color: var(--role-qa);"><span class="reporter-dot"></span>Reported by <strong>QA Tester</strong></div>
+      <p class="bug-guide-card-symptom">A shopper can apply the same promo code repeatedly and receive the discount more than once, driving the cart total down with each duplicate application.</p>
+      <div class="bug-guide-sub">Reproduction Steps</div>
+      <ol>
+        <li>Add at least one product to the cart and navigate to the cart page (<code>/cart</code>).</li>
+        <li>Enter a valid promo code (for example <code>GHC2026</code> or <code>WELCOME10</code>) and click <strong>Apply</strong>.</li>
+        <li>The coupon appears in the applied list and the discount is reflected in the total.</li>
+        <li>Without reloading, enter the same promo code again and click <strong>Apply</strong>.</li>
+        <li>Now, the same coupon is listed again (and the discount total increases).</li>
+      </ol>
+      <div class="bug-guide-sub">Acceptance Criteria</div>
+      <ol>
+        <li>The same promo code cannot be applied more than once per cart session.</li>
+        <li>A second attempt shows clear feedback (e.g., "This promo code is already applied.").</li>
+        <li><code>discountTotal</code> reflects each distinct coupon at most once.</li>
+      </ol>
+      <div class="workshop-prompt">
+        <strong>Your mission:</strong> Reproduce the duplicate-apply behavior, inspect how applied coupons are tracked across page loads, and propose a fix that prevents stacking the same code multiple times.
+      </div>
+      <div class="bug-guide-card-footer">
+        <a class="solution-link" href="solutions.html#promo-duplicate">View solution →</a>
+      </div>
+    </div>
+
+    <div class="bug-guide-card" id="sale-price-not-honored" data-types="data" data-reporter="qa" style="--bug-guide-color: var(--role-qa); --bug-guide-bg: rgba(14, 165, 160, 0.12);">
+      <div class="bug-guide-card-header">
+        <div class="bug-guide-card-type">Data Bug</div>
+      </div>
+      <h3>Cart and checkout totals ignore the sale price</h3>
+      <div class="reporter-line" style="--reporter-color: var(--role-qa);"><span class="reporter-dot"></span>Reported by <strong>QA Tester</strong></div>
+      <p class="bug-guide-card-symptom">A shopper adds an item marked "On Sale" to their cart. The line-item price in the cart matches the sale price shown on the product card, but the cart Subtotal and Total — and the checkout Order Summary and <strong>Place Order</strong> button — are calculated from the higher crossed-out price instead of the sale price.</p>
+      <div class="bug-guide-sub">Reproduction Steps</div>
+      <ol>
+        <li>In the header, click <strong>Sale</strong> (or on the shop page, sort by <strong>On Sale</strong>) and pick any product showing a "Sale" badge with a strikethrough original price.</li>
+        <li>Click <strong>Add to Cart</strong>. The cart modal opens automatically.</li>
+        <li>In the modal, compare the line-item price against the modal's <strong>Total</strong> — the total is higher than the line-item price times quantity.</li>
+        <li>Click <strong>View Cart &amp; Checkout</strong>. On the cart page, the line item shows the sale price, but the <strong>Subtotal</strong> and <strong>Total</strong> use the original (pre-sale) price.</li>
+        <li>Click <strong>Proceed to Checkout</strong>. The Order Summary and the <strong>Place Order</strong> button both show the inflated total.</li>
+      </ol>
+      <div class="bug-guide-sub">Comparison Case</div>
+      <ol>
+        <li>Add a product <em>without</em> a "Sale" badge to the cart.</li>
+        <li>Observe that the line-item price, the modal total, the cart Subtotal, and the checkout total all agree.</li>
+      </ol>
+      <div class="bug-guide-sub">Acceptance Criteria</div>
+      <ol>
+        <li>Cart-modal total, cart-page Subtotal and Total, and checkout Order Summary all reflect the <em>sale</em> price for items on sale.</li>
+        <li>Per-line item totals in the cart page and checkout Order Summary agree with the summary Subtotal.</li>
+        <li>The <strong>Place Order</strong> button shows the same total as the Order Summary.</li>
+        <li>Non-sale items (no <code>compare_at_price</code>) are unaffected.</li>
+        <li>A percentage-based promo code applied on top of a sale item discounts against the sale price, not the crossed-out price.</li>
+      </ol>
+      <div class="workshop-prompt">
+        <strong>Your mission:</strong> Reproduce the mismatch between the line-item price and the summary total, trace how the cart's subtotal is computed, and propose a fix that honors the sale price consistently across the modal, cart, and checkout — without regressing non-sale items.
+      </div>
+      <div class="bug-guide-card-footer">
+        <a class="solution-link" href="solutions.html#sale-price-not-honored">View solution →</a>
+      </div>
+    </div>
+
+    <div class="bug-guide-card" id="stale-search" data-types="search" data-reporter="dev" style="--bug-guide-color: var(--role-dev); --bug-guide-bg: rgba(123, 47, 190, 0.12);">
+      <div class="bug-guide-card-header">
+        <div class="bug-guide-card-type">Search Bug</div>
+      </div>
+      <h3>Stale search results</h3>
+      <div class="reporter-line" style="--reporter-color: var(--role-dev);"><span class="reporter-dot"></span>Reported by <strong>Software Engineer</strong></div>
+      <p class="bug-guide-card-symptom">As a shopper types in the header search, earlier suggestions can appear after newer ones, so the list does not always match the current query. Only shows up under network latency.</p>
+      <figure class="bug-guide-repro">
+        <img src="stale-search-repro1.gif" alt="Header search suggestions showing results for an earlier query after the search text changes">
+        <figcaption>Reproduced using DevTools with throttled network profile: stale suggestions can replace results for the current query.</figcaption>
+      </figure>
+      <div class="bug-guide-sub">Reproduction Steps</div>
+      <ol>
+        <li>Open the app and, in browser DevTools, enable a throttled network profile such as <strong>Fast 3G</strong>.</li>
+        <li>In the header search box, quickly type a short query and then extend or replace it — for example type <code>mon</code> and then highlight it to replace it with <code>snake</code>.</li>
+        <li>Repeat with a few different search terms if needed.</li>
+        <li>Observe that the suggestions may display results for an earlier query instead of the text currently in the input.</li>
+      </ol>
+      <div class="bug-guide-sub">Comparison Case</div>
+      <ol>
+        <li>Open the app on a normal network profile or with a stable connection.</li>
+        <li>Type a new query in the header search box.</li>
+        <li>Watch the suggestions update as each character is entered.</li>
+        <li>Observe that the visible suggestions remain consistent with the latest text and do not lag behind the current query.</li>
+      </ol>
+      <div class="bug-guide-sub">Acceptance Criteria</div>
+      <ol>
+        <li>Header-search suggestions always correspond to the text currently in the input, regardless of request order or network latency.</li>
+        <li>Responses from stale (superseded) requests are discarded and never overwrite newer results.</li>
+        <li>Behavior is verified under a throttled network profile (e.g., Fast 3G) with rapid typing.</li>
+        <li>No new console errors or unhandled promise rejections introduced by the fix.</li>
+      </ol>
+      <div class="workshop-prompt">
+        <strong>Your mission:</strong> Investigate why earlier request responses can overwrite newer suggestions, and propose a fix that ensures the visible results always correspond to the latest search text, regardless of request timing.
+      </div>
+      <div class="bug-guide-card-footer">
+        <a class="solution-link" href="solutions.html#stale-search">View solution →</a>
+      </div>
+    </div>
+
+  </div>
+  </section>
+
+
+</div>
+
+<script>
+  (function () {
+    const filters = document.querySelectorAll('.bug-guide-filter');
+    const cards = document.querySelectorAll('#bug-guide-cards .bug-guide-card');
+    const empty = document.getElementById('bug-guide-empty');
+    const state = { type: 'all', reporter: 'all' };
+    function apply() {
+      let visible = 0;
+      cards.forEach((card) => {
+        const types = (card.dataset.types || '').split(/\s+/);
+        const reporter = card.dataset.reporter || '';
+        const typeMatch = state.type === 'all' || types.includes(state.type);
+        const repMatch = state.reporter === 'all' || reporter === state.reporter;
+        const show = typeMatch && repMatch;
+        card.classList.toggle('hidden', !show);
+        if (show) visible++;
+      });
+      empty.classList.toggle('show', visible === 0);
+    }
+    filters.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const group = btn.dataset.group;
+        state[group] = btn.dataset.filter;
+        filters.forEach((b) => {
+          if (b.dataset.group === group) b.classList.toggle('active', b === btn);
+        });
+        apply();
+      });
+    });
+  })();
+</script>
