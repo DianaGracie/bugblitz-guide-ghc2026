@@ -18,35 +18,99 @@
     --role-dev: #7B2FBE; --role-pm: #E040A0; --role-lead: #2563EB;
     --role-qa: #0EA5A0; --role-director: #9333EA; --role-support: #D97706;
     --code-bg: #F5F0FA;
+    --code-accent: #6B21A8;
+    --cat-css: #7B2FBE;
+    --cat-css-bg: #F0E6FF;
+
+    --cat-device: #02a0c7;
+    --cat-device-bg: #e9fafa;
+
+    --cat-interaction: #E8960C;
+    --cat-interaction-bg: #FFF8E6;
+
+    --cat-form: #DC3545;
+    --cat-form-bg: #FFF0F1;
+
+    --cat-search: #253EEB;
+    --cat-search-bg: #EFF6FF;
+
+    --cat-data: #059669;
+    --cat-data-bg: #ECFDF5;
+
+    --cat-tag-border: rgba(255, 255, 255, 0.12);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --ground: #0D0815; --surface: #1A1230; --text-primary: #F0E6FF;
-      --text-secondary: #C4B5D8; --text-muted: #8A7A9E;
+      --text-secondary: #ebe3f6; --text-muted: #8A7A9E;
       --accent: #A855F7; --accent-bright: #F472B6; --accent-glow: rgba(168, 85, 247, 0.15);
       --border: #2D2050; --border-light: #251A40;
       --card-bg: #161028; --card-shadow: rgba(0, 0, 0, 0.3);
       --nav-bg: rgba(13, 8, 21, 0.92);
       --severity-critical-bg: #2A0A10; --severity-major-bg: #2A1E05; --severity-minor-bg: #0A2220;
-      --code-bg: #1A1230;
+      --code-bg: #1A1230; 
+      --code-accent: #C084FC;
+      --cat-css: #E9D5FF;
+      --cat-css-bg: rgba(216, 180, 254, 0.12);
+
+      --cat-device: #BAE6FD;
+      --cat-device-bg: rgba(125, 211, 252, 0.12);
+
+      --cat-interaction: #ffefb0;
+      --cat-interaction-bg: rgba(252, 211, 77, 0.12);
+
+      --cat-form: #FECACA;
+      --cat-form-bg: rgba(252, 165, 165, 0.12);
+
+      --cat-search: #BFDBFE;
+      --cat-search-bg: rgba(147, 197, 253, 0.12);
+
+      --cat-data: #A7F3D0;
+      --cat-data-bg: rgba(110, 231, 183, 0.12);
     }
   }
   :root[data-theme="dark"] {
     --ground: #0D0815; --surface: #1A1230; --text-primary: #F0E6FF;
-    --text-secondary: #C4B5D8; --text-muted: #8A7A9E;
+    --text-secondary: #ebe3f6; --text-muted: #8A7A9E;
     --accent: #A855F7; --accent-bright: #F472B6; --accent-glow: rgba(168, 85, 247, 0.15);
     --border: #2D2050; --border-light: #251A40;
     --card-bg: #161028; --card-shadow: rgba(0, 0, 0, 0.3);
     --nav-bg: rgba(13, 8, 21, 0.92);
     --severity-critical-bg: #2A0A10; --severity-major-bg: #2A1E05; --severity-minor-bg: #0A2220;
     --code-bg: #1A1230;
-  }
+    --cat-device: #BAE6FD;
+    --cat-device-bg: rgba(125, 211, 252, 0.12);
+
+    --cat-interaction: #ffefb0;
+    --cat-interaction-bg: rgba(252, 211, 77, 0.12);
+
+    --cat-form: #FECACA;
+    --cat-form-bg: rgba(252, 165, 165, 0.12);
+
+    --cat-search: #BFDBFE;
+    --cat-search-bg: rgba(147, 197, 253, 0.12);
+
+    --cat-data: #A7F3D0;
+    --cat-data-bg: rgba(110, 231, 183, 0.12);
+    }
   html { scroll-behavior: smooth; }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   .bug-guide-card[id] { scroll-margin-top: 1rem; }
   body { background: var(--ground); color: var(--text-primary); font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.7; -webkit-font-smoothing: antialiased; }
-  a { color: var(--accent); }
-  code { font-family: var(--font-mono); font-size: 0.85em; background: var(--code-bg); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+  /* Base link styling with higher contrast and clear focus/hover indicators */
+  a {
+    color: var(--primary-dark, var(--accent));
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  a:hover, 
+  a:focus-visible {
+    color: var(--accent-bright);
+    text-decoration: none;
+  }
+  code { font-family: var(--font-mono); font-size: 0.85em; background: var(--code-bg); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent-code); }
   .content { max-width: 64rem; margin: 0 auto; padding: 0 1.5rem 4rem; }
   .masthead { padding: 3rem 1.5rem 2rem; text-align: center; border-bottom: 1px solid var(--border-light); }
   .masthead-eyebrow { font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
@@ -57,6 +121,15 @@
   .masthead-nav a:hover, .masthead-nav a[aria-current="page"] { color: var(--accent); border-color: var(--accent); }
   h2 { font-family: var(--font-display); font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; }
   .lead { font-size: 1.125rem; color: var(--text-secondary); max-width: 48rem; margin: 2rem 0 0.5rem; }
+
+  /* ── Table of contents ── */
+  .toc { margin: 2rem 0 1rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 8px; box-shadow: 0 1px 3px var(--card-shadow); }
+  .toc h2 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+  .toc ol { padding-left: 1.5rem; margin: 0; }
+  .toc li { font-size: 0.95rem; color: var(--text-secondary); padding: 0.35rem 0; display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+  .toc a { text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc-tag { font-family: var(--font-display); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.15rem 0.5rem; border-radius: 4px; background: var(--surface); color: var(--accent); white-space: nowrap; }
 
   .bug-guide-filter-row { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap; }
   .bug-guide-filter-row:first-of-type { margin-top: 1.25rem; }
@@ -86,11 +159,57 @@
   .bug-guide-sub:first-of-type { margin-top: 0; }
   .bug-guide-card ol { padding-left: 1.25rem; margin: 0; }
   .bug-guide-card ol li { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; padding: 0.1rem 0; }
-  .bug-guide-card .workshop-prompt { margin-top: 1rem; padding: 0.75rem 1rem; background: var(--accent-glow); border-radius: 6px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+  .bug-guide-card .workshop-prompt {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--accent-glow);
+    border-left: 3px solid var(--accent); /* Adds a subtle structural accent line */
+    border-radius: 0 6px 6px 0;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
   .bug-guide-card .workshop-prompt strong { color: var(--accent); }
   .bug-guide-card-footer { display: flex; justify-content: flex-end; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-light); }
   .solution-link { font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent); border-radius: 100px; transition: all 0.15s; }
   .solution-link:hover { background: var(--accent); color: #fff; }
+
+  /* Dark Mode Overrides for softer contrast */
+  :root[data-theme="dark"] .bug-guide-card .workshop-prompt {
+    background: rgba(168, 85, 247, 0.07); /* Dimmed glow from 0.15 to 0.07 opacity */
+    border-left-color: var(--accent-link, var(--accent));
+    color: var(--text-secondary); /* Keeps prompt text soft (#C4B5D8) */
+  }
+
+  :root[data-theme="dark"] .bug-guide-card .workshop-prompt strong {
+    color: var(--accent-link, #D8B4FE); /* Ensures the bold key text uses high-contrast lavender */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .bug-guide-card .workshop-prompt {
+      background: rgba(168, 85, 247, 0.07);
+      border-left-color: var(--accent-link, var(--accent));
+      color: var(--text-secondary);
+    }
+
+    :root:not([data-theme="light"]) .bug-guide-card .workshop-prompt strong {
+      color: var(--accent-link, #D8B4FE);
+    }
+  }
+  :root[data-theme="dark"] .solution-link {
+    color: var(--text-muted); /* Soft gray-purple (#8A7A9E) */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .solution-link {
+      color: var(--text-muted);
+    }
+
+    :root:not([data-theme="light"]) .solution-link:hover {
+      background: rgba(191, 125, 253, 0.436);
+
+    }
+  }
 
   @media (max-width: 600px) {
     .masthead { padding: 2rem 1rem 1.5rem; }
@@ -145,6 +264,76 @@
   .bug-cat-icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
   .bug-cat h3 { font-size: 0.95rem; text-align: center; margin-bottom: 0.35rem; }
   .bug-cat p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+  .bug-guide-card-type.cat-css,
+  .toc-tag.cat-css {
+    background: var(--cat-css-bg);
+    color: var(--cat-css);
+  }
+
+  .bug-guide-card-type.cat-device,
+  .toc-tag.cat-device {
+    background: var(--cat-device-bg);
+    color: var(--cat-device);
+  }
+
+  .bug-guide-card-type.cat-interaction,
+  .toc-tag.cat-interaction {
+    background: var(--cat-interaction-bg);
+    color: var(--cat-interaction);
+  }
+
+  .bug-guide-card-type.cat-form,
+  .toc-tag.cat-form {
+    background: var(--cat-form-bg);
+    color: var(--cat-form);
+  }
+
+  .bug-guide-card-type.cat-search,
+  .toc-tag.cat-search {
+    background: var(--cat-search-bg);
+    color: var(--cat-search);
+  }
+
+  .bug-guide-card-type.cat-data,
+  .toc-tag.cat-data {
+    background: var(--cat-data-bg);
+    color: var(--cat-data);
+  }
+  .bug-guide-card-type,
+  .toc-tag {
+    border: 1px solid var(--cat-tag-border, transparent);
+    transition: border-color 0.15s ease;
+  }
+
+  :root[data-theme="dark"] .bug-guide-card-type,
+  :root[data-theme="dark"] .toc-tag {
+    border-color: color-mix(in srgb, currentColor 30%, transparent);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .bug-guide-card-type,
+    :root:not([data-theme="light"]) .toc-tag {
+      border-color: color-mix(in srgb, currentColor 30%, transparent);
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      /* Use a brighter purple/pink in dark mode for a higher contrast ratio */
+      --accent-link: #D8B4FE; 
+      --text-muted: #A190B8; /* Slightly lighter muted text for better readability */
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --accent-link: #D8B4FE;
+    --text-muted: #A190B8;
+  }
+
+  /* Apply the dark-mode accessible link variable */
+  a {
+    color: var(--accent-link, var(--accent));
+  }
 </style>
 
 <div class="masthead">
@@ -347,6 +536,23 @@
     <h2>Reported Bugs</h2>
     <p class="lead">Each ticket was filed by a different role — some brief, some deeply technical. Part of your job is to weigh what's said, what's missing, and what the reporter's perspective is telling you. Filter by bug type or reporter, and follow the solution link once your team has attempted a fix.</p>
 
+  <nav class="toc" aria-label="Bug report table of contents">
+    <h2>Quick Links</h2>
+    <ol>
+      <li><a href="#welcome-offer-mobile">Welcome offer cannot be dismissed on mobile</a><span class="toc-tag cat-css">CSS</span><span class="toc-tag cat-device">Device-Specific</span></li>
+      <li><a href="#duplicate-order-placed">"Charged twice for the same order?"</a><span class="toc-tag cat-interaction">Interaction</span></li>
+      <li><a href="#generic-error">Checkout error message is unhelpful — hurting conversion</a><span class="toc-tag cat-form">Form Validation</span></li>
+      <li><a href="#international-postal-code">International customers can't check out</a><span class="toc-tag cat-form">Form Validation</span></li>
+      <li><a href="#stale-state">State/Province selection carries over when the country changes</a><span class="toc-tag cat-form">Form Validation</span></li>
+      <li><a href="#sold-out-feedback">"The Add to Cart button is broken on some plants"</a><span class="toc-tag cat-interaction">Interaction</span></li>
+      <li><a href="#broken-image">One of the product cards has a missing image</a><span class="toc-tag cat-data">Data</span></li>
+      <li><a href="#dialog-bug">Clear Cart dialog locks the page</a><span class="toc-tag cat-interaction">Interaction</span><span class="toc-tag cat-css">CSS</span></li>
+      <li><a href="#promo-duplicate">Same promo code can be applied multiple times</a><span class="toc-tag cat-data">Data</span></li>
+      <li><a href="#sale-price-not-honored">Cart and checkout totals ignore the sale price</a><span class="toc-tag cat-data">Data</span></li>
+      <li><a href="#stale-search">Stale search results</a><span class="toc-tag cat-search">Search</span></li>
+    </ol>
+  </nav>
+
   <div class="bug-guide-filter-row">
     <span class="bug-guide-filter-label">Type</span>
     <div class="bug-guide-filters" role="group" aria-label="Filter bugs by type">
@@ -378,8 +584,8 @@
 
     <div class="bug-guide-card" id="welcome-offer-mobile" data-types="css device" data-reporter="qa" style="--bug-guide-color: var(--role-qa); --bug-guide-bg: rgba(14, 165, 160, 0.12);">
       <div class="bug-guide-card-header">
-        <div class="bug-guide-card-type">CSS Bug</div>
-        <div class="bug-guide-card-type severity">Device-Specific</div>
+        <div class="bug-guide-card-type cat-css">CSS Bug</div>
+        <div class="bug-guide-card-type cat-device">Device-Specific</div>
       </div>
       <h3>Welcome offer cannot be dismissed on mobile</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-qa);"><span class="reporter-dot"></span>Reported by <strong>QA Tester</strong></div>
@@ -416,7 +622,7 @@
 
     <div class="bug-guide-card" id="duplicate-order-placed" data-types="interaction" data-reporter="support" style="--bug-guide-color: var(--role-support); --bug-guide-bg: rgba(217, 119, 6, 0.12);">
       <div class="bug-guide-card-header">
-        <div class="bug-guide-card-type">Interaction Bug</div>
+        <div class="bug-guide-card-type cat-interaction">Interaction Bug</div>
       </div>
       <h3>"Charged twice for the same order?"</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-support);"><span class="reporter-dot"></span>Reported by <strong>Customer Support</strong></div>
@@ -431,7 +637,7 @@
 
     <div class="bug-guide-card" id="generic-error" data-types="form" data-reporter="pm" style="--bug-guide-color: var(--role-pm); --bug-guide-bg: rgba(224, 64, 160, 0.12);">
       <div class="bug-guide-card-header">
-        <div class="bug-guide-card-type">Form Validation Bug</div>
+        <div class="bug-guide-card-type cat-form">Form Validation Bug</div>
       </div>
       <h3>Checkout error message is unhelpful — hurting conversion</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-pm);"><span class="reporter-dot"></span>Reported by <strong>Product Manager</strong></div>
@@ -452,7 +658,7 @@
 
     <div class="bug-guide-card" id="international-postal-code" data-types="form" data-reporter="director" style="--bug-guide-color: var(--role-director); --bug-guide-bg: rgba(147, 51, 234, 0.12);">
       <div class="bug-guide-card-header">
-        <div class="bug-guide-card-type">Form Validation Bug</div>
+        <div class="bug-guide-card-type cat-form">Form Validation Bug</div>
       </div>
       <h3>International customers can't check out</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-director);"><span class="reporter-dot"></span>Reported by <strong>Director</strong></div>
@@ -467,7 +673,7 @@
 
     <div class="bug-guide-card" id="stale-state" data-types="form" data-reporter="qa" style="--bug-guide-color: var(--role-qa); --bug-guide-bg: rgba(14, 165, 160, 0.12);">
       <div class="bug-guide-card-header">
-        <div class="bug-guide-card-type">Form Validation Bug</div>
+        <div class="bug-guide-card-type cat-form">Form Validation Bug</div>
       </div>
       <h3>State/Province selection carries over when the country changes</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-qa);"><span class="reporter-dot"></span>Reported by <strong>QA Tester</strong></div>
@@ -502,7 +708,7 @@
 
     <div class="bug-guide-card" id="sold-out-feedback" data-types="interaction" data-reporter="support" style="--bug-guide-color: var(--role-support); --bug-guide-bg: rgba(217, 119, 6, 0.12);">
       <div class="bug-guide-card-header">
-        <div class="bug-guide-card-type">Interaction Bug</div>
+        <div class="bug-guide-card-type cat-interaction">Interaction Bug</div>
       </div>
       <h3>"The Add to Cart button is broken on some plants"</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-support);"><span class="reporter-dot"></span>Reported by <strong>Customer Support</strong></div>
@@ -517,7 +723,7 @@
 
     <div class="bug-guide-card" id="broken-image" data-types="data" data-reporter="pm" style="--bug-guide-color: var(--role-pm); --bug-guide-bg: rgba(224, 64, 160, 0.12);">
       <div class="bug-guide-card-header">
-        <div class="bug-guide-card-type">Data Bug</div>
+        <div class="bug-guide-card-type cat-data">Data Bug</div>
       </div>
       <h3>One of the product cards has a missing image</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-pm);"><span class="reporter-dot"></span>Reported by <strong>Product Manager</strong></div>
@@ -532,8 +738,8 @@
 
     <div class="bug-guide-card" id="dialog-bug" data-reporter="pm" data-types="interaction css">
       <div class="bug-guide-card-header">
-        <div class="bug-guide-card-type">Interaction Bug</div>
-        <div class="bug-guide-card-type severity">CSS</div>
+        <div class="bug-guide-card-type cat-interaction">Interaction Bug</div>
+        <div class="bug-guide-card-type cat-css">CSS Bug</div>
       </div>
       <h3>Clear Cart dialog locks the page</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-pm);"><span class="reporter-dot"></span>Reported by <strong>Product Manager</strong></div>
@@ -560,7 +766,7 @@
 
     <div class="bug-guide-card" id="promo-duplicate" data-types="data" data-reporter="qa" style="--bug-guide-color: var(--role-qa); --bug-guide-bg: rgba(14, 165, 160, 0.12);">
       <div class="bug-guide-card-header">
-        <div class="bug-guide-card-type">Data Bug</div>
+        <div class="bug-guide-card-type cat-data">Data Bug</div>
       </div>
       <h3>Same promo code can be applied multiple times</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-qa);"><span class="reporter-dot"></span>Reported by <strong>QA Tester</strong></div>
@@ -589,7 +795,7 @@
 
     <div class="bug-guide-card" id="sale-price-not-honored" data-types="data" data-reporter="qa" style="--bug-guide-color: var(--role-qa); --bug-guide-bg: rgba(14, 165, 160, 0.12);">
       <div class="bug-guide-card-header">
-        <div class="bug-guide-card-type">Data Bug</div>
+        <div class="bug-guide-card-type cat-data">Data Bug</div>
       </div>
       <h3>Cart and checkout totals ignore the sale price</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-qa);"><span class="reporter-dot"></span>Reported by <strong>QA Tester</strong></div>
@@ -625,7 +831,7 @@
 
     <div class="bug-guide-card" id="stale-search" data-types="search" data-reporter="dev" style="--bug-guide-color: var(--role-dev); --bug-guide-bg: rgba(123, 47, 190, 0.12);">
       <div class="bug-guide-card-header">
-        <div class="bug-guide-card-type">Search Bug</div>
+        <div class="bug-guide-card-type cat-search">Search Bug</div>
       </div>
       <h3>Stale search results</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-dev);"><span class="reporter-dot"></span>Reported by <strong>Software Engineer</strong></div>

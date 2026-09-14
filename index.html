@@ -38,8 +38,11 @@
     --role-qa: #0EA5A0;
     --role-director: #9333EA;
     --role-support: #D97706;
+    --code-accent: #6B21A8;
     --code-bg: #F5F0FA;
     --success: #16A34A;
+    --accent-link: #6D28A9;
+    --accent-text: #7B2FBE;
   }
 
   /* ── Dark palette (system preference, no explicit stamp) ── */
@@ -49,20 +52,34 @@
       --surface: #1A1230;
       --surface-alt: #221845;
       --text-primary: #F0E6FF;
-      --text-secondary: #C4B5D8;
-      --text-muted: #8A7A9E;
+      --text-secondary: #D6CBE5;
+      --text-muted: #A190B8;
       --accent: #A855F7;
       --accent-bright: #F472B6;
       --accent-glow: rgba(168, 85, 247, 0.15);
       --border: #2D2050;
       --border-light: #251A40;
       --card-bg: #161028;
+      --setup-glow: #161028;
       --card-shadow: rgba(0, 0, 0, 0.3);
       --nav-bg: rgba(13, 8, 21, 0.92);
+      --severity-critical: #FF6B7A;
+      --severity-major: #FFB84D;
+      --severity-minor: #38D9D2;
       --severity-critical-bg: #2A0A10;
       --severity-major-bg: #2A1E05;
       --severity-minor-bg: #0A2220;
-      --code-bg: #1A1230;
+      --role-dev: #B77CFF;
+      --role-pm: #FF7BC5;
+      --role-lead: #6EA8FF;
+      --role-qa: #38D9D2;
+      --role-director: #C084FC;
+      --role-support: #FFB454;
+      --code-accent: #C084FC; /* Dark theme */
+      --code-bg: #0a0518c2;
+      --success: #4ADE80;
+      --accent-link: #D8B4FE;
+      --accent-text: #F0E6FF;
     }
   }
 
@@ -72,27 +89,63 @@
     --surface: #1A1230;
     --surface-alt: #221845;
     --text-primary: #F0E6FF;
-    --text-secondary: #C4B5D8;
-    --text-muted: #8A7A9E;
+    --text-secondary: #D6CBE5;
+    --text-muted: #A190B8;
     --accent: #A855F7;
     --accent-bright: #F472B6;
     --accent-glow: rgba(168, 85, 247, 0.15);
     --border: #2D2050;
     --border-light: #251A40;
     --card-bg: #161028;
+    --setup-glow: #161028;
     --card-shadow: rgba(0, 0, 0, 0.3);
     --nav-bg: rgba(13, 8, 21, 0.92);
+    --severity-critical: #FF6B7A;
+    --severity-major: #FFB84D;
+    --severity-minor: #38D9D2;
     --severity-critical-bg: #2A0A10;
     --severity-major-bg: #2A1E05;
     --severity-minor-bg: #0A2220;
-    --code-bg: #1A1230;
+    --role-dev: #B77CFF;
+    --role-pm: #FF7BC5;
+    --role-lead: #6EA8FF;
+    --role-qa: #38D9D2;
+    --role-director: #C084FC;
+    --role-support: #FFB454;
+    --code-accent: #C084FC; /* Dark theme */
+    --code-bg: #0a0518c2;
+    --success: #4ADE80;
+    --accent-link: #D8B4FE;
+    --accent-text: #F0E6FF;
+  }
+
+  /* ── Global link treatment ── */
+  a {
+    color: var(--accent-link, var(--accent));
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
+  }
+
+  a:hover,
+  a:focus-visible {
+    color: var(--accent-bright);
   }
 
   /* ── Reset & base ── */
-  html { scroll-behavior: smooth; }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html {
+    scroll-behavior: smooth;
+  }
 
-  section[id] { scroll-margin-top: 3.5rem; }
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  section[id] {
+    scroll-margin-top: 3.5rem;
+  }
 
   body {
     background: var(--ground);
@@ -292,22 +345,22 @@
     padding: 0 1.5rem;
   }
 
-  html { scroll-behavior: smooth; }
-
   section {
     padding: 3rem 0;
     border-bottom: 1px solid var(--border-light);
-    scroll-margin-top: 4rem;   /* offset for the sticky section-nav */
+    scroll-margin-top: 4rem;
   }
 
-  section:last-child { border-bottom: none; }
+  section:last-child {
+    border-bottom: none;
+  }
 
   .section-label {
     font-family: var(--font-display);
     font-size: 0.7rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--accent-text);
     margin-bottom: 0.5rem;
   }
 
@@ -329,7 +382,9 @@
     margin-bottom: 0.5rem;
   }
 
-  p + p { margin-top: 0.75rem; }
+  p + p {
+    margin-top: 0.75rem;
+  }
 
   .lead {
     font-size: 1.125rem;
@@ -351,7 +406,7 @@
     background: var(--card-bg);
     border: 1px solid var(--border-light);
     border-radius: 8px;
-    padding: 1.25rem 1.25rem 1.25rem 1.25rem;
+    padding: 1.25rem;
     box-shadow: 0 1px 3px var(--card-shadow);
   }
 
@@ -481,10 +536,12 @@
     background: var(--severity-critical-bg);
     color: var(--severity-critical);
   }
+
   .severity-badge.major {
     background: var(--severity-major-bg);
     color: var(--severity-major);
   }
+
   .severity-badge.minor {
     background: var(--severity-minor-bg);
     color: var(--severity-minor);
@@ -589,7 +646,7 @@
     background: var(--code-bg);
     padding: 0.15em 0.4em;
     border-radius: 4px;
-    color: var(--accent);
+    color: var(--code-accent);
   }
 
   /* ── Prompting framework (Brief · Audit · Own) ── */
@@ -944,8 +1001,13 @@
   }
 
   @media (max-width: 640px) {
-    .ai-split { grid-template-columns: 1fr; }
-    .effort-matrix { font-size: 0.8rem; }
+    .ai-split {
+      grid-template-columns: 1fr;
+    }
+
+    .effort-matrix {
+      font-size: 0.8rem;
+    }
   }
 
   /* ── Setup sub-headings ── */
@@ -1010,16 +1072,39 @@
     margin-top: 1.25rem;
   }
 
-  .closing-mantra {
-    font-family: var(--font-display);
-    font-size: 0.75rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent);
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 100px;
+  .closing-mantras {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.closing-mantra {
+  position: relative;
+  padding-left: 1rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.closing-mantra::before {
+  content: "✦";
+  position: absolute;
+  left: 0;
+  color: var(--accent-bright);
+}
+
+@media (max-width: 600px) {
+  .closing-mantras {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
   }
+}
 
   /* ── Bug guide filters ── */
   .bug-guide-filter-row {
@@ -1030,7 +1115,9 @@
     flex-wrap: wrap;
   }
 
-  .bug-guide-filter-row:first-of-type { margin-top: 1.25rem; }
+  .bug-guide-filter-row:first-of-type {
+    margin-top: 1.25rem;
+  }
 
   .bug-guide-filter-label {
     font-family: var(--font-display);
@@ -1085,9 +1172,13 @@
     margin-top: 1rem;
   }
 
-  .bug-guide-empty.show { display: block; }
+  .bug-guide-empty.show {
+    display: block;
+  }
 
-  .bug-guide-card.hidden { display: none; }
+  .bug-guide-card.hidden {
+    display: none;
+  }
 
   /* ── Bug guide cards ── */
   .bug-guide-cards {
@@ -1180,18 +1271,233 @@
     color: var(--accent);
   }
 
+  /* ── Inline form controls ── */
+  .setup-step-content input[type="number"] {
+    color: var(--text-primary);
+    background: var(--card-bg);
+    border-color: var(--border);
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] .setup-step-content input[type="number"] {
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .setup-step-content input[type="number"] {
+      color-scheme: dark;
+    }
+  }
+
+  /* ── Setup formatting ── */
+
+.setup-step-content h4 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0.15rem 0 0.5rem;
+}
+
+.setup-option {
+  margin-top: 1rem;
+  padding: 1rem 1.15rem;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+}
+
+.setup-option + .setup-option {
+  margin-top: 1rem;
+}
+
+.setup-option-label,
+.setup-path-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.table-launcher {
+  margin-top: 0.85rem;
+  padding: 0.85rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.table-launcher-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.table-launcher-row label {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.table-launcher-row input {
+  width: 70px;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.table-launcher-row button {
+  background: var(--accent);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.55rem 1.1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.table-launcher-row button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.table-launcher-alt {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.table-input-error {
+  display: none;
+  color: var(--severity-critical);
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-top: 0.4rem;
+}
+
+.setup-note {
+  margin-top: 0.7rem !important;
+  font-size: 0.84rem !important;
+  color: var(--text-muted) !important;
+  line-height: 1.5 !important;
+}
+
+.setup-path {
+  margin-top: 0.9rem;
+  padding: 0.85rem 1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 7px;
+}
+
+.setup-path p {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.setup-path pre {
+  margin-top: 0.6rem;
+}
+
+.setup-connect {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  background: var(--setup-glow, var(--accent-glow));
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+}
+
+.setup-connect ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.setup-connect li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0.25rem 0;
+}
+
+.setup-callout {
+  margin-top: 0.85rem;
+  padding: 0.75rem 1rem;
+  background: var(--accent-glow);
+  border-left: 3px solid var(--accent-bright);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.setup-callout strong {
+  color: var(--text-primary);
+}
+
+@media (max-width: 600px) {
+  .table-launcher-row {
+    align-items: stretch;
+  }
+
+  .table-launcher-row button {
+    width: 100%;
+  }
+
+  .table-launcher-alt {
+    width: 100%;
+    margin-top: 0.15rem;
+  }
+}
+
   /* ── Responsive ── */
   @media (max-width: 600px) {
-    .masthead { padding: 2rem 1rem 1.5rem; }
-    .masthead-meta { flex-direction: column; gap: 0.5rem; align-items: center; }
-    .severity-row { flex-direction: column; }
-    .severity-badge { width: auto; align-self: flex-start; }
-    .roles-grid { grid-template-columns: 1fr; }
-    .timeline { grid-template-columns: 1fr; }
-    section { padding: 2rem 0; }
-    .content { padding: 0 1rem; }
+    .masthead {
+      padding: 2rem 1rem 1.5rem;
+    }
+
+    .masthead-meta {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .severity-row {
+      flex-direction: column;
+    }
+
+    .severity-badge {
+      width: auto;
+      align-self: flex-start;
+    }
+
+    .roles-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline {
+      grid-template-columns: 1fr;
+    }
+
+    section {
+      padding: 2rem 0;
+    }
+
+    .content {
+      padding: 0 1rem;
+    }
   }
 </style>
+
 <script>
   function launchStackBlitz() {
     const input = document.getElementById('table-input');
@@ -1320,83 +1626,175 @@
     <p class="lead">Launch the app in StackBlitz for a quick-start workspace with no installation required. If you prefer running locally, you can clone the repository from GitHub.</p>
 
     <div class="setup-steps">
+
+      <!-- Step 1: Launch -->
       <div class="setup-step">
         <div class="setup-step-content">
-          <h3>Option 1: Launch in StackBlitz (Recommended)</h3>
-          <p>Enter your table number (1–20) or scan the QR code at your table. This option will connect you to your team's database via the team URL parameter.</p>
-          <!-- Table Number Launcher -->
-          <div style="margin-top: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-              <label for="table-input" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Table #:</label>
-              <input 
-                id="table-input" 
-                type="number" 
-                min="1" 
-                max="20" 
-                value="1" 
-                aria-describedby="table-input-error"
-                style="width: 70px; padding: 0.45rem 0.6rem; border: 1px solid var(--border-color, #ccc); border-radius: 6px; font-size: 0.9rem; font-weight: 600; text-align: center;" 
-                oninput="clearTableError()"
-              />
-              <button 
-                type="button" 
-                onclick="launchStackBlitz()" 
-                style="background: var(--accent); color: #ffffff; font-family: var(--font-display); font-size: 0.85rem; font-weight: 700; padding: 0.55rem 1.1rem; border: none; border-radius: 6px; cursor: pointer; transition: opacity 0.2s;"
-                onmouseover="this.style.opacity='0.9'"
-                onmouseout="this.style.opacity='1'"
-              >
-                Launch Table Workspace →
-              </button>
-              <span style="font-size: 0.85rem; color: var(--text-muted);">or scan the QR code on your table tent</span>
+          <h3>Launch the Workshop App</h3>
+
+          <div class="setup-option">
+            <div class="setup-option-label">Option 1 · Recommended · No Install</div>
+            <h4>Launch in StackBlitz</h4>
+
+            <p>
+              Enter your table number (1–20) or scan the QR code at your table.
+              This connects you to your team's isolated database schema.
+            </p>
+
+            <!-- Table Number Launcher -->
+            <div class="table-launcher">
+              <div class="table-launcher-row">
+                <label for="table-input">Table #:</label>
+
+                <input 
+                  id="table-input" 
+                  type="number" 
+                  min="1" 
+                  max="20" 
+                  value="1" 
+                  aria-describedby="table-input-error"
+                  oninput="clearTableError()"
+                />
+
+                <button 
+                  type="button" 
+                  onclick="launchStackBlitz()"
+                >
+                  Launch Table Workspace →
+                </button>
+
+                <span class="table-launcher-alt">
+                  or scan the QR code on your table
+                </span>
+              </div>
+
+              <!-- Field-level Inline Error Message -->
+              <div 
+                id="table-input-error" 
+                role="alert"
+                class="table-input-error"
+              ></div>
             </div>
 
-            <!-- Field-level Inline Error Message -->
-            <div 
-              id="table-input-error" 
-              role="alert" 
-              style="display: none; color: #dc2626; font-size: 0.85rem; font-weight: 600; margin-top: 0.25rem;"
-            ></div>
+            <p class="setup-note">
+              <strong>⚠️ Important:</strong>
+              The <code>?team=&lt;id&gt;</code> parameter routes database requests
+              to your squad's isolated schema in Supabase. <strong>Do not remove it.</strong>
+            </p>
           </div>
-          <p style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 0.6rem;">
-            <em>Note: The <code>?team=&lt;id&gt;</code> parameter automatically routes database requests to your squad's isolated schema in Supabase. Do not remove this parameter.</em>
-          </p>
+
+          <div class="setup-option">
+            <div class="setup-option-label">Option 2 · Local Development</div>
+            <h4>Clone &amp; Run Locally</h4>
+
+            <p>
+              <strong>Prerequisite:</strong> Node.js 22 or newer.
+              Check your version with <code>node --version</code>.
+            </p>
+
+            <p class="setup-note">
+              💻 Need to install or upgrade Node? Download it from
+              <a href="https://nodejs.org/">nodejs.org</a>, or use a version manager:
+              <a href="https://github.com/nvm-sh/nvm">nvm</a> on macOS/Linux or
+              <a href="https://github.com/coreybutler/nvm-windows">nvm-windows</a>
+              on Windows.
+            </p>
+
+            <p>
+              Clone the repository from 
+              <a href="https://github.com/marisamachlis/bugblitz-ghc2026" target="_blank" rel="noopener noreferrer">https://github.com/marisamachlis/bugblitz-ghc2026</a>, 
+              then choose one of the paths below.
+            </p>
+
+            <div class="setup-path">
+              <div class="setup-path-label">Path A · Standard npm</div>
+              <p>Recommended and works on any OS.</p>
+              <pre><code>npm install &amp;&amp; npm start</code></pre>
+            </div>
+
+            <div class="setup-path">
+              <div class="setup-path-label">Path B · Makefile</div>
+              <p>
+                If you already have <code>make</code> and <code>nvm</code>,
+                the repo can handle setup and startup for you.
+              </p>
+              <pre><code>make setup &amp;&amp; make dev</code></pre>
+              <p class="setup-note">
+                If <code>make</code> errors or is not set up, we recommend following Path A.
+              </p>
+            </div>
+
+            <div class="setup-connect">
+              <strong>Connect to your team's database:</strong>
+
+              <ul>
+                <li>
+                  <strong>Via URL:</strong>
+                  Navigate to
+                  <code>http://localhost:4200/?team=&lt;table number&gt;</code>
+                </li>
+                <li>
+                  <strong>Via Code:</strong>
+                  Set
+                  <code>team: '&lt;table number&gt;'</code>
+                  inside
+                  <code>src/environments/environment.ts</code>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="setup-step">
-        <div class="setup-step-content">
-          <h3>Option 2: Clone &amp; Run Locally</h3>
-          <p><strong>Prerequisites:</strong> Node.js 22 or newer. Check with <code>node --version</code>; if you need to install or upgrade it, download from <a href="https://nodejs.org/">nodejs.org</a> (installers for macOS, Windows, and Linux), or use a version manager — <a href="https://github.com/nvm-sh/nvm">nvm</a> on macOS/Linux, <a href="https://github.com/coreybutler/nvm-windows">nvm-windows</a> on Windows — then run <code>nvm install 22 &amp;&amp; nvm use 22</code>.</p>
-          <p>Clone the repository from GitHub, then from the project root pick one of the two paths below.</p>
-          <p style="margin-top: 0.75rem;"><strong>Path A — Standard npm (recommended, works on any OS):</strong></p>
-          <pre><code>npm install
-npm start</code></pre>
-          <p style="margin-top: 0.75rem;"><strong>Path B — Makefile shortcut (if you already have <code>make</code> and <code>nvm</code>):</strong> the repo ships a <code>Makefile</code> that wraps <code>nvm install</code> (using <code>.nvmrc</code>), deps, and the dev server in one go. It works well when both tools are set up, but <em>may not work</em> depending on your environment (missing <code>make</code>, no <code>nvm</code>, non-Unix shell). If it errors, fall back to Path A.</p>
-          <pre><code>make setup && make dev</code></pre>
-          <p>Either path serves the app at <code>http://localhost:4200</code>. To connect to your team's isolated database schema, use either method:</p>
-          <ul>
-            <li><strong>Via URL:</strong> Navigate to <code>http://localhost:4200/?team=&lt;table number&gt;</code> in your browser.</li>
-            <li><strong>Via Code:</strong> Set <code>team: '&lt;table number&gt;'</code> inside <code>src/environments/environment.ts</code>.</li>
-          </ul>
-        </div>
-      </div>
+
+      <!-- Step 2: Explore -->
       <div class="setup-step">
         <div class="setup-step-content">
           <h3>Explore the App</h3>
-          <p>Browse the plant store — shop for plants, add items to cart, try checking out. Notice anything off? That's a bug. Use browser DevTools (Open with <code>F12</code> / Mac: <code>Option + Command + I</code> / Windows: <code>Ctrl + Shift + I</code>) to inspect the page and view the console, network tools, and DOM.</p>
+          <p>Browse the plant store — shop for plants, add items to cart, try checking out. Notice anything off? That's a bug. Use browser DevTools to inspect the page and view the console, network tools, and DOM.</p>
+          <p class="setup-note">
+            Open DevTools with
+            <code>F12</code>,
+            <code>Option + Command + I</code> on Mac, or
+            <code>Ctrl + Shift + I</code> on Windows.
+          </p>
         </div>
       </div>
+
+      <!-- Step 3: Read -->
       <div class="setup-step">
         <div class="setup-step-content">
           <h3>Read the Bug Report</h3>
-          <p>Your team will receive a Bug Report with issues reported by stakeholders — some vague, some specific. Match the reports to what you see in the app and the code.</p>
+
+          <p>
+            Your team will receive a Bug Report with issues reported by
+            stakeholders — some vague, some specific.
+          </p>
+
+          <div class="setup-callout">
+            <strong>Your job:</strong>
+            Match the reported bugs to what you see in the app and the code.
+          </div>
         </div>
       </div>
+
+      <!-- Step 4: Prioritize -->
       <div class="setup-step">
         <div class="setup-step-content">
           <h3>Prioritize &amp; Fix</h3>
-          <p>As a team, decide which bugs to tackle first based on severity and your role's perspective. Make code changes in StackBlitz or your IDE, and verify your fix works.</p>
+
+          <p>
+            As a team, decide which bugs to tackle first based on
+            <strong>severity</strong>, <strong>time constraints</strong>, and your <strong>role's perspective</strong>.
+          </p>
+
+          <div class="setup-callout">
+            <strong>Then fix it.</strong>
+            Make your code changes in StackBlitz or your IDE, and verify
+            that the fix actually works.
+          </div>
         </div>
       </div>
+
     </div>
   </section>
 

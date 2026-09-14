@@ -16,34 +16,42 @@
     --success: #16A34A;
     --diff-add-bg: #E6F9EC; --diff-add-text: #166534;
     --diff-remove-bg: #FFF0F1; --diff-remove-text: #991B1B;
+    --code-accent: #6B21A8; 
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --ground: #0D0815; --surface: #1A1230; --text-primary: #F0E6FF;
-      --text-secondary: #C4B5D8; --text-muted: #8A7A9E;
+      --text-secondary: #ebe3f6; --text-muted: #8A7A9E;
       --accent: #A855F7; --accent-bright: #F472B6; --accent-glow: rgba(168, 85, 247, 0.15);
       --border: #2D2050; --border-light: #251A40;
       --card-bg: #161028; --card-shadow: rgba(0, 0, 0, 0.3);
       --code-bg: #1A1230;
       --diff-add-bg: #0F2A18; --diff-add-text: #86EFAC;
       --diff-remove-bg: #2A0F13; --diff-remove-text: #FCA5A5;
+      --code-accent: #C084FC; /* Dark theme */
     }
   }
   :root[data-theme="dark"] {
     --ground: #0D0815; --surface: #1A1230; --text-primary: #F0E6FF;
-    --text-secondary: #C4B5D8; --text-muted: #8A7A9E;
+    --text-secondary: #ebe3f6; --text-muted: #8A7A9E;
     --accent: #A855F7; --accent-bright: #F472B6; --accent-glow: rgba(168, 85, 247, 0.15);
     --border: #2D2050; --border-light: #251A40;
     --card-bg: #161028; --card-shadow: rgba(0, 0, 0, 0.3);
     --code-bg: #1A1230;
     --diff-add-bg: #0F2A18; --diff-add-text: #86EFAC;
     --diff-remove-bg: #2A0F13; --diff-remove-text: #FCA5A5;
+    --code-accent: #C084FC; /* Dark theme */
   }
   html { scroll-behavior: smooth; }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   .solution[id] { scroll-margin-top: 1rem; }
   body { background: var(--ground); color: var(--text-primary); font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.7; -webkit-font-smoothing: antialiased; }
-  a { color: var(--accent); }
+  a {
+    color: var(--accent-link, var(--accent));
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
   code { font-family: var(--font-mono); font-size: 0.85em; background: var(--code-bg); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
   pre { font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; background: var(--code-bg); color: var(--text-primary); padding: 0.9rem 1rem; border-radius: 6px; overflow-x: auto; margin: 0.5rem 0; }
   pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
@@ -84,6 +92,63 @@
     .content { padding: 0 1rem 3rem; }
     .solution { padding: 1.25rem; }
   }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    color: var(--code-accent); /* Updated from var(--accent) */
+  }
+
+  :root[data-theme="dark"] .notice {
+    background: rgba(168, 85, 247, 0.08); /* Softened glow */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      /* Use a brighter purple/pink in dark mode for a higher contrast ratio */
+      --accent-link: #D8B4FE; 
+      --text-muted: #A190B8; /* Slightly lighter muted text for better readability */
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --accent-link: #D8B4FE;
+    --text-muted: #A190B8;
+  }
+
+  .toc { 
+  margin: 2rem 0 3rem; 
+  padding: 1.5rem; 
+  background: var(--card-bg); 
+  border: 1px solid var(--border-light); 
+  border-radius: 8px; 
+  box-shadow: 0 1px 3px var(--card-shadow); 
+} 
+
+.toc h2 { 
+  font-family: var(--font-display); 
+  font-size: 1rem; 
+  font-weight: 700; 
+  letter-spacing: 0.05em; 
+  text-transform: uppercase; 
+  color: var(--accent); 
+  margin-bottom: 1rem; 
+} 
+
+.toc ol { 
+  padding-left: 1.5rem; 
+  margin: 0; 
+} 
+
+.toc li { 
+  font-size: 0.95rem; 
+  color: var(--text-secondary); 
+  padding: 0.35rem 0; 
+} 
+
 </style>
 
 <div class="masthead">
