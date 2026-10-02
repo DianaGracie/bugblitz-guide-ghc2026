@@ -216,33 +216,63 @@
     margin-right: 0.5rem;
     vertical-align: middle;
   }
-
-  /* ── Masthead cross-page nav ── */
-  .masthead-pages {
-    display: flex;
-    gap: 0.6rem;
+  /* Navigation between guides */
+  .guide-nav {
+    --guide-hover-bg: rgba(255, 255, 255, 0.6);
+    --guide-active-bg: var(--card-bg);
+    --guide-active-text: var(--accent);
+    display: inline-flex;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
-    margin-top: 1.25rem;
-  }
-
-  .masthead-pages a {
-    font-family: var(--font-display);
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    text-decoration: none;
-    padding: 0.4rem 0.85rem;
+    max-width: 100%;
+    gap: 0.25rem;
+    margin: 1.5rem auto -0.5rem;
+    padding: 0.3rem;
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 100px;
-    transition: all 0.15s;
+    border-radius: 8px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
   }
-
-  .masthead-pages a:hover,
-  .masthead-pages a[aria-current="page"] {
-    color: var(--accent);
-    border-color: var(--accent);
+  .guide-nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .guide-nav a:hover {
+    color: var(--text-primary);
+    background: var(--guide-hover-bg);
+  }
+  .guide-nav a[aria-current="page"] {
+    background: var(--guide-active-bg);
+    color: var(--guide-active-text);
+    box-shadow: 0 1px 3px var(--card-shadow), 0 1px 2px rgba(0, 0, 0, 0.08);
+  }
+  .guide-nav a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  :root[data-theme="dark"] .guide-nav {
+    --guide-hover-bg: rgba(255, 255, 255, 0.08);
+    --guide-active-bg: #6b21a8;
+    --guide-active-text: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .guide-nav {
+      --guide-hover-bg: rgba(255, 255, 255, 0.08);
+      --guide-active-bg: #6b21a8;
+      --guide-active-text: #ffffff;
+    }
   }
 
   /* ── Materials CTA cards ── */
@@ -1430,6 +1460,40 @@
   margin: 0.25rem 0;
 }
 
+/* Optional setup troubleshooting */
+.setup-troubleshooting {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: #fff8e8;
+  color: #573a0c;
+  border: 1px solid #e6c779;
+  border-left: 4px solid #ad720b;
+  border-radius: 8px;
+  scroll-margin-top: 4rem;
+}
+.setup-step-content .setup-troubleshooting h4 {
+  color: inherit;
+  margin: 0 0 0.5rem;
+}
+.setup-step-content .setup-troubleshooting p {
+  color: inherit;
+  font-size: 0.9375rem;
+  margin: 0 0 0.5rem;
+}
+.setup-step-content .setup-troubleshooting p:last-child { margin-bottom: 0; }
+:root[data-theme="dark"] .setup-troubleshooting {
+  background: #2b2114;
+  color: #f4d9a5;
+  border-color: #80612e;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .setup-troubleshooting {
+    background: #2b2114;
+    color: #f4d9a5;
+    border-color: #80612e;
+  }
+}
+
 .setup-callout {
   margin-top: 0.85rem;
   padding: 0.75rem 1rem;
@@ -1504,9 +1568,9 @@
     const errorEl = document.getElementById('table-input-error');
     const teamId = parseInt(input.value, 10);
 
-    // Validation: Check if missing/empty or out of 1-20 range
-    if (isNaN(teamId) || teamId < 1 || teamId > 20) {
-      errorEl.textContent = 'Please enter a valid table number between 1 and 20.';
+    // Validation: Check if missing/empty or out of 1-50 range
+    if (isNaN(teamId) || teamId < 1 || teamId > 50) {
+      errorEl.textContent = 'Please enter a valid table number between 1 and 50.';
       errorEl.style.display = 'block';
       input.setAttribute('aria-invalid', 'true');
       input.style.borderColor = '#dc2626';
@@ -1543,11 +1607,11 @@
     <span>Anaheim, CA</span>
     <span>Oct 29, 2026</span>
   </div>
-  <div class="masthead-pages">
+  <nav class="guide-nav" aria-label="Workshop guides">
     <a href="index.html" aria-current="page">Workshop Guide</a>
-    <a href="bugs.html">Bug Guide →</a>
-    <a href="solutions.html">Solutions →</a>
-  </div>
+    <a href="bugs.html">Bug Guide</a>
+    <a href="solutions.html">Solutions</a>
+  </nav>
 </div>
 
 <!-- Section Nav -->
@@ -1637,7 +1701,7 @@
             <h4>Launch in StackBlitz</h4>
 
             <p>
-              Enter your table number (1–20) or scan the QR code at your table.
+              Enter your table number or scan the QR code at your table.
               This connects you to your team's isolated database schema.
             </p>
 
@@ -1743,6 +1807,12 @@
               </ul>
             </div>
           </div>
+
+          <aside class="setup-troubleshooting" id="mock-api-mode" aria-labelledby="mock-api-heading">
+            <h4 id="mock-api-heading">Troubleshooting Network Restrictions</h4>
+            <p>If you don't see any products after loading the app, choose <strong>Mock API</strong> from the app's <strong>Workshop Mode</strong> toggle. You can also append <code>&amp;mock=true</code> to your team URL.</p>
+            <p>Mock mode uses local data that is not shared with your team. Orders will only be visible to you and will reset when the app is reloaded. Switch back to <strong>Live Supabase</strong> using the same menu. In Supabase mode, team members will share the same data and orders.</p>
+          </aside>
         </div>
       </div>
 

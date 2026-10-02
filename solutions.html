@@ -62,9 +62,64 @@
   .masthead-eyebrow { font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
   .masthead h1 { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.15; color: var(--text-primary); margin-bottom: 0.5rem; }
   .masthead-sub { font-size: 1.125rem; color: var(--text-secondary); max-width: 42rem; margin: 0 auto 1.25rem; }
-  .masthead-nav { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
-  .masthead-nav a { font-family: var(--font-display); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; padding: 0.4rem 0.85rem; border: 1px solid var(--border); border-radius: 100px; }
-  .masthead-nav a:hover, .masthead-nav a[aria-current="page"] { color: var(--accent); border-color: var(--accent); }
+  /* Navigation between guides */
+.guide-nav {
+  --guide-hover-bg: rgba(255, 255, 255, 0.6);
+  --guide-active-bg: var(--card-bg);
+  --guide-active-text: var(--accent);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 100%;
+  gap: 0.25rem;
+  margin: 1.5rem auto -0.5rem;
+  padding: 0.3rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+.guide-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.guide-nav a:hover {
+  color: var(--text-primary);
+  background: var(--guide-hover-bg);
+}
+.guide-nav a[aria-current="page"] {
+  background: var(--guide-active-bg);
+  color: var(--guide-active-text);
+  box-shadow: 0 1px 3px var(--card-shadow), 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.guide-nav a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+:root[data-theme="dark"] .guide-nav {
+  --guide-hover-bg: rgba(255, 255, 255, 0.08);
+  --guide-active-bg: #6b21a8;
+  --guide-active-text: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .guide-nav {
+    --guide-hover-bg: rgba(255, 255, 255, 0.08);
+    --guide-active-bg: #6b21a8;
+    --guide-active-text: #ffffff;
+  }
+}
 
   .notice { margin: 2rem 0; padding: 1rem 1.25rem; background: var(--surface); border-left: 3px solid var(--accent); border-radius: 6px; font-size: 0.92rem; color: var(--text-secondary); }
   .notice strong { color: var(--accent); }
@@ -155,11 +210,11 @@
   <div class="masthead-eyebrow">BugBlitz · Workshop Materials</div>
   <h1>Solutions &amp; Best Practices</h1>
   <p class="masthead-sub">Root cause, the fix, and why it works — for every bug in the guide. Use this as a reference after your team has attempted the fix themselves.</p>
-  <div class="masthead-nav">
+  <nav class="guide-nav" aria-label="Workshop guides">
     <a href="index.html">Workshop Guide</a>
     <a href="bugs.html">Bug Guide</a>
     <a href="solutions.html" aria-current="page">Solutions</a>
-  </div>
+  </nav>
 </div>
 
 <div class="content">
@@ -187,23 +242,21 @@
     <a class="solution-bug-link" href="bugs.html#welcome-offer-mobile">← back to bug</a>
 
     <div class="solution-section-label">Root Cause</div>
-    <p>On narrow viewports (≤768px), <code>.offer-popover</code> is positioned with <code>bottom: 84px</code>. Its close button (<code>.offer-close</code>) sits near the bottom-right corner of the card, and its <code>.offer-cta</code> button sits in normal flow above the card's bottom padding. <code>.cookie-banner</code> switches to a stacked column layout on mobile (message row, then a full-width button row) with <code>padding: 16px 16px 40px</code>, making its rendered height greater than the 84px of clearance the offer card reserves for it. The banner has a higher stacking order (<code>z-index: 1000</code> vs. the offer's <code>z-index: 900</code>), so its box covers the bottom region of the offer card: the close button is fully behind it, and the "Start shopping" CTA's lower edge is also covered.</p>
+    <p>On mobile, the offer reserves <code>84px</code> below it, but the <code>.consent-banner</code> is taller and has a higher stacking order. It covers the offer's close button and part of the shopping button.</p>
 
     <div class="solution-section-label">The Fix</div>
-    <p>Increase the offer's bottom clearance so the card clears the banner's rendered height. Both the close button and the CTA are positioned relative to the card, so raising the card's clearance addresses both at once:</p>
+    <p>Increase the offer's bottom clearance so its close and shopping buttons sit above the consent banner:</p>
     <pre><code>/* welcome-offer.component.scss */
 @media (max-width: 768px) {
   .offer-popover {
+    /* …other existing styles… */
 <span class="diff-remove">    bottom: 84px;</span>
-<span class="diff-add">    bottom: 148px;   /* clears the stacked mobile cookie banner */</span>
+<span class="diff-add">    bottom: 148px;</span>
   }
 }</code></pre>
 
-    <div class="solution-section-label">Why This Works</div>
-    <ul>
-      <li><strong>Clearance is set against the banner's actual rendered height</strong> rather than a value that happened to match its previous size.</li>
-      <li><strong>One root cause covers both symptoms.</strong> The invisible × and the clipped CTA are both a consequence of the same undersized clearance value on the parent card, not two independent overlaps.</li>
-    </ul>
+    <div class="solution-section-label">Confirming the Fix</div>
+    <p>Check narrow mobile widths and enlarged text with both panels visible. If the consent banner wraps to a greater height, adjust the clearance so both offer buttons remain accessible.</p>
 
     <div class="solution-section-label">Related Pitfalls</div>
     <ul>
@@ -219,7 +272,7 @@
 
     <div class="solution-section-label">Root Cause</div>
     <p>
-      When a user clicks <strong>Place Order</strong>, the browser starts processing the payment. However, because there is no safety lock (an "in-flight guard") preventing additional clicks, the user can click the button multiple times while waiting. This triggers multiple payment requests to the backend for a single order, resulting in duplicate charges.
+      When a user clicks <strong>Place Order</strong>, the app starts creating the order. However, because there is no safety lock (an "in-flight guard") preventing additional clicks, the user can click the button multiple times while waiting. This triggers multiple order requests to the backend for a single order, resulting in duplicate orders.
     </p>
 
     <div class="solution-section-label">The Fix</div>
@@ -232,17 +285,18 @@
     <ul>
       <li>Open DevTools → <strong>Network</strong> and enable <em>Preserve log</em>.</li>
       <li>Click <strong>Place Order</strong> multiple times in quick succession.</li>
-      <li>Verify multiple identical <strong>POST</strong> requests to the payment/order endpoint appear (same payload or order id), showing duplicate submissions.</li>
+      <li>Notice that there are multiple <strong>POST</strong> requests to the <code>orders</code> endpoint appear with the same checkout details.</li>
+      <li>Open <strong>My Orders</strong> and search by the checkout email to see the duplicate orders.</li>
     </ul>
       <div class="solution-section-label">Confirming the Fix</div>
-      <p>After applying the fix, rapid-click the <strong>Place Order</strong> button and verify the app only sends a single order request.</p>
+      <p>After applying the fix, rapid-click the <strong>Place Order</strong> button and confirm only one new order is created.</p>
       <ul>
         <li>With DevTools → <strong>Network</strong> open and <em>Preserve log</em> enabled, rapid-click the button.</li>
-        <li>Confirm only one <strong>POST</strong> to the payment/order endpoint is recorded.</li>
-        <li>Optionally, check the response or order id in the request/response to ensure only one order was created.</li>
+        <li>Confirm only one <strong>POST</strong> to the <code>orders</code> endpoint is recorded.</li>
+        <li>Open <strong>My Orders</strong> and search by the checkout email to confirm only one new order was created.</li>
       </ul>
 
-    <pre><code>// src/app/checkout/checkout.component.ts
+    <pre><code>// src/app/components/checkout/checkout.component.ts
 export class CheckoutComponent {
   // Simple object-backed form used in this workshop app
   form = {
@@ -255,29 +309,31 @@ export class CheckoutComponent {
     country: '',
   };
 
-<span class="diff-add">  // Tracks whether a request is currently in-flight
-  submitting = signal(false);</span>
+  // Tracks whether a request is currently in-flight
+  submitting = signal(false);
 
   async onSubmit(event: Event) {
     event.preventDefault();
     this.errorMessage.set('');
 
 <span class="diff-add">    // 1. Guard: Stop execution immediately if already processing
-    if (this.submitting()) return;
+    if (this.submitting()) return;</span>
+
+    // Existing field validation (omitted)
 
     // 2. Lock: Set submitting state to true
-    this.submitting.set(true);</span>
+    this.submitting.set(true);
 
     try {
-      // Perform payment / order write (omitted)
+      // Perform order write (omitted)
     } finally {
-<span class="diff-add">      // 3. Unlock: Always reset guard, even if the request fails
-      this.submitting.set(false);</span>
+      // 3. Unlock: Always reset guard, even if the request fails
+      this.submitting.set(false);
     }
   }
 }</code></pre>
 
-    <pre><code>&lt;!-- src/app/checkout/checkout.component.html --&gt;
+    <pre><code>&lt;!-- src/app/components/checkout/checkout.component.html --&gt;
 <span class="diff-remove">&lt;button type="submit" class="place-order-btn"&gt;</span>
 <span class="diff-add">&lt;!-- Bind [disabled] to the submitting state to prevent UI interaction --&gt;
 &lt;button type="submit" class="place-order-btn" [disabled]="submitting()"&gt;</span>
@@ -304,7 +360,7 @@ export class CheckoutComponent {
         <strong>Spinners aren't safeguards:</strong> Showing a loading spinner provides helpful visual feedback, but unless the button is disabled or guarded in code, users can still click it.
       </li>
       <li>
-        <strong>Always clean up state:</strong> Placing <code>this.submitting.set(false)</code> inside a <code>finally</code> block ensures the button unlocks if the payment fails, preventing the user from getting permanently stuck.
+        <strong>Always clean up state:</strong> Placing <code>this.submitting.set(false)</code> inside a <code>finally</code> block ensures the button unlocks if the order request fails, preventing the user from getting permanently stuck.
       </li>
       <li>
         <strong>Defense in depth:</strong> Web apps should guard actions at both the interface level (disabling buttons) and the backend API level (for example, by checking a unique order id to see if the order has already been processed).
@@ -319,7 +375,7 @@ export class CheckoutComponent {
 
     <div class="solution-section-label">Root Cause</div>
     <p>The submit handler in <code>checkout.component.ts</code> checks all required fields in a single boolean expression and, if any are missing, sets one generic error string. Users can't tell which field failed.</p>
-    <p class="file-path">src/app/checkout/checkout.component.ts:123–134</p>
+    <p class="file-path">src/app/components/checkout/checkout.component.ts:125–136</p>
 
     <div class="solution-section-label">The Fix</div>
     <p>Collect the specific missing fields, then show a targeted message (and, ideally, per-field inline errors driven by Angular's form state):</p>
@@ -350,7 +406,8 @@ async onSubmit(event: Event) {
   // … rest unchanged
 }</code></pre>
     <pre><code>&lt;!-- checkout.component.html — repeat per field --&gt;
-&lt;div class="form-group full" [class.has-error]="fieldErrors()['email']"&gt;
+<span class="diff-remove">&lt;div class="form-group full"&gt;</span>
+<span class="diff-add">&lt;div class="form-group full" [class.has-error]="fieldErrors()['email']"&gt;</span>
   &lt;label for="email"&gt;Email&lt;/label&gt;
   &lt;input id="email" type="email" [(ngModel)]="form.email" name="email" /&gt;
 <span class="diff-add">  @if (fieldErrors()['email']) {
@@ -367,7 +424,7 @@ async onSubmit(event: Event) {
 
     <div class="solution-section-label">Related Pitfalls</div>
     <ul>
-      <li>Don't clear all errors on every keystroke — only clear a field's error once the user has changed that field.</li>
+      <li>Trim required text fields before checking them—a value containing only spaces should still count as missing.</li>
       <li>For accessibility, associate error text with the input via <code>aria-describedby</code> and mark the input <code>aria-invalid="true"</code>.</li>
     </ul>
   </div>
@@ -378,8 +435,8 @@ async onSubmit(event: Event) {
     <a class="solution-bug-link" href="bugs.html#international-postal-code">← back to bug</a>
 
     <div class="solution-section-label">Root Cause</div>
-    <p>The submit handler always tests the ZIP against <code>US_ZIP_PATTERN</code>, regardless of the selected country. Any valid Canadian, UK, or other international postal code is rejected as "invalid".</p>
-    <p class="file-path">src/app/checkout/checkout.component.ts:7, 136–139</p>
+    <p>The submit handler always tests the ZIP against <code>US_ZIP_PATTERN</code>, regardless of the selected country. Valid international postal codes that do not match the US format, such as Canadian or UK codes, are rejected.</p>
+    <p class="file-path">src/app/components/checkout/checkout.component.ts:7, 138–141</p>
 
     <div class="solution-section-label">The Fix</div>
     <p>Look up the appropriate pattern per country, and fall back to a permissive check when the country's format is unknown:</p>
@@ -420,7 +477,8 @@ if (!pattern.test(this.form.zip.trim())) {
     <div class="solution-section-label">Related Pitfalls</div>
     <ul>
       <li>Regex is a client-side convenience, not authoritative validation. Always re-validate on the server / at order write, and don't reject a real order just because the pattern list is incomplete.</li>
-      <li>Consider libraries like <code>i18n-postal-address</code> or Google's <code>libphonenumber</code>-equivalent for postal codes if the country list grows.</li>
+      <li>For country-specific format checks, consider <a href="https://github.com/Cimpress-MCP/postal-codes-js" target="_blank" rel="noopener noreferrer"><code>postal-codes-js</code></a> or <a href="https://github.com/melwynfurtado/postcode-validator" target="_blank" rel="noopener noreferrer"><code>postcode-validator</code></a>. A matching format does not confirm that the postal code belongs to the entered address.</li>
+      <li>For full-address validation in a production checkout, consider <a href="https://developers.google.com/maps/documentation/address-validation/overview" target="_blank" rel="noopener noreferrer">Google Address Validation API</a> or <a href="https://www.smarty.com/docs/apis/international-street-api/reference" target="_blank" rel="noopener noreferrer">Smarty address verification</a>. Check coverage for the countries you serve and let shoppers review suggested corrections.</li>
     </ul>
   </div>
 
@@ -431,13 +489,12 @@ if (!pattern.test(this.form.zip.trim())) {
 
     <div class="solution-section-label">Root Cause</div>
     <p>The <code>onCountryChange</code> handler updates the region list, label, and ZIP label — but never clears <code>form.state</code>. A previous value (e.g., <code>"CA"</code>) silently persists and passes the required-field check.</p>
-    <p class="file-path">src/app/checkout/checkout.component.ts:112–118</p>
+    <p class="file-path">src/app/components/checkout/checkout.component.ts:113–119</p>
 
     <div class="solution-section-label">The Fix</div>
     <pre><code>onCountryChange(): void {
   const country = this.form.country;
-<span class="diff-add">  this.form.state = '';                    // reset dependent field
-  this.fieldErrors.update(e =&gt; ({ ...e, state: '' }));  // clear stale error too</span>
+<span class="diff-add">  this.form.state = ''; // reset dependent field</span>
   this.stateOptions = REGIONS[country] ?? [];
   this.hasRegions = this.stateOptions.length &gt; 0;
   this.stateLabel = STATE_LABELS[country] ?? 'State / Province';
@@ -447,15 +504,10 @@ if (!pattern.test(this.form.zip.trim())) {
     <div class="solution-section-label">Why This Works</div>
     <ul>
       <li><strong>Dependent fields must be reset when their parent changes.</strong> This is a universal form pattern — country → state, category → subcategory, product → variant, and so on.</li>
-      <li><strong>Clearing the error alongside the value</strong> avoids showing a stale "State is required" message before the user has even touched the new state input.</li>
-      <li><strong>Prefer reactive forms with <code>updateOn: 'change'</code></strong> and a <code>valueChanges</code> subscription on the country control if you're refactoring — it makes this cascade declarative.</li>
     </ul>
 
-    <div class="solution-section-label">Related Pitfalls</div>
-    <ul>
-      <li>Don't reset silently in a way the user can't tell — if the state was already valid, consider preserving it when the new country has the same code (rare, but noticeable if you're switching between US/CA which both have <code>"CA"</code>).</li>
-      <li>ZIP validation also depends on country now — clear the ZIP error on country change too.</li>
-    </ul>
+    <div class="solution-section-label">Confirming the Fix</div>
+    <p>Select a US state, then change the country to Canada. Confirm the state is cleared and a Canadian province must be selected before submitting.</p>
   </div>
 
   <div class="solution" id="promo-duplicate">
@@ -465,7 +517,7 @@ if (!pattern.test(this.form.zip.trim())) {
 
     <div class="solution-section-label">Root Cause</div>
     <p><code>applyCoupon()</code> in <code>cart.service.ts</code> validates that a code exists and is not expired, then unconditionally appends it to <code>appliedCoupons</code> and persists to <code>localStorage</code> (<code>cart_coupons</code>). There is no check for an already-applied code, so each click of <strong>Apply</strong> stacks another copy and the discount total grows.</p>
-    <p class="file-path">src/lib/cart.service.ts:112–116</p>
+    <p class="file-path">src/app/services/cart.service.ts:112–116</p>
 
     <div class="solution-section-label">The Fix</div>
     <p>Reject duplicate codes before mutating state. Normalize input so casing and whitespace cannot bypass the guard:</p>
@@ -492,8 +544,7 @@ this.appliedCoupons.set([
     <div class="solution-section-label">Related Pitfalls</div>
     <ul>
       <li>Client-only guards can be bypassed — for production, enforce uniqueness in the order-write path and respect <code>max_uses</code> in the database.</li>
-      <li>After fixing, verify <code>discountTotal</code> does not exceed <code>subtotal</code> and that reloading the page restores at most one entry per code.</li>
-      <li>Inspect <code>cart_coupons</code> in DevTools → Application → Local Storage to confirm the stored array shape during debugging.</li>
+      <li>The guard prevents new duplicates but does not remove duplicates already saved in <code>cart_coupons</code>.</li>
     </ul>
   </div>
 
@@ -504,10 +555,10 @@ this.appliedCoupons.set([
 
     <div class="solution-section-label">Root Cause</div>
     <p>The button is correctly disabled with <code>[disabled]="!product.in_stock"</code>, but the only sold-out signal is a small "Out of Stock" badge on the image. On mobile or in quick scans the badge is easy to miss — so users perceive the button as broken.</p>
-    <p class="file-path">src/app/product-card/product-card.component.html:24–30</p>
+    <p class="file-path">src/app/components/product-card/product-card.component.html:24–30</p>
 
     <div class="solution-section-label">The Fix</div>
-    <p>Make the button itself carry the message, and expose the state to assistive tech:</p>
+    <p>Change the button label to explain why it is disabled. Keep the stock badge as well:</p>
     <pre><code>&lt;!-- product-card.component.html --&gt;
 &lt;button
   class="add-btn"
@@ -516,32 +567,26 @@ this.appliedCoupons.set([
 <span class="diff-add">  [attr.aria-label]="!product.in_stock
     ? product.name + ' is sold out'
     : 'Add ' + product.name + ' to cart'"
-  [title]="!product.in_stock ? 'This item is currently out of stock' : null"&gt;
-  {{ product.in_stock ? 'Add to Cart' : 'Sold Out' }}</span>
-<span class="diff-remove">&gt;
-  Add to Cart</span>
+  [title]="!product.in_stock ? 'This item is currently out of stock' : null"</span>
+&gt;
+<span class="diff-remove">  Add to Cart</span>
+<span class="diff-add">  {{ product.in_stock ? 'Add to Cart' : 'Sold Out' }}</span>
 &lt;/button&gt;</code></pre>
-    <pre><code>/* product-card.component.scss */
-.add-btn[disabled] {
-<span class="diff-add">  background: var(--surface-alt);
-  color: var(--text-muted);
-  cursor: not-allowed;
-  opacity: 1;   /* the label change is the signal — don't hide it behind opacity */</span>
-}</code></pre>
 
-    <div class="solution-section-label">Why This Works</div>
-    <ul>
-      <li><strong>The label is the truth.</strong> A button that reads "Sold Out" cannot be misinterpreted — no badge required.</li>
-      <li><strong>Cursor and color reinforce disabled state</strong> without dimming the label to unreadable.</li>
-      <li><strong><code>aria-label</code> + <code>title</code></strong> covers screen-reader and hover-tooltip users.</li>
-    </ul>
+      <div class="solution-section-label">Confirming the Fix</div>
+      <p>Check that sold-out products show a disabled <strong>Sold Out</strong> button. In-stock products should still show <strong>Add to Cart</strong> and add items normally.</p>
+      <div class="solution-section-label">Why This Works</div>
+      <ul>
+        <li><strong>The button label is the truth.</strong> A button that reads "Sold Out" makes the unavailability clear to users.</li>
+        <li><strong>Cursor and color reinforce disabled state</strong> without dimming the label to unreadable.</li>
+        <li><strong><code>aria-label</code> + <code>title</code></strong> covers screen-reader and hover-tooltip users.</li>
+      </ul>
 
-    <div class="solution-section-label">Related Pitfalls</div>
-    <ul>
-      <li>Don't remove the "Out of Stock" image badge — it's still useful at a glance across a grid of many cards.</li>
-      <li>If you offer restock notifications, the label becomes an actionable "Notify Me" and the button re-enables — plan for that state.</li>
-    </ul>
-  </div>
+      <div class="solution-section-label">Related Pitfalls</div>
+      <ul>
+        <li>Don't remove the "Out of Stock" card badge — it's still useful at a glance across a grid of many cards.</li>
+      </ul>
+    </div>
 
   <div class="solution" id="broken-image">
     <span class="solution-tag">Data</span>
@@ -549,42 +594,34 @@ this.appliedCoupons.set([
     <a class="solution-bug-link" href="bugs.html#broken-image">← back to bug</a>
 
     <div class="solution-section-label">Root Cause</div>
-    <p>One product's <code>image_url</code> in the starter data references a non-existent Pexels asset (typo, deleted photo, or wrong slug mapping). The image tag renders but the network request 404s.</p>
-    <p class="file-path">supabase/migrations/20260626145013_sync_product_image_urls.sql</p>
+    <p>The <code>heartleaf-philodendron</code> entry in <code>PRODUCT_IMAGES</code> has a hostname typo: <code>image.pexels.com</code> instead of <code>images.pexels.com</code>. Product image URLs come from this TypeScript map.</p>
+    <p class="file-path">src/app/data/product-images.ts:62</p>
 
     <div class="solution-section-label">The Fix</div>
-    <p>Two-part: patch the bad URL <em>and</em> harden the UI against future breakage.</p>
-    <p><strong>1. Patch the data.</strong> Add a new migration (never edit an old one that's been run):</p>
-    <pre><code>-- supabase/migrations/YYYYMMDDHHMMSS_fix_broken_image.sql
-UPDATE products
-SET image_url = 'https://images.pexels.com/photos/&lt;correct-id&gt;/pexels-photo-&lt;correct-id&gt;.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800'
-WHERE slug = '&lt;affected-slug&gt;';</code></pre>
-    <p><strong>2. Harden the component.</strong> Fall back to a placeholder when the image fails to load, so no user ever sees a broken icon:</p>
+    <p>Correct the URL in <code>PRODUCT_IMAGES</code>:</p>
+    <pre><code>// src/app/data/product-images.ts — PRODUCT_IMAGES
+<span class="diff-remove">'heartleaf-philodendron': 'https://image.pexels.com/photos/17665056/pexels-photo-17665056.jpeg',</span>
+<span class="diff-add">'heartleaf-philodendron': 'https://images.pexels.com/photos/17665056/pexels-photo-17665056.jpeg',</span></code></pre>
+    <p>Add an error handler to show a placeholder if a product image fails to load:</p>
     <pre><code>&lt;!-- product-card.component.html --&gt;
 &lt;img
   [src]="product.image_url"
   [alt]="product.name"
   loading="lazy"
 <span class="diff-add">  (error)="onImageError($event)"</span> /&gt;</code></pre>
-    <pre><code>// product-card.component.ts
+    <pre><code>// src/app/components/product-card/product-card.component.ts
+<span class="diff-add">import { resolveProductImage } from '../../data/product-images';</span>
+
+// Inside ProductCardComponent:
 <span class="diff-add">onImageError(event: Event) {
   const img = event.target as HTMLImageElement;
-  if (img.src.endsWith('/placeholder.svg')) return;   // avoid infinite loop
-  img.src = '/assets/placeholder.svg';
+  const placeholder = resolveProductImage(null); // existing inline SVG fallback
+  if (img.src === placeholder) return; // avoid retrying a failed fallback
+  img.src = placeholder;
 }</span></code></pre>
 
-    <div class="solution-section-label">Why This Works</div>
-    <ul>
-      <li><strong>Migrations are additive.</strong> A new migration patches the URL and preserves history — editing an old file breaks reproducibility for anyone who has already run it.</li>
-      <li><strong>An <code>onerror</code> fallback</strong> means one bad URL never ships a broken card — a small placeholder tells the user the product exists, just without a photo yet.</li>
-      <li><strong>Verify in DevTools' Network tab</strong> after the fix — <em>no</em> 404s for product images.</li>
-    </ul>
-
-    <div class="solution-section-label">Related Pitfalls</div>
-    <ul>
-      <li>Don't hotlink to third-party CDNs (Pexels, Unsplash) without a caching layer — they can rotate or remove images at any time.</li>
-      <li>Consider a build-time or test-time crawl over all <code>image_url</code>s to catch dead links before they ship.</li>
-    </ul>
+    <div class="solution-section-label">Confirming the Fix</div>
+    <p>Check that the photo loads. Temporarily use an invalid URL to check that the placeholder appears, then restore the correct URL.</p>
   </div>
 
   <div class="solution" id="dialog-bug">
@@ -593,28 +630,30 @@ WHERE slug = '&lt;affected-slug&gt;';</code></pre>
     <a class="solution-bug-link" href="bugs.html#dialog-bug">← back to bug</a>
 
     <div class="solution-section-label">Root Cause</div>
-    <p>Dismissing the Clear Cart dialog hides the dialog box, but leaves the invisible backdrop overlay element active in the DOM with <code>pointer-events: auto</code>, blocking user interactions with the rest of the page.</p>
+    <p>The component appends <code>confirmOverlayEl</code> to <code>document.body</code>. Closing the dialog destroys the Angular component, but leaves that overlay behind, blocking clicks.</p>
 
     <div class="solution-section-label">The Fix</div>
-    <p>Ensure the dialog backdrop overlay is hidden or removed from pointer events when the dialog is dismissed:</p>
-    <pre><code>function closeClearCartDialog() {
-  const dialogOverlay = document.querySelector('.dialog-overlay');
-  if (dialogOverlay) {
-<span class="diff-add">    dialogOverlay.classList.remove('active');
-    dialogOverlay.style.display = 'none';
-    dialogOverlay.style.pointerEvents = 'none';</span>
-  }
+    <p>Remove the overlay when the component is destroyed:</p>
+    <pre><code>// src/app/components/confirmation-dialog/confirmation-dialog.component.ts
+<span class="diff-remove">import { Component, input, OnInit, output } from '@angular/core';</span>
+<span class="diff-add">import { Component, input, OnInit, OnDestroy, output } from '@angular/core';</span>
+
+<span class="diff-remove">export class ConfirmationDialogComponent implements OnInit {</span>
+<span class="diff-add">export class ConfirmationDialogComponent implements OnInit, OnDestroy {</span>
+  // Keep the existing fields and methods.
+<span class="diff-add">  ngOnDestroy(): void {
+    this.confirmOverlayEl?.remove();
+    this.confirmOverlayEl = null;
+  }</span>
 }</code></pre>
 
-    <div class="solution-section-label">Why This Works</div>
-    <ul>
-      <li><strong>Pointer Cleanup:</strong> Disabling <code>pointer-events</code> prevents invisible overlays from capturing mouse and touch input.</li>
-      <li><strong>DOM Synchronization:</strong> Ensures the backdrop visual state stays in sync with the modal visibility.</li>
-    </ul>
-    <div class="solution-section-label">Key Takeaway</div>
-    <ul>
-      <li><strong>Complete Lifecycle Cleanup:</strong> Whenever a component or temporary state is dismissed, ensure all related side effects—including overlay wrappers, global event listeners, body locks, and focus states—are fully torn down together.</li>
-    </ul>
+    <div class="solution-section-label">Confirming the Fix</div>
+    <ol>
+      <li>Add an item to the cart and click the <strong>Clear Cart</strong> button to open the confirmation dialog.</li>
+      <li>Click the <strong>Keep Items</strong> button. Confirm the dialog closes, the item remains, and the page responds to clicks.</li>
+      <li>Open the dialog again and click the shaded area outside it. Confirm the same behavior.</li>
+      <li>Open the dialog again and click the <strong>Clear Cart</strong> button inside the dialog. Confirm the cart is emptied and the page still responds to clicks.</li>
+    </ol>
   </div>
 
   <div class="solution" id="stale-search">
@@ -623,41 +662,55 @@ WHERE slug = '&lt;affected-slug&gt;';</code></pre>
     <a class="solution-bug-link" href="bugs.html#stale-search">← back to bug</a>
 
     <div class="solution-section-label">Root Cause</div>
-    <p>Each keystroke fires a new search request, but responses are applied in the order they arrive — not the order they were requested. On a slow network, the response for <code>mon</code> can land <em>after</em> the response for <code>monstera</code>, overwriting the correct results.</p>
-
+    <p>Each keystroke fires a new search request, but responses are applied in the order they arrive — not the order they were requested. On a slow network, the response for <code>mon</code> can land <em>after</em> the response for <code>snake</code>, overwriting the correct results.</p>
     <div class="solution-section-label">The Fix</div>
-    <p>Use a request-id (sequence number) and discard any response that isn't for the latest request. Even better in RxJS: <code>switchMap</code>, which cancels the previous in-flight request automatically.</p>
-    <pre><code>// header.component.ts — plain-async version
+    <p>Give each search change a sequence number. Only the latest search may update results or loading state, including when the query is cleared or a request fails.</p>
+    <pre><code>// src/app/components/header/header.component.ts
 <span class="diff-add">private requestSeq = 0;</span>
 
-async onSearch(query: string) {
+async onSearchChange(query: string) {
 <span class="diff-add">  const seq = ++this.requestSeq;</span>
-  const results = await this.searchService.suggest(query);
-<span class="diff-add">  if (seq !== this.requestSeq) return;   // a newer request has been issued
-</span>  this.suggestions.set(results);
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) {
+    this.searchResults.set([]);
+    this.searchLoading.set(false);
+    return;
+  }
+
+  this.searchLoading.set(true);
+  try {
+<span class="diff-remove">    this.searchResults.set(await this.storeData.searchProducts(trimmedQuery));</span>
+<span class="diff-add">    const results = await this.storeData.searchProducts(trimmedQuery);
+    if (seq !== this.requestSeq) return;
+    this.searchResults.set(results);</span>
+  } catch (err) {
+<span class="diff-add">    if (seq !== this.requestSeq) return;</span>
+    console.error('search products:', err);
+    this.searchResults.set([]);
+  } finally {
+<span class="diff-remove">    this.searchLoading.set(false);</span>
+<span class="diff-add">    if (seq === this.requestSeq) this.searchLoading.set(false);</span>
+  }
 }</code></pre>
-    <pre><code>// or, the RxJS way — switchMap cancels the previous request
-<span class="diff-add">this.query$
-  .pipe(
-    debounceTime(150),           // don't hammer the network
-    distinctUntilChanged(),      // ignore no-op keystrokes
-    switchMap(q =&gt; this.searchService.suggest(q))
-  )
-  .subscribe(results =&gt; this.suggestions.set(results));</span></code></pre>
+    <p>Also invalidate pending searches when a suggestion is selected:</p>
+    <pre><code>selectSearchResult(product: Product) {
+<span class="diff-add">  ++this.requestSeq;
+  this.searchLoading.set(false);</span>
+  this.searchValue = product.name;
+  this.searchResults.set([]);
+  this.router.navigate(['/shop'], { queryParams: { q: product.name } });
+}</code></pre>
 
-    <div class="solution-section-label">Why This Works</div>
-    <ul>
-      <li><strong>The sequence guard</strong> is the simplest correct pattern — increment on request, compare on response, drop stale results.</li>
-      <li><strong><code>switchMap</code></strong> is the declarative version — it unsubscribes from the previous inner observable when a new one arrives, so stale requests are cancelled at the network layer too.</li>
-      <li><strong>Debounce + distinctUntilChanged</strong> reduces the number of requests to begin with — fewer races, less server load.</li>
-    </ul>
-
-    <div class="solution-section-label">Related Pitfalls</div>
-    <ul>
-      <li>Don't debounce so long that suggestions feel laggy — 100–200ms is the sweet spot for search-as-you-type.</li>
-      <li>Also handle the empty-query case: clear suggestions immediately rather than firing a network request for <code>""</code>.</li>
-      <li>If you need infinite-scroll or paginated results, switch to <code>concatMap</code> or <code>exhaustMap</code> — <code>switchMap</code>'s cancellation would drop the wrong requests.</li>
-    </ul>
+    <div class="solution-section-label">Confirming the Fix</div>
+    <ol>
+      <li>Open Chrome DevTools → <strong>Network</strong> and search for <code>mon</code> to capture its request.</li>
+      <li>Right-click that request and select <strong>Throttle request</strong>. In <strong>Request conditions</strong>, apply a slow preset to the <code>mon</code> query only, leaving <code>snake</code> unthrottled. <a href="https://developer.chrome.com/docs/devtools/request-conditions" target="_blank" rel="noopener noreferrer">Chrome DevTools throttling guide&nbsp;↗</a></li>
+      <li>Clear the input, type <code>mon</code> again, then replace it with <code>snake</code> while the <code>mon</code> request is pending.</li>
+      <li>Confirm the <code>snake</code> suggestions stay visible after the delayed <code>mon</code> response arrives.</li>
+      <li>Search for <code>mon</code> again and clear the input while its request is pending. Suggestions should stay empty after the response arrives.</li>
+      <li>Select a suggestion while another search is pending; the delayed response should not reopen the suggestions.</li>
+      <li>Disable the throttling rule afterward.</li>
+    </ol>
   </div>
 
   <div class="solution" id="sale-price-not-honored">
@@ -668,11 +721,11 @@ async onSearch(query: string) {
     <div class="solution-section-label">Root Cause</div>
     <p>In the domain, <code>price</code> is the amount the shopper pays (the sale price when there is one), and <code>compare_at_price</code> is a display-only "was this much" reference — the crossed-out number shown next to the sale price on the product card. The presence of a <code>compare_at_price</code> is also what tags an item "on sale" in the shop filter.</p>
     <p>The cart's <code>subtotal</code> computed signal reads <code>(item.product.compare_at_price || item.product.price) * item.quantity</code>. The order is inverted: when a product is on sale, <code>compare_at_price</code> is truthy, so the reduce uses the <em>higher</em> crossed-out price. <code>total()</code> derives from <code>subtotal()</code>, so both the summary Subtotal and the checkout Total inherit the same inflated number. Meanwhile every per-line template reads <code>item.product.price * item.quantity</code> directly, so line items look correct — which is exactly what makes the mismatch so confusing at first glance.</p>
-    <p class="file-path">src/lib/cart.service.ts:68–74</p>
+    <p class="file-path">src/app/services/cart.service.ts:71–77</p>
 
     <div class="solution-section-label">The Fix</div>
     <p>Read the same price the templates read. One line:</p>
-    <pre><code>// src/lib/cart.service.ts
+    <pre><code>// src/app/services/cart.service.ts
 subtotal = computed(() =&gt;
   this.items().reduce(
 <span class="diff-remove">    (sum, item) =&gt;
@@ -684,6 +737,7 @@ subtotal = computed(() =&gt;
 
     <div class="solution-section-label">How to Reproduce</div>
     <ul>
+      <li>Start with an empty cart and no applied promo codes. Remove items individually if Clear Cart is still broken.</li>
       <li>Open the header <strong>Sale</strong> link (or sort the shop by <strong>On Sale</strong>) and add any product with a "Sale" badge.</li>
       <li>In the cart modal, note the line-item price versus the modal's <strong>Total</strong> — the total will be higher.</li>
       <li>Cross-check on the cart page: the line-item total uses the sale price, but <strong>Subtotal</strong> and <strong>Total</strong> jump up to the crossed-out price.</li>
@@ -692,22 +746,15 @@ subtotal = computed(() =&gt;
 
     <div class="solution-section-label">Confirming the Fix</div>
     <ul>
-      <li>Repeat the sale-item flow: line-item price × quantity should equal the modal total, the cart Subtotal, and the checkout total.</li>
+      <li>Repeat the sale-item flow with no promo codes: line-item price × quantity should equal the modal total, the cart Subtotal, and the checkout total.</li>
       <li>Add a non-sale item alongside — the mixed cart's totals should still be the sum of each line's <code>price × quantity</code>.</li>
-      <li>Place a test order and inspect the <code>orders.subtotal</code> and <code>orders.total</code> columns — they should now match what the shopper saw at checkout.</li>
+      <li>Place a test order, open <strong>My Orders</strong>, and search by the checkout email. Confirm the order total matches checkout and the sum of its items.</li>
     </ul>
 
     <div class="solution-section-label">Why This Works</div>
     <ul>
       <li><strong>Non-sale items are unaffected.</strong> When <code>compare_at_price</code> is <code>null</code>, the old expression already fell through to <code>price</code>, so the numbers on plain items never depended on the buggy branch.</li>
-      <li><strong>The order write path is also corrected.</strong> <code>checkout.component.ts</code> passes <code>this.subtotal()</code> and <code>this.total()</code> straight into the <code>orders</code> INSERT — fixing the computed also fixes what gets persisted to the database.</li>
-    </ul>
-
-    <div class="solution-section-label">Related Pitfalls</div>
-    <ul>
-      <li><strong>Beware <code>a || b</code> as a "prefer <em>a</em>" fallback</strong> when <em>a</em> is the value you don't want in the common case. Here, <code>compare_at_price</code> is <em>set</em> precisely when there's a sale — so the truthiness check silently reversed the meaning of "which price to charge." When two fields both hold real values, name and pick explicitly (e.g., always <code>item.product.price</code>) instead of relying on truthy-fallback order.</li>
-      <li><strong>Percentage coupons compound the bug.</strong> <code>getCouponDiscount()</code> multiplies <code>subtotal()</code> by the discount rate — a wrong subtotal also inflates a percent discount, which can mask the total error by "coincidentally" bringing the number back close to the expected one. Verify with a fixed-amount coupon too.</li>
-      <li><strong>Line items in the DB were already correct.</strong> <code>order_items.price</code> is written from <code>item.product.price</code>, so historical <code>order_items</code> rows are trustworthy — but the aggregate <code>orders.subtotal</code> / <code>orders.total</code> for any shipped sale orders will be inflated.</li>
+      <li><strong>Saved orders use the corrected totals.</strong> Checkout passes the cart subtotal and total to <code>createOrder()</code>.</li>
     </ul>
   </div>
 

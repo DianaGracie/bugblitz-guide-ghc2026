@@ -116,9 +116,65 @@
   .masthead-eyebrow { font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
   .masthead h1 { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.15; color: var(--text-primary); margin-bottom: 0.5rem; }
   .masthead-sub { font-size: 1.125rem; color: var(--text-secondary); max-width: 42rem; margin: 0 auto 1.25rem; }
-  .masthead-nav { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
-  .masthead-nav a { font-family: var(--font-display); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; padding: 0.4rem 0.85rem; border: 1px solid var(--border); border-radius: 100px; transition: all 0.15s; }
-  .masthead-nav a:hover, .masthead-nav a[aria-current="page"] { color: var(--accent); border-color: var(--accent); }
+  /* Navigation between guides */
+.guide-nav {
+  --guide-hover-bg: rgba(255, 255, 255, 0.6);
+  --guide-active-bg: var(--card-bg);
+  --guide-active-text: var(--accent);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 100%;
+  gap: 0.25rem;
+  margin: 1.5rem auto -0.5rem;
+  padding: 0.3rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+.guide-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.guide-nav a:hover {
+  color: var(--text-primary);
+  background: var(--guide-hover-bg);
+}
+.guide-nav a[aria-current="page"] {
+  background: var(--guide-active-bg);
+  color: var(--guide-active-text);
+  box-shadow: 0 1px 3px var(--card-shadow), 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.guide-nav a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+:root[data-theme="dark"] .guide-nav {
+  --guide-hover-bg: rgba(255, 255, 255, 0.08);
+  --guide-active-bg: #6b21a8;
+  --guide-active-text: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .guide-nav {
+    --guide-hover-bg: rgba(255, 255, 255, 0.08);
+    --guide-active-bg: #6b21a8;
+    --guide-active-text: #ffffff;
+  }
+}
+
   h2 { font-family: var(--font-display); font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; }
   .lead { font-size: 1.125rem; color: var(--text-secondary); max-width: 48rem; margin: 2rem 0 0.5rem; }
 
@@ -340,11 +396,11 @@
   <div class="masthead-eyebrow">BugBlitz · Workshop Materials</div>
   <h1>Bug Guide</h1>
   <p class="masthead-sub">The bugs your team is tackling today. Each entry includes the reported symptom, reproduction steps, a working comparison case, and the acceptance criteria a fix must meet.</p>
-  <div class="masthead-nav">
+  <nav class="guide-nav" aria-label="Workshop guides">
     <a href="index.html">Workshop Guide</a>
     <a href="bugs.html" aria-current="page">Bug Guide</a>
     <a href="solutions.html">Solutions</a>
-  </div>
+  </nav>
 </div>
 
 <!-- Section Nav -->
@@ -607,13 +663,13 @@
       </ol>
       <div class="bug-guide-sub">Acceptance Criteria</div>
       <ol>
-        <li>The close (×) control is visible above the cookie notice on all supported mobile widths — not just tappable, but rendered without any part hidden.</li>
+        <li>The welcome offer's close (×) control is visible above the cookie notice on all supported mobile widths — not just tappable, but rendered without any part hidden.</li>
         <li>The "Start shopping" call-to-action is fully visible and fully tappable, with no portion covered by the cookie notice.</li>
         <li>The cookie notice remains fully visible and functional after the fix.</li>
         <li>Behavior on viewports wider than 768px is unchanged.</li>
       </ol>
       <div class="workshop-prompt">
-        <strong>Your mission:</strong> Investigate why the visible close control does not receive mobile taps, and propose a fix that preserves the cookie notice and makes the close control easy to tap.
+        <strong>Your mission:</strong> Investigate why the cookie notice partially or fully covers the welcome offer on mobile, and propose a fix that keeps both notices functional and the buttons visible and easy to tap.
       </div>
       <div class="bug-guide-card-footer">
         <a class="solution-link" href="solutions.html#welcome-offer-mobile">View solution →</a>
@@ -626,7 +682,7 @@
       </div>
       <h3>"Charged twice for the same order?"</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-support);"><span class="reporter-dot"></span>Reported by <strong>Customer Support</strong></div>
-      <p class="bug-guide-card-symptom">Getting a wave of complaints from customers saying they placed a single order but were charged twice. A couple of them mentioned they "clicked the button twice because nothing happened the first time." Not sure if that's related — passing it to engineering to look at.</p>
+      <p class="bug-guide-card-symptom">Getting a wave of complaints from customers saying they placed a single order but were charged twice. A couple of them mentioned they "clicked the button twice because nothing happened the first time." The <strong>My Orders</strong> tab shows duplicate orders when they search using their email. Passing it to engineering to look at.</p>
       <div class="workshop-prompt">
         <strong>Your mission:</strong> Reproduce the duplicate charge yourself, trace the checkout submit flow, and propose a fix that prevents a second checkout request from firing while the first one is still processing.
       </div>
@@ -712,7 +768,7 @@
       </div>
       <h3>"The Add to Cart button is broken on some plants"</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-support);"><span class="reporter-dot"></span>Reported by <strong>Customer Support</strong></div>
-      <p class="bug-guide-card-symptom">Customers keep messaging in convinced the "Add to Cart" button is broken on certain products — they click it and nothing happens. When I look at those products they're actually sold out, but that's not obvious to shoppers. Can we make it more obvious? People shouldn't have to contact us to figure out that a plant is out of stock.</p>
+      <p class="bug-guide-card-symptom">Customers keep messaging in convinced the "Add to Cart" button is broken on certain products — they click it and nothing happens. Those cards are faded and have an "Out of Stock" badge in the top-right corner, but shoppers seem to miss it and the button still says "Add to Cart." Can we make the availability clearer? People shouldn't have to contact us to figure out that a plant is out of stock.</p>
       <div class="workshop-prompt">
         <strong>Your mission:</strong> The reporter has told you what shoppers <em>think</em> is happening; work out what's actually happening in the UI, then propose a fix that makes the sold-out state obvious without breaking normal Add to Cart behavior on in-stock items.
       </div>
@@ -802,6 +858,7 @@
       <p class="bug-guide-card-symptom">A shopper adds an item marked "On Sale" to their cart. The line-item price in the cart matches the sale price shown on the product card, but the cart Subtotal and Total — and the checkout Order Summary and <strong>Place Order</strong> button — are calculated from the higher crossed-out price instead of the sale price.</p>
       <div class="bug-guide-sub">Reproduction Steps</div>
       <ol>
+        <li>Start with an empty cart and no applied promo codes. Remove items individually if Clear Cart is still broken.</li>
         <li>In the header, click <strong>Sale</strong> (or on the shop page, sort by <strong>On Sale</strong>) and pick any product showing a "Sale" badge with a strikethrough original price.</li>
         <li>Click <strong>Add to Cart</strong>. The cart modal opens automatically.</li>
         <li>In the modal, compare the line-item price against the modal's <strong>Total</strong> — the total is higher than the line-item price times quantity.</li>
@@ -810,7 +867,7 @@
       </ol>
       <div class="bug-guide-sub">Comparison Case</div>
       <ol>
-        <li>Add a product <em>without</em> a "Sale" badge to the cart.</li>
+        <li>Remove the sale item, then add one product <em>without</em> a "Sale" badge. Keep promo codes removed.</li>
         <li>Observe that the line-item price, the modal total, the cart Subtotal, and the checkout total all agree.</li>
       </ol>
       <div class="bug-guide-sub">Acceptance Criteria</div>
@@ -842,23 +899,23 @@
       </figure>
       <div class="bug-guide-sub">Reproduction Steps</div>
       <ol>
-        <li>Open the app and, in browser DevTools, enable a throttled network profile such as <strong>Fast 3G</strong>.</li>
-        <li>In the header search box, quickly type a short query and then extend or replace it — for example type <code>mon</code> and then highlight it to replace it with <code>snake</code>.</li>
-        <li>Repeat with a few different search terms if needed.</li>
-        <li>Observe that the suggestions may display results for an earlier query instead of the text currently in the input.</li>
+        <li>Open DevTools → <strong>Network</strong>, then type <code>mon</code> in the header search to capture its request.</li>
+        <li>Throttle that search request. <a href="https://developer.chrome.com/docs/devtools/request-conditions" target="_blank" rel="noopener noreferrer">Chrome DevTools throttling guide&nbsp;↗</a></li>
+        <li>Clear the search box.</li>
+        <li>Type <code>mon</code> again, then quickly replace it with <code>snake</code> while the first request is pending.</li>
+        <li>Watch for suggestions that no longer match the text in the search box.</li>
       </ol>
       <div class="bug-guide-sub">Comparison Case</div>
       <ol>
-        <li>Open the app on a normal network profile or with a stable connection.</li>
-        <li>Type a new query in the header search box.</li>
-        <li>Watch the suggestions update as each character is entered.</li>
-        <li>Observe that the visible suggestions remain consistent with the latest text and do not lag behind the current query.</li>
+        <li>Refresh the page.</li>
+        <li>Paste <code>snake</code> into the header search box.</li>
+        <li>Wait for the suggestions and confirm they match <code>snake</code>.</li>
       </ol>
       <div class="bug-guide-sub">Acceptance Criteria</div>
       <ol>
         <li>Header-search suggestions always correspond to the text currently in the input, regardless of request order or network latency.</li>
         <li>Responses from stale (superseded) requests are discarded and never overwrite newer results.</li>
-        <li>Behavior is verified under a throttled network profile (e.g., Fast 3G) with rapid typing.</li>
+        <li>Behavior is verified with network throttling enabled and rapid changes to the search text.</li>
         <li>No new console errors or unhandled promise rejections introduced by the fix.</li>
       </ol>
       <div class="workshop-prompt">
