@@ -663,7 +663,7 @@
       </ol>
       <div class="bug-guide-sub">Acceptance Criteria</div>
       <ol>
-        <li>The welcome offer's close (×) control is visible above the cookie notice on all supported mobile widths — not just tappable, but rendered without any part hidden.</li>
+        <li>The welcome offer's close (×) control is visible above the cookie notice on all supported mobile widths. It should be tappable and rendered without any part hidden.</li>
         <li>The "Start shopping" call-to-action is fully visible and fully tappable, with no portion covered by the cookie notice.</li>
         <li>The cookie notice remains fully visible and functional after the fix.</li>
         <li>Behavior on viewports wider than 768px is unchanged.</li>
@@ -720,7 +720,7 @@
       <div class="reporter-line" style="--reporter-color: var(--role-director);"><span class="reporter-dot"></span>Reported by <strong>Director</strong></div>
       <p class="bug-guide-card-symptom">Sales flagged this — orders from non-US customers aren't going through. Canada, UK, and Japan all seeing it. Would like a triage plan by end of day: whether this is a same-day fix or something that needs a temporary workaround while a proper fix ships.</p>
       <div class="workshop-prompt">
-        <strong>Your mission:</strong> Confirm the problem is real, then decide how to treat it — immediate fix, temporary workaround, or defer. If your answer isn't "fix it now, top priority," be ready to explain the reasoning.
+        <strong>Your mission:</strong> Reproduce the checkout failure with a valid international postal code, trace the validation logic, and propose a fix that supports the selected country without breaking US ZIP validation.
       </div>
       <div class="bug-guide-card-footer">
         <a class="solution-link" href="solutions.html#international-postal-code">View solution →</a>
@@ -733,13 +733,13 @@
       </div>
       <h3>State/Province selection carries over when the country changes</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-qa);"><span class="reporter-dot"></span>Reported by <strong>QA Tester</strong></div>
-      <p class="bug-guide-card-symptom">A shopper changes the selected country in the checkout form, but a previously chosen state or province value silently carries over — so the form submits with a state that doesn't belong to the new country.</p>
+      <p class="bug-guide-card-symptom">A shopper changes the selected country in the checkout form, but a previously chosen state or province value silently carries over, so the form submits with a state that doesn't belong to the new country.</p>
       <div class="bug-guide-sub">Reproduction Steps</div>
       <ol>
         <li>Add any item to the cart and navigate to the checkout page.</li>
         <li>Select <strong>United States</strong> as the country and pick a state (e.g., <strong>California</strong>).</li>
         <li>Change the country to a different one (e.g., <strong>Germany</strong> or <strong>United Kingdom</strong>).</li>
-        <li>Fill in the remaining fields and submit — or inspect the form data.</li>
+        <li>Fill in the remaining fields and submit the form or inspect the form data.</li>
         <li>Observe that the state field still holds the previously chosen value ("CA") even though it makes no sense for the new country.</li>
       </ol>
       <div class="bug-guide-sub">Comparison Case</div>
@@ -861,7 +861,7 @@
         <li>Start with an empty cart and no applied promo codes. Remove items individually if Clear Cart is still broken.</li>
         <li>In the header, click <strong>Sale</strong> (or on the shop page, sort by <strong>On Sale</strong>) and pick any product showing a "Sale" badge with a strikethrough original price.</li>
         <li>Click <strong>Add to Cart</strong>. The cart modal opens automatically.</li>
-        <li>In the modal, compare the line-item price against the modal's <strong>Total</strong> — the total is higher than the line-item price times quantity.</li>
+        <li>In the modal, compare the line-item price against the modal's <strong>Total</strong>. The total is higher than the line-item price times quantity.</li>
         <li>Click <strong>View Cart &amp; Checkout</strong>. On the cart page, the line item shows the sale price, but the <strong>Subtotal</strong> and <strong>Total</strong> use the original (pre-sale) price.</li>
         <li>Click <strong>Proceed to Checkout</strong>. The Order Summary and the <strong>Place Order</strong> button both show the inflated total.</li>
       </ol>
@@ -879,7 +879,7 @@
         <li>A percentage-based promo code applied on top of a sale item discounts against the sale price, not the crossed-out price.</li>
       </ol>
       <div class="workshop-prompt">
-        <strong>Your mission:</strong> Reproduce the mismatch between the line-item price and the summary total, trace how the cart's subtotal is computed, and propose a fix that honors the sale price consistently across the modal, cart, and checkout — without regressing non-sale items.
+        <strong>Your mission:</strong> Reproduce the mismatch between the line-item price and the summary total, trace how the cart's subtotal is computed, and propose a fix that honors the sale price consistently across the modal, cart, and checkout.
       </div>
       <div class="bug-guide-card-footer">
         <a class="solution-link" href="solutions.html#sale-price-not-honored">View solution →</a>
