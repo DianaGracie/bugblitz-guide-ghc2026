@@ -1323,6 +1323,13 @@
 
 .setup-step-content h4 {
   font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 0.15rem 0 0.5rem;
+}
+
+.setup-step-content h5 {
+  font-family: var(--font-display);
   font-size: 1rem;
   color: var(--text-primary);
   margin: 0.15rem 0 0.5rem;
@@ -1415,6 +1422,21 @@
   margin-top: 0.4rem;
 }
 
+.header-controls-guide {
+  margin: 1.25rem 0 0.5rem;
+}
+.header-controls-guide img {
+  display: block;
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.header-controls-guide figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
 .setup-note {
   margin-top: 0.7rem !important;
   font-size: 0.84rem !important;
@@ -1504,6 +1526,14 @@
   color: var(--text-secondary);
 }
 
+.setup-control-group > :last-child {
+  margin-bottom: 0;
+}
+
+.setup-control-group .header-controls-guide {
+  margin-top: 0.75rem;
+}
+
 .setup-callout strong {
   color: var(--text-primary);
 }
@@ -1566,10 +1596,10 @@
   function launchStackBlitz() {
     const input = document.getElementById('table-input');
     const errorEl = document.getElementById('table-input-error');
-    const teamId = parseInt(input.value, 10);
+    const teamId = Number(input.value);
 
     // Validation: Check if missing/empty or out of 1-50 range
-    if (isNaN(teamId) || teamId < 1 || teamId > 50) {
+    if (!Number.isInteger(teamId) || teamId < 1 || teamId > 50) {
       errorEl.textContent = 'Please enter a valid table number between 1 and 50.';
       errorEl.style.display = 'block';
       input.setAttribute('aria-invalid', 'true');
@@ -1702,7 +1732,7 @@
 
             <p>
               Enter your table number or scan the QR code at your table.
-              This connects you to your team's isolated database schema.
+              This selects your team for sharing live data in Supabase.
             </p>
 
             <!-- Table Number Launcher -->
@@ -1714,7 +1744,7 @@
                   id="table-input" 
                   type="number" 
                   min="1" 
-                  max="20" 
+                  max="50"
                   value="1" 
                   aria-describedby="table-input-error"
                   oninput="clearTableError()"
@@ -1743,7 +1773,7 @@
             <p class="setup-note">
               <strong>⚠️ Important:</strong>
               The <code>?team=&lt;id&gt;</code> parameter routes database requests
-              to your squad's isolated schema in Supabase. <strong>Do not remove it.</strong>
+              to your team's shared schema in Supabase. <strong>Do not remove it.</strong>
             </p>
           </div>
 
@@ -1788,30 +1818,30 @@
               </p>
             </div>
 
-            <div class="setup-connect">
-              <strong>Connect to your team's database:</strong>
-
-              <ul>
-                <li>
-                  <strong>Via URL:</strong>
-                  Navigate to
-                  <code>http://localhost:4200/?team=&lt;table number&gt;</code>
-                </li>
-                <li>
-                  <strong>Via Code:</strong>
-                  Set
-                  <code>team: '&lt;table number&gt;'</code>
-                  inside
-                  <code>src/environments/environment.ts</code>
-                </li>
-              </ul>
+            <div class="setup-connect setup-control-group">
+              <h5>Select Your Team</h5>
+              <p>Open <code>http://localhost:4200/</code> once the app starts. Click the
+                <strong>Team</strong> badge in the header, enter your assigned team
+                number, and click <strong>Set team</strong>.</p>
+              <p class="setup-note">Note that you can still participate with <strong>Team: None</strong>, but live Supabase data will be shared with other participants who haven’t selected a team.</p>
             </div>
+          </div>
+
+          <div class="setup-connect setup-control-group">
+            <h4>View or Update Your Current Setup</h4>
+            <figure class="header-controls-guide">
+              <img src="header-controls.png" width="1280" height="130"
+                alt="The Green Nook app header with the Workshop Mode: Live Supabase and Team: None dropdown controls."
+                loading="lazy" />
+              <figcaption>The header badges show your selected team and whether you are in Live Supabase or Mock API mode. Click either badge to make a change.</figcaption>
+            </figure>
+            <p class="setup-note">On a small viewport width, open the hamburger menu (☰) to find the badges.</p>
           </div>
 
           <aside class="setup-troubleshooting" id="mock-api-mode" aria-labelledby="mock-api-heading">
             <h4 id="mock-api-heading">Troubleshooting Network Restrictions</h4>
-            <p>If you don't see any products after loading the app, choose <strong>Mock API</strong> from the app's <strong>Workshop Mode</strong> toggle. You can also append <code>&amp;mock=true</code> to your team URL.</p>
-            <p>Mock mode uses local data that is not shared with your team. Orders will only be visible to you and will reset when the app is reloaded. Switch back to <strong>Live Supabase</strong> using the same menu. In Supabase mode, team members will share the same data and orders.</p>
+            <p>If your network blocks Supabase, click the Workshop <strong>Mode</strong> badge and choose <strong>Switch to Mock API</strong> to continue with local mock data.</p>
+            <p>Mock data isn’t shared with your team. Mock orders will reset if you restart the mock server. Keep your team selected in case you switch back to <strong>Live Supabase</strong>.</p>
           </aside>
         </div>
       </div>
@@ -1893,7 +1923,7 @@
         <div class="goal-icon">🎯</div>
         <div>
           <h3>Triage Mastery</h3>
-          <p>Sort a pile of incoming bug reports into P1/P2/P3 and level-of-effort — quickly, and with reasoning you can defend.</p>
+          <p>Sort a pile of incoming bug reports into severity levels and effort levels— quickly, and with reasoning you can defend.</p>
         </div>
       </div>
       <div class="goal-card">
@@ -1945,7 +1975,7 @@
     <ol class="objectives-list">
       <li>
         <strong>Triage First.</strong>
-        Assign priority and effort to the reported bugs. Sort them into P1/P2/P3 with a quick effort estimate and be ready to defend your ranking in one sentence per ticket.
+        Assess each bug by user impact and effort. Decide what needs attention first, what can wait, and be ready to defend your reasoning.
       </li>
       <li>
         <strong>Share the Why.</strong>
@@ -1953,7 +1983,7 @@
       </li>
       <li>
         <strong>Choose Your Approach.</strong>
-        Decide between a quick workaround and a comprehensive fix. Both are right answers in the right column of the Priority × Effort matrix.
+        Decide between a quick workaround and a comprehensive fix. Either can be the right answer depending on the bug's complexity, its impact, and the time you have.
       </li>
       <li>
         <strong>Problem Solve.</strong>
@@ -2038,7 +2068,7 @@
       </div>
       <div class="hint-item">
         <div class="hint-icon">🃏</div>
-        <div class="hint-text"><strong>Reach for the guide.</strong> Stuck? Skim the Bug Guide for repro steps and the Brief · Audit · Own framework for prompting AI well. A facilitator is your last resort — not your first.</div>
+        <div class="hint-text"><strong>Reach for the guide.</strong> Stuck? Check the Bug Guide for reproduction steps and the Brief · Audit · Own framework for prompting AI.</div>
       </div>
       <div class="hint-item">
         <div class="hint-icon">🔍</div>
