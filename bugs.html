@@ -208,6 +208,13 @@
   .reporter-dot { display: inline-block; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--reporter-color, var(--accent)); flex-shrink: 0; }
   .bug-guide-card h3 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.15rem; }
   .bug-guide-card-symptom { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem; font-style: italic; }
+  .bug-guide-address { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.35rem 1.25rem; margin: 0 0 1rem; padding: 0.75rem 1rem; background: var(--surface); border: 1px solid var(--border-light); border-radius: 6px; font-size: 0.9rem; line-height: 1.6; }
+  .bug-guide-address dt { font-weight: 700; color: var(--text-primary); }
+  .bug-guide-address dd { margin: 0; color: var(--text-secondary); overflow-wrap: anywhere; }
+  @media (max-width: 400px) {
+    .bug-guide-address { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .bug-guide-address dd:not(:last-child) { margin-bottom: 0.5rem; }
+  }
   .bug-guide-repro { margin: 0 0 1rem; }
   .bug-guide-repro img { display: block; width: 100%; height: auto; border: 1px solid var(--border-light); border-radius: 6px; }
   .bug-guide-repro figcaption { margin-top: 0.35rem; color: var(--text-muted); font-size: 0.78rem; font-style: italic; }
@@ -697,10 +704,10 @@
       </div>
       <h3>Checkout error message is unhelpful — hurting conversion</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-pm);"><span class="reporter-dot"></span>Reported by <strong>Product Manager</strong></div>
-      <p class="bug-guide-card-symptom">When a shopper submits checkout with a missing or invalid field, they get one generic "Please fill in all fields" message with no indication of <em>which</em> field is the problem. Session replays show people re-checking every input in frustration; funnel data shows abandonment spikes at this step. Fixing this should be a straightforward conversion win.</p>
+      <p class="bug-guide-card-symptom">When a shopper submits checkout with a missing required field, they get one generic "Please fill in all fields" message with no indication of <em>which</em> field is the problem. Session replays show people re-checking every input in frustration; funnel data shows abandonment spikes at this step. Fixing this should be a straightforward conversion win.</p>
       <div class="bug-guide-sub">What good looks like</div>
       <ul>
-        <li>Each invalid field is called out inline, with a message that names the field and what's expected.</li>
+        <li>Each missing required field is called out inline, with a message that names the field and what's expected.</li>
         <li>Valid fields don't get flagged as errors.</li>
         <li>Successful submissions behave exactly as they do today.</li>
       </ul>
@@ -719,6 +726,14 @@
       <h3>International customers can't check out</h3>
       <div class="reporter-line" style="--reporter-color: var(--role-director);"><span class="reporter-dot"></span>Reported by <strong>Director</strong></div>
       <p class="bug-guide-card-symptom">Sales flagged this — orders from non-US customers aren't going through. Canada, UK, and Japan all seeing it. Would like a triage plan by end of day: whether this is a same-day fix or something that needs a temporary workaround while a proper fix ships.</p>
+      <p class="bug-guide-card-symptom">A Canadian customer reported that the following address wasn't accepted:</p>
+      <dl class="bug-guide-address">
+        <dt>Street address</dt><dd>100 Queen's Park</dd>
+        <dt>City</dt><dd>Toronto</dd>
+        <dt>Province</dt><dd>ON</dd>
+        <dt>Postal code</dt><dd>M5S 2C6</dd>
+        <dt>Country</dt><dd>Canada</dd>
+      </dl>
       <div class="workshop-prompt">
         <strong>Your mission:</strong> Reproduce the checkout failure with a valid international postal code, trace the validation logic, and propose a fix that supports the selected country without breaking US ZIP validation.
       </div>
@@ -751,7 +766,7 @@
       <ol>
         <li>Changing the country clears any previously selected state/province value.</li>
         <li>The state field re-renders correctly (select vs. free-text input) based on the new country's regions.</li>
-        <li>The required-field check catches the empty state after a country change instead of allowing a stale value to slip through.</li>
+        <li>When State/Province is required for the selected country, the required-field check catches the empty value after a country change instead of allowing a stale value to slip through. Otherwise, the field is optional or hidden and an empty value does not block submission.</li>
         <li>No regressions to the initial country selection flow.</li>
       </ol>
       <div class="workshop-prompt">
