@@ -488,21 +488,51 @@ if (!pattern.test(this.form.zip.trim())) {
     <a class="solution-bug-link" href="bugs.html#stale-state">← back to bug</a>
 
     <div class="solution-section-label">Root Cause</div>
-    <p>The <code>onCountryChange</code> handler updates the region list, label, and ZIP label — but never clears <code>form.state</code>. A previous value (e.g., <code>"CA"</code>) silently persists and passes the required-field check.</p>
+    <p>The <code>onCountryChange</code> handler updates the region list, label, and ZIP label — but never clears <code>form.state</code>. A previous value (e.g., <code>"CA"</code>) silently persists and passes the required-field check. Additionally, the validation logic doesn't account for countries that do not require states, provinces, or regions in valid mailing addresses.</p>
     <p class="file-path">src/app/components/checkout/checkout.component.ts:113–119</p>
 
     <div class="solution-section-label">The Fix</div>
-    <pre><code>onCountryChange(): void {
+    <p>Clear the state on every country change and only make the field required for countries that need it. For this workshop, require a region for the US, Canada, and Australia; leave it optional elsewhere.</p>
+    <p class="file-path">src/app/components/checkout/checkout.component.ts:113–119 (original lines)</p>
+    <pre><code><span class="diff-add">get stateRequired(): boolean {
+  return ['United States', 'Canada', 'Australia'].includes(this.form.country);
+}
+</span>
+onCountryChange(): void {
   const country = this.form.country;
-<span class="diff-add">  this.form.state = ''; // reset dependent field</span>
+<span class="diff-add">  this.form.state = '';</span>
   this.stateOptions = REGIONS[country] ?? [];
   this.hasRegions = this.stateOptions.length &gt; 0;
   this.stateLabel = STATE_LABELS[country] ?? 'State / Province';
   this.zipLabel = country === 'United States' ? 'ZIP Code' : 'Postal Code';
 }</code></pre>
+    <p class="file-path">src/app/components/checkout/checkout.component.ts:129–135 (original lines)</p>
+    <pre><code>// …
+      !this.form.city ||
+<span class="diff-remove">      !this.form.state ||</span>
+<span class="diff-add">      (this.stateRequired &amp;&amp; !this.form.state.trim()) ||</span>
+      !this.form.zip ||
+      !this.form.country
+    ) {
+<span class="diff-remove">      this.errorMessage.set('Please fill in all fields.');</span>
+<span class="diff-add">      this.errorMessage.set('Please fill in all required fields.');</span>
+      return;
+// …</code></pre>
+    <p class="file-path">src/app/components/checkout/checkout.component.html:49–52 (original lines)</p>
+    <pre><code><span class="diff-remove">&lt;label for="state"&gt;{{ stateLabel }}&lt;/label&gt;</span>
+<span class="diff-add">&lt;label for="state"&gt;{{ stateLabel }}{{ stateRequired ? '' : ' (optional)' }}&lt;/label&gt;</span>
+@if (hasRegions) {
+<span class="diff-remove">  &lt;select id="state" [(ngModel)]="form.state" name="state" required&gt;</span>
+<span class="diff-add">  &lt;select id="state" [(ngModel)]="form.state" name="state" [required]="stateRequired"&gt;</span>
+<span class="diff-remove">    &lt;option value="" disabled&gt;Select {{ stateLabel }}&lt;/option&gt;</span>
+<span class="diff-add">    &lt;option value="" [disabled]="stateRequired"&gt;Select {{ stateLabel }}&lt;/option&gt;</span>
+  &lt;!-- … --&gt;</code></pre>
+    <p class="file-path">src/app/components/checkout/checkout.component.html:58 (original lines)</p>
+    <pre><code><span class="diff-remove">&lt;input id="state" type="text" [(ngModel)]="form.state" name="state" required placeholder="{{ stateLabel }}" /&gt;</span>
+<span class="diff-add">&lt;input id="state" type="text" [(ngModel)]="form.state" name="state" [required]="stateRequired" placeholder="{{ stateLabel }}" /&gt;</span></code></pre>
 
     <div class="solution-section-label">Confirming the Fix</div>
-    <p>Select a US state, then change the country to Canada. Confirm the state is cleared and a Canadian province must be selected before submitting.</p>
+    <p>Switch from California to Canada: the value clears and a province is required. Switch to France: the value clears and an empty region passes validation.</p>
     <div class="solution-section-label">Related Pitfall</div>
     <ul>
       <li><strong>Dependent fields must be reset when their parent changes.</strong> This is a universal form pattern — country → state, category → subcategory, product → variant, and so on.</li>
