@@ -348,10 +348,10 @@ export class CheckoutComponent {
     <div class="solution-section-label">Why This Works</div>
     <ul>
       <li>
-        <strong>Template Guardrail:</strong> Disabling the button in the HTML template prevents mouse clicks and browser-level submit events from reaching our code once a request starts.
+        <strong>Template Guardrail:</strong> Disabling the button prevents additional clicks while the order request is in progress.
       </li>
       <li>
-        <strong>Component Logic Guardrail:</strong> Checking <code>if (this.submitting()) return;</code> acts as a fallback guard in case the user triggers submission using keyboard shortcuts
+        <strong>Component Logic Guardrail:</strong> Checking <code>submitting()</code> inside <code>onSubmit()</code> protects against submissions that arrive before the button becomes disabled, preventing a second request.
       </li>
     </ul>
 
@@ -364,7 +364,7 @@ export class CheckoutComponent {
         <strong>Always clean up state:</strong> Placing <code>this.submitting.set(false)</code> inside a <code>finally</code> block ensures the button unlocks if the order request fails, so the user can retry.
       </li>
       <li>
-        <strong>Browser & backend guards:</strong> Web apps should guard actions at both the interface level (disabling buttons) and the backend API level (for example, by checking a unique order id to see if the order has already been processed).
+        <strong>Backend protection:</strong> In production, assign a unique ID to each checkout attempt and reuse it when retrying. The backend uses this ID—known as an <strong>idempotency key</strong>—to ensure that duplicate requests create only one order.
       </li>
     </ul>
   </div>
@@ -731,7 +731,7 @@ subtotal = computed(() =&gt;
     <div class="solution-section-label">Root Cause</div>
     <p>Each keystroke fires a new search request, but responses are applied in the order they arrive, not the order they were requested. On a slow network, the response for <code>mon</code> can land <em>after</em> the response for <code>snake</code>, overwriting the correct results.</p>
     <div class="solution-section-label">The Fix</div>
-    <p>Give each search change a sequence number. Only the latest search may update results or loading state, including when the query is cleared or a request fails.</p>
+    <p>Clear previous suggestions when the query changes. Give each search change a sequence number so only the latest search may update results or loading state.</p>
     <pre><code>// src/app/components/header/header.component.ts
 <span class="diff-add">private requestSeq = 0;</span>
 
@@ -744,6 +744,7 @@ async onSearchChange(query: string) {
     return;
   }
 
+<span class="diff-add">  this.searchResults.set([]);</span>
   this.searchLoading.set(true);
   try {
 <span class="diff-remove">    this.searchResults.set(await this.storeData.searchProducts(trimmedQuery));</span>
@@ -776,6 +777,7 @@ async onSearchChange(query: string) {
       <li>Confirm the <code>snake</code> suggestions stay visible after the delayed <code>mon</code> response arrives.</li>
       <li>Search for <code>mon</code> again and clear the input while its request is pending. Suggestions should stay empty after the response arrives.</li>
       <li>Clear the throttling rule afterward to clean it up.</li>
+      <li>Wait for suggestions to appear, then change the query. Confirm the old suggestions disappear while the new search loads.</li>
     </ol>
   </div>
 
