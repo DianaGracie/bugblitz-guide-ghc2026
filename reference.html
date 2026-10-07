@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html data-page="reference">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BugBlitz Workshop Reference</title>
+<link rel="stylesheet" href="styles.css">
+
+<div class="masthead">
+  <div class="masthead-eyebrow">BugBlitz · Workshop Materials</div>
+  <h1>Workshop Reference</h1>
+  <p class="masthead-sub">Goals, debugging mindset, AI prompting tips, and release day perspectives to support your team during the exercise.</p>
+  <nav class="guide-nav" aria-label="Workshop guides">
+    <a href="index.html">Workshop Guide</a>
+    <a href="bugs.html">Bug Report</a>
+    <a href="solutions.html">Solutions</a>
+    <a href="reference.html" aria-current="page">Reference</a>
+  </nav>
+</div>
+<nav class="section-nav" aria-label="Page sections">
+  <div class="section-nav-inner">
+    <a href="#goals">Goals</a>
+    <a href="#mindset">Mindset</a>
+    <a href="#severity">Severity &amp; Priority</a>
+    <a href="#bug-types">Bug Types</a>
+    <a href="#ai-tips">AI Tips</a>
+    <a href="#roles">Stakeholders</a>
+    <a href="#hints">Hints</a>
+  </div>
+</nav>
+<div class="content">
+  <!-- Workshop Goals -->
+  <section id="goals">
+    <div class="section-label">Why We're Here</div>
+    <h2>Workshop Goals</h2>
+    <p class="lead">By the end of the hour, you'll have practiced four things that actually matter on release day.</p>
+
+    <div class="goals-grid">
+      <div class="goal-card">
+        <div class="goal-icon">💪</div>
+        <div>
+          <h3>Confidence Building</h3>
+          <p>Walk into your next launch day knowing you have a repeatable playbook for the moment things break.</p>
+        </div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-icon">🤝</div>
+        <div>
+          <h3>Teamwork &amp; Communication</h3>
+          <p>Bring different release day perspectives into the discussion, share context, and land at a decision the whole War Room can back.</p>
+        </div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-icon">🎯</div>
+        <div>
+          <h3>Triage Mastery</h3>
+          <p>Sort a pile of incoming bug reports into severity levels and effort levels— quickly, and with reasoning you can defend.</p>
+        </div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-icon">🛠️</div>
+        <div>
+          <h3>Debugging &amp; DevTools</h3>
+          <p>Practice using the browser Console, Elements, and Network tabs — plus AI as a debugging partner — to isolate root causes fast.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bug-Busting Mindset -->
+  <section id="mindset">
+    <div class="section-label">Set the Tone</div>
+    <h2>Bug-Busting Mindset</h2>
+    <p class="lead">Bugs on release day come with the territory. A calm War Room isn't one where nothing broke — it's one that knows how to react. Three pillars carry that.</p>
+
+    <div class="mindset-grid">
+      <div class="pillar-card">
+        <div class="pillar-card-num">Pillar 1</div>
+        <h3>Psychological Safety</h3>
+        <p class="pillar-card-subtitle">Reward Curiosity</p>
+        <p>Respond together, not with blame or panic. Surface what's broken and share context.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-card-num">Pillar 2</div>
+        <h3>Strategic Triage &amp; Trade-Offs</h3>
+        <p class="pillar-card-subtitle">Functional over Flawless</p>
+        <p>Weigh impact against effort. Resolve true release blockers now; defer the rest.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-card-num">Pillar 3</div>
+        <h3>Leveraging Your Voice</h3>
+        <p class="pillar-card-subtitle">Own Your Reasoning</p>
+        <p>Back your decisions with clear rationale. Make sure your reasoning is visible, not just assumed.</p>
+      </div>
+    </div>
+
+    <div class="mindset-tagline">True success is getting a different console error than before.</div>
+  </section>
+
+
+  <!-- Severity Guide -->
+  <section id="severity">
+    <div class="section-label">Triage &amp; Prioritize</div>
+    <h2>Bug Severity Levels</h2>
+    <p class="lead">Severity describes how badly a bug affects the product. Priority describes how urgently your team should address it. Use severity alongside customer impact, available workarounds, and release timing to choose a priority: P1 (High), P2 (Medium), or P3 (Low).</p>
+
+    <div style="margin-top: 1.25rem; padding: 1rem 1.25rem; background: var(--surface); border-radius: 8px; font-size: 0.92rem; color: var(--text-secondary); line-height: 1.55;">
+      <strong style="color: var(--text-primary);">Workaround vs. root-cause fix — pick on purpose.</strong>
+      A workaround shrinks the blast radius today (a feature flag, a hidden button, a "we know" banner). A root-cause fix removes the bug for good but takes longer to land.
+    </div>
+
+    <div class="severity-list">
+      <div class="severity-row">
+        <div class="severity-badge critical">Critical</div>
+        <div class="severity-content">
+          <h3>Blocker — Feature Completely Broken</h3>
+          <p>No workaround exists. Prevents a primary user flow. Causes severe loss of revenue, data loss, security vulnerabilities, or widespread app crashes.</p>
+          <div class="examples"><strong>Example impact:</strong> Users can't check out, the cart total is wrong by orders of magnitude, or the app crashes on load.</div>
+        </div>
+      </div>
+
+      <div class="severity-row">
+        <div class="severity-badge major">Major</div>
+        <div class="severity-content">
+          <h3>Behavioral — Badly Frustrating UX</h3>
+          <p>A workaround exists but causes highly frustrating user experience. Frustrated users can still eventually check out, but something important is clearly wrong.</p>
+          <div class="examples"><strong>Example impact:</strong> The cart doesn't update correctly, a promotional code fails to apply, or a form rejects valid input.</div>
+        </div>
+      </div>
+
+      <div class="severity-row">
+        <div class="severity-badge minor">Minor</div>
+        <div class="severity-content">
+          <h3>Cosmetic — Polish &amp; Alignment</h3>
+          <p>Typographical errors or minor alignment issues with negligible impact. The app functions correctly but looks less polished. Users can still shop without friction.</p>
+          <div class="examples"><strong>Example impact:</strong> A button has the wrong shade of color, a label has a typo, or icons are slightly misaligned.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bug Types -->
+  <section id="bug-types">
+    <div class="section-label">What You'll Encounter</div>
+    <h2>Bug Categories</h2>
+    <p class="lead">The Bug Report contains a variety of issue types. Each requires different debugging tools and approaches.</p>
+
+    <div class="bug-categories">
+      <div class="bug-cat">
+        <div class="bug-cat-icon">🎨</div>
+        <h3>Visual / CSS</h3>
+        <p>Layout breaks, z-index conflicts, pop-ups that won't close, mobile responsiveness issues.</p>
+      </div>
+      <div class="bug-cat">
+        <div class="bug-cat-icon">🔢</div>
+        <h3>Logic &amp; Calculation</h3>
+        <p>Incorrect totals, wrong price references, off-by-one errors, string math instead of number math.</p>
+      </div>
+      <div class="bug-cat">
+        <div class="bug-cat-icon">📋</div>
+        <h3>Form Validation</h3>
+        <p>Overly strict regex, stale state carried between selections, generic error messages that don't help the user.</p>
+      </div>
+      <div class="bug-cat">
+        <div class="bug-cat-icon">🗄️</div>
+        <h3>Database / Data</h3>
+        <p>Incorrect data references, sale prices not honored, data fetching errors.</p>
+      </div>
+      <div class="bug-cat">
+        <div class="bug-cat-icon">🖱️</div>
+        <h3>Interaction &amp; State</h3>
+        <p>Buttons not responding, double-click registering twice, sold-out items silently added to cart.</p>
+      </div>
+      <div class="bug-cat">
+        <div class="bug-cat-icon">📱</div>
+        <h3>Device-Specific</h3>
+        <p>Touch targets too small on mobile, scroll bugs on iOS, viewport-specific rendering issues.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI Debugging Tips -->
+  <section id="ai-tips">
+    <div class="section-label">AI as Your Sidekick</div>
+    <h2>Prompting</h2>
+    <p class="lead">AI agents can accelerate your debugging — but only if you prompt them well. Know where they shine and where they need a push, then use the three-step framework below on every prompt.</p>
+
+    <div class="ai-split">
+      <div class="ai-split-card">
+        <h3>AI's strong suits</h3>
+        <ul>
+          <li>Decoding a cryptic error — paste the surrounding code and one sentence about what you were doing; you'll usually get a real lead.</li>
+          <li>Spotting the mechanical stuff: typos, missing semicolons, swapped argument order. Anything a second read would catch.</li>
+          <li>Drafting unit tests once you've told it the behavior you want. Coverage without the boilerplate.</li>
+        </ul>
+      </div>
+      <div class="ai-split-card">
+        <h3>Where AI needs a nudge</h3>
+        <ul>
+          <li>It can't see your app. Describe what's on screen and what you expected instead — vague prompts get vague fixes.</li>
+          <li>Don't accept the first suggestion. Make it defend its logic, then read the diff before you click accept.</li>
+          <li>Feed it the framework, file paths, and data shape — otherwise you'll get textbook Angular answers to your very specific bug.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="prompt-framework-intro">You can't throw a vague request at an agent and expect production-ready code. To get the most out of AI during a high-pressure release, use a three-step framework: <strong>Brief, Audit, and Own</strong>.</p>
+
+    <div class="prompt-framework-grid">
+      <div class="prompt-framework-card">
+        <div class="prompt-framework-num">Step 1</div>
+        <h3>Brief the Agent</h3>
+        <ul>
+          <li>Define your role and the specific issue.</li>
+          <li>Provide full context — logs, code, environment.</li>
+          <li>State the current behavior vs. the expected behavior.</li>
+        </ul>
+      </div>
+      <div class="prompt-framework-card">
+        <div class="prompt-framework-num">Step 2</div>
+        <h3>Audit the Output</h3>
+        <ul>
+          <li>Don't assume AI is correct — watch for hallucinations.</li>
+          <li>Force the agent to defend its logic.</li>
+          <li>Stress-test for missing edge cases.</li>
+        </ul>
+      </div>
+      <div class="prompt-framework-card">
+        <div class="prompt-framework-num">Step 3</div>
+        <h3>Own the Solution</h3>
+        <ul>
+          <li>Never just click "Accept."</li>
+          <li>Ask for step-by-step breakdowns.</li>
+          <li>Cross-reference with reputable documentation.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roles -->
+  <section id="roles">
+    <div class="section-label">Know Your Team</div>
+    <h2>Release Day Stakeholders</h2>
+    <p class="lead">A release day War Room brings together people with different responsibilities. These stakeholders bring different perspectives to triage, fixes, and launch decisions. Bug reporters are the people who raise specific issues; not every stakeholder needs to file a report to contribute to the release.</p>
+
+    <div class="roles-grid">
+      <div class="role-card" style="--role-color: var(--role-dev)">
+        <div class="role-card-title">Software Engineer / Developer</div>
+        <div class="role-card-vibe">The builder, the fixer, and the realist.</div>
+        <p>Engineers investigate errors, read stack traces, and write fixes. They assess technical risk and estimate how much work a fix will take.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Technical health of the app, state management, errors in the console, and writing the actual fix.</div>
+      </div>
+
+      <div class="role-card" style="--role-color: var(--role-pm)">
+        <div class="role-card-title">Product Owner / Product Manager</div>
+        <div class="role-card-vibe">The voice of the business and the customer.</div>
+        <p>Product managers connect bugs to customer experience and business impact. They help the team prioritize issues that affect revenue, conversion, and trust.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Business impact, customer experience, and how the bug makes the company look.</div>
+      </div>
+
+      <div class="role-card" style="--role-color: var(--role-design)">
+        <div class="role-card-title">Design</div>
+        <div class="role-card-vibe">The voice of usability and a clear, consistent experience.</div>
+        <p>Designers spot confusing interactions, layout problems, and barriers to using the product. They help the team assess whether a fix works across screen sizes and input methods.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Usability, visual hierarchy, accessibility, and interaction consistency.</div>
+      </div>
+
+      <div class="role-card" style="--role-color: var(--role-lead)">
+        <div class="role-card-title">People Leader / Engineering Manager</div>
+        <div class="role-card-vibe">The shield, the translator, and the resource allocator.</div>
+        <p>Engineering managers protect the team from unnecessary panic, keep work scoped, and make sure the right people work on the right issues.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Team capacity, project prioritization, and shielding engineers so they can actually focus on debugging.</div>
+      </div>
+
+      <div class="role-card" style="--role-color: var(--role-qa)">
+        <div class="role-card-title">QA Tester</div>
+        <div class="role-card-vibe">The gatekeeper of quality and the customer advocate.</div>
+        <p>QA testers reproduce issues, identify edge cases, and verify fixes. They check for regressions and help the team assess whether the release is ready.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Identifying edge cases, ensuring the fix doesn't create new bugs, and validating from the user's perspective.</div>
+      </div>
+
+      <div class="role-card" style="--role-color: var(--role-director)">
+        <div class="role-card-title">Leadership / Director</div>
+        <div class="role-card-vibe">The big picture and the bottom line.</div>
+        <p>Leaders weigh release timing, business risk, and customer impact. They need clear status updates to support launch decisions and communicate with stakeholders.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Revenue impact, brand risk, and high-level status updates for stakeholders.</div>
+      </div>
+
+      <div class="role-card" style="--role-color: var(--role-support)">
+        <div class="role-card-title">Customer Support</div>
+        <div class="role-card-vibe">The frontline voice, calming the waters.</div>
+        <p>Customer support brings reports from affected customers into the release day conversation. They collect details engineering needs, spot patterns across tickets, and keep customers informed while a fix is on its way.</p>
+        <div class="role-card-focus">Focus</div>
+        <div class="role-card-focus-text">Triaging incoming customer-reported issues, surfacing patterns to engineering, and keeping affected customers informed while a fix lands.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hints for Success -->
+  <section id="hints">
+    <div class="section-label">Your Toolkit</div>
+    <h2>Hints for Success</h2>
+
+    <div class="hints-grid">
+      <div class="hint-item">
+        <div class="hint-icon">📝</div>
+        <div class="hint-text"><strong>Document clearly.</strong> Write down what you found, how you found it, and your fix. Collaborative notes help the whole team.</div>
+      </div>
+      <div class="hint-item">
+        <div class="hint-icon">🤝</div>
+        <div class="hint-text"><strong>Collaborate often.</strong> Share your screen, pair up, and talk through problems. Two perspectives catch more than one.</div>
+      </div>
+      <div class="hint-item">
+        <div class="hint-icon">🃏</div>
+        <div class="hint-text"><strong>Reach for the guide.</strong> Stuck? Check the <a href="bugs.html">Bug Report</a> for reproduction steps and <a href="#ai-tips">Brief · Audit · Own</a> for prompting AI.</div>
+      </div>
+      <div class="hint-item">
+        <div class="hint-icon">🔍</div>
+        <div class="hint-text"><strong>Use DevTools.</strong> The Console, Network tab, and Elements inspector are your best friends. Check for errors, failed requests, and DOM state.</div>
+      </div>
+      <div class="hint-item">
+        <div class="hint-icon">🏆</div>
+        <div class="hint-text"><strong>Own the solution.</strong> Don't just fix it — understand <em>why</em> it broke and explain your reasoning to your teammates.</div>
+      </div>
+      <div class="hint-item">
+        <div class="hint-icon">💡</div>
+        <div class="hint-text"><strong>Advocate with intent.</strong> Practice justifying technical decisions and driving team priorities with the perspectives of the release day team in mind.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</html>
