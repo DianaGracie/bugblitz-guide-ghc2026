@@ -66,16 +66,16 @@
     };
     const initialEffort = {
       'welcome-offer-mobile': 'Low',
-      'duplicate-order-placed': 'Medium',
+      'duplicate-order-placed': 'High',
       'generic-error': 'Medium',
-      'international-postal-code': 'Medium',
-      'stale-state': 'Low',
+      'international-postal-code': 'High',
+      'stale-state': 'Medium',
       'sold-out-feedback': 'Low',
       'broken-image': 'Low',
       'dialog-bug': 'Medium',
-      'promo-duplicate': 'Low',
+      'promo-duplicate': 'Medium',
       'sale-price-not-honored': 'Medium',
-      'stale-search': 'Medium'
+      'stale-search': 'High'
     };
     const pending = document.getElementById('needs-triage-tiles');
     const pendingHelp = document.getElementById('needs-triage-help');
