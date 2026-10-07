@@ -422,7 +422,7 @@ this.appliedCoupons.set([
     <a class="solution-bug-link" href="bugs.html#broken-image">← back to bug</a>
 
     <div class="solution-section-label">Root Cause</div>
-    <p>The <code>heartleaf-philodendron</code> entry in <code>PRODUCT_IMAGES</code> uses the Pexels website hostname, <code>pexels.com</code>, instead of the image-hosting hostname, <code>images.pexels.com</code>—a copy-paste mistake in the image URL. Product image URLs come from this TypeScript map.</p>
+    <p>The <code>heartleaf-philodendron</code> entry in <code>PRODUCT_IMAGES</code> uses the Pexels website hostname, <code>pexels.com</code>, instead of the image-hosting hostname, <code>images.pexels.com</code>.
     <p class="file-path">src/app/data/product-images.ts:62</p>
 
     <div class="solution-section-label">The Fix</div>

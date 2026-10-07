@@ -299,7 +299,7 @@
   }
 
   .bug-guide-card[id] {
-    scroll-margin-top: 1rem;
+    scroll-margin-top: var(--bug-anchor-offset, 9rem);
   }
 
   body {
@@ -922,6 +922,7 @@
   }
 
   .bug-guide-card {
+    position: relative;
     background: var(--card-bg);
     border: 1px solid var(--border-light);
     border-radius: 8px;
@@ -1374,8 +1375,8 @@
   /* Sticky Filter Toolbar */
   .bug-filter-toolbar {
     position: sticky;
-    top: 2.8rem;
-    /* Aligns directly below sticky .section-nav */
+    top: var(--bug-nav-height, 2.8rem);
+    /* Aligns below the measured section navigation, including wrapped text. */
     z-index: 90;
     background: var(--nav-bg, #ffffff);
     backdrop-filter: blur(12px);
@@ -3695,3 +3696,69 @@ html[data-page="bugs"] .matrix-effort-label { display: none; }
     }
   }
 }
+
+/* Anchor targets clear the navigation and filter toolbar at every viewport size. */
+html[data-page="bugs"] #quick-links {
+  scroll-margin-top: var(--bug-nav-height, 3rem);
+}
+
+html[data-page="bugs"] .bug-reports-heading {
+  margin: 2rem 0 0.75rem;
+}
+
+html[data-page="bugs"] :is(#triage-board, #solve-bugs, #bug-cards-heading, .triage-table tr) {
+  scroll-margin-top: var(--bug-anchor-offset, 9rem);
+}
+
+/* The filter toolbar is a sibling of the directory and reports, so it stays
+   sticky throughout the report section instead of stopping at the table. */
+html[data-page="bugs"] .directory-intro { margin-bottom: 0; border-bottom: 0; border-radius: 8px 8px 0 0; padding-bottom: 0.5rem; box-shadow: none; }
+html[data-page="bugs"] #bug-filter-toolbar { margin-top: 0; margin-bottom: 0; border-left: 1px solid var(--border-light); border-right: 1px solid var(--border-light); }
+html[data-page="bugs"] .directory-list { margin-top: 0; border-top: 0; border-radius: 0 0 8px 8px; }
+
+/* Sidebar mirrors the active report filters. */
+html[data-page="bugs"] .toc-link[hidden] { display: none; }
+html[data-page="bugs"] .sidebar-filter-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.5rem 0.6rem 0.8rem; font-size: 0.78rem; color: var(--text-secondary); }
+html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn) { font: inherit; color: var(--accent-link, var(--accent)); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 0.3rem 0.5rem; cursor: pointer; }
+html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+html[data-page="bugs"] .sidebar-empty { padding: 0.5rem 0.6rem; color: var(--text-secondary); font-size: 0.82rem; }
+
+html[data-page="bugs"] .filter-reveal-notice {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 1.25rem;
+  transform: translateY(-50%);
+  max-width: calc(100% - 2.5rem);
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--bug-guide-color, var(--accent));
+  border-radius: 4px;
+  background: var(--bug-guide-color, var(--accent));
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+html[data-page="bugs"] .filter-match-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+html[data-page="bugs"] .filter-match-divider::after {
+  flex: 1;
+  height: 1px;
+  background: var(--border-light);
+  content: "";
+}
+
+html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { background: var(--accent-glow); text-decoration: none; }

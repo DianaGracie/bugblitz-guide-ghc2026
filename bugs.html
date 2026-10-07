@@ -45,6 +45,11 @@
     <button type="button" class="close-drawer-btn" id="close-drawer-btn" aria-label="Close Bug List">✕</button>
   </div>
 
+  <div class="sidebar-filter-summary">
+    <span id="sidebar-result-count" role="status"></span>
+    <button type="button" id="sidebar-clear-filters" hidden>Clear filters</button>
+  </div>
+  <p class="sidebar-empty" id="sidebar-empty" hidden>No bugs match these filters.</p>
   <nav class="toc-links" aria-label="Bug Quick Index">
     <a href="#welcome-offer-mobile" class="toc-link">
       <span class="toc-bug-id">—</span>
@@ -120,7 +125,7 @@
     <h3 style="font-size: 1rem; margin-top: 1.75rem;">Priority × Effort — the quick-triage matrix</h3>
     <p style="font-size: 0.92rem; color: var(--text-secondary); margin-top: 0.25rem;">Your bug reporters have provided
       initial effort estimates. Feel free to adjust them based on your team’s experience and what you discover, but
-      focus on assigning priority. <span class="triage-pointer-copy">Drag a bug from Needs triage into the matrix, or edit its values in the Bug Directory.</span><span class="triage-touch-copy">Set priority and effort in the <a href="#quick-links">Bug Directory</a>. The matrix updates automatically.</span></p>
+      assigning priority to the bugs should be your main focus. <span class="triage-pointer-copy">Drag a bug from Needs triage into the matrix, or edit its values in the Bug Directory.</span><span class="triage-touch-copy">Set priority and effort in the <a href="#quick-links">Bug Directory</a>. The matrix updates automatically.</span></p>
 
     <p class="board-help"><a href="reference.html#severity">About severity and priority</a></p>
     <div id="triage-board">
@@ -200,9 +205,63 @@
       </div>
     </div>
 
-    <nav class="toc" aria-label="Bug report table of contents" id="quick-links">
+    <div class="toc directory-intro" id="quick-links">
       <h2>Bug Directory</h2>
       <p class="board-help">Set priority and effort below<span class="triage-pointer-copy">, or drag bugs into the triage matrix above</span><span class="triage-touch-copy">; the matrix updates automatically</span>.</p>
+    </div>
+
+    <div class="bug-filter-toolbar" id="bug-filter-toolbar">
+      <button type="button" class="filter-panel-toggle" id="filter-panel-toggle"
+        aria-controls="filter-panel-content" aria-expanded="false">
+        <span>Filter bugs</span>
+        <span class="filter-panel-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="filter-panel-content" id="filter-panel-content">
+        <div class="filter-group">
+          <span class="filter-label">Filter bugs</span>
+
+          <!-- Unified Triage & Priority Pills -->
+          <div class="filter-pills" id="bug-filter-pills">
+            <button type="button" class="bug-guide-filter active" data-filter="all">All</button>
+            <button type="button" class="bug-guide-filter" data-filter="needs-triage">Needs Triage</button>
+            <button type="button" class="bug-guide-filter" data-filter="P1">P1</button>
+            <button type="button" class="bug-guide-filter" data-filter="P2">P2</button>
+            <button type="button" class="bug-guide-filter" data-filter="P3">P3</button>
+            <button type="button" class="bug-guide-filter" data-filter="quick-wins">⚡ Quick Wins</button>
+          </div>
+
+          <span class="filter-divider">|</span>
+
+          <div class="filter-selects">
+            <select class="filter-dropdown" id="filter-type" aria-label="Filter by Bug Type">
+              <option value="all">Filter by Bug Type</option>
+              <option value="css">CSS</option>
+              <option value="device">Device-Specific</option>
+              <option value="interaction">Interaction</option>
+              <option value="form">Form Validation</option>
+              <option value="search">Search</option>
+              <option value="data">Data</option>
+            </select>
+
+            <select class="filter-dropdown" id="filter-reporter" aria-label="Filter by Reporter">
+              <option value="all">Filter by Reporter</option>
+              <option value="dev">Engineer</option>
+              <option value="qa">QA</option>
+              <option value="pm">Product Manager</option>
+              <option value="support">Customer Support</option>
+              <option value="director">Director</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filter-status">
+          Showing <strong id="visible-count">0</strong> of <span id="total-count">0</span> bugs
+          <button type="button" id="clear-filters-btn" class="clear-filters-btn" hidden>Clear filters</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="toc directory-list" aria-label="Bug report table of contents" id="bug-directory-list">
       <table class="triage-table" aria-label="Bug priorities and effort">
         <thead>
           <tr>
@@ -287,60 +346,9 @@
       <h2>Goal 2: Solve bugs together</h2>
       <p>Reproduce your chosen bug, investigate its cause, make a fix or workaround, and verify it. Be ready to explain
         your reasoning.</p>
-      <h3 class="exercise-goal-subheading" id="bug-cards-heading">Bug Reports</h3>
     </div>
 
-    <div class="bug-filter-toolbar" id="bug-filter-toolbar">
-      <button type="button" class="filter-panel-toggle" id="filter-panel-toggle"
-        aria-controls="filter-panel-content" aria-expanded="false">
-        <span>Filters</span>
-        <span class="filter-panel-chevron" aria-hidden="true">⌄</span>
-      </button>
-      <div class="filter-panel-content" id="filter-panel-content">
-        <div class="filter-group">
-          <span class="filter-label">Filter:</span>
-
-          <!-- Unified Triage & Priority Pills -->
-          <div class="filter-pills" id="bug-filter-pills">
-            <button type="button" class="bug-guide-filter active" data-filter="all">All</button>
-            <button type="button" class="bug-guide-filter" data-filter="needs-triage">Needs Triage</button>
-            <button type="button" class="bug-guide-filter" data-filter="P1">P1</button>
-            <button type="button" class="bug-guide-filter" data-filter="P2">P2</button>
-            <button type="button" class="bug-guide-filter" data-filter="P3">P3</button>
-            <button type="button" class="bug-guide-filter" data-filter="quick-wins">⚡ Quick Wins</button>
-          </div>
-
-          <span class="filter-divider">|</span>
-
-          <div class="filter-selects">
-            <select class="filter-dropdown" id="filter-type" aria-label="Filter by Bug Type">
-              <option value="all">Filter by Bug Type</option>
-              <option value="css">CSS</option>
-              <option value="device">Device-Specific</option>
-              <option value="interaction">Interaction</option>
-              <option value="form">Form Validation</option>
-              <option value="search">Search</option>
-              <option value="data">Data</option>
-            </select>
-
-            <select class="filter-dropdown" id="filter-reporter" aria-label="Filter by Reporter">
-              <option value="all">Filter by Reporter</option>
-              <option value="dev">Engineer</option>
-              <option value="qa">QA</option>
-              <option value="pm">Product Manager</option>
-              <option value="support">Customer Support</option>
-              <option value="director">Director</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="filter-status">
-          Showing <strong id="visible-count">0</strong> of <span id="total-count">0</span> bugs
-          <button type="button" id="clear-filters-btn" class="clear-filters-btn" hidden>Reset filters ✕</button>
-        </div>
-      </div>
-    </div>
-
+    <h2 id="bug-cards-heading" class="bug-reports-heading">Bug Reports</h2>
     <div class="bug-guide-empty" id="bug-guide-empty">No bugs match this filter.</div>
 
     <div class="bug-guide-cards" id="bug-guide-cards">

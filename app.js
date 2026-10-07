@@ -40,7 +40,8 @@
 
   function setupBugGuides() {
     const filters = document.querySelectorAll('.bug-guide-filter');
-    const cards = document.querySelectorAll('#bug-guide-cards .bug-guide-card');
+    const bugCardsContainer = document.getElementById('bug-guide-cards');
+    const cards = bugCardsContainer.querySelectorAll('.bug-guide-card');
     const empty = document.getElementById('bug-guide-empty');
 
     if (!cards.length) return;
@@ -379,8 +380,34 @@
       return { type, reporter, priority, effort, isTriaged, isQuickWin };
     }
 
+    let temporarilyRevealedBugId = null;
+    const matchesDivider = document.createElement('h3');
+    matchesDivider.className = 'filter-match-divider';
+    matchesDivider.textContent = 'Matches your filters';
+
+    function revealNoticeTextColor(card) {
+      const channels = getComputedStyle(card).borderTopColor.match(/\d+(?:\.\d+)?/g);
+      if (!channels || channels.length < 3) return '#fff';
+
+      const [red, green, blue] = channels.slice(0, 3).map((channel) => {
+        const value = Number(channel) / 255;
+        return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+      });
+      const luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+      return luminance > 0.179 ? '#111' : '#fff';
+    }
+
+    function clearTemporaryReveal() {
+      if (!temporarilyRevealedBugId) return;
+      document.getElementById(temporarilyRevealedBugId)?.querySelector('.filter-reveal-notice')?.remove();
+      temporarilyRevealedBugId = null;
+      matchesDivider.remove();
+      cards.forEach((card) => bugCardsContainer.append(card));
+    }
+
     function applyFilters() {
       let visibleCount = 0;
+      let matchingCount = 0;
       const selectedType = typeSelect ? typeSelect.value : 'all';
       const selectedReporter = reporterSelect ? reporterSelect.value : 'all';
 
@@ -403,21 +430,46 @@
         const matchesType = (selectedType === 'all') || (data.type === selectedType) || data.type.includes(selectedType);
         const matchesReporter = (selectedReporter === 'all') || (data.reporter === selectedReporter) || data.reporter.includes(selectedReporter);
         const isMatch = matchesPreset && matchesType && matchesReporter;
+        if (temporarilyRevealedBugId === bugId && isMatch) clearTemporaryReveal();
+        const isTemporarilyRevealed = temporarilyRevealedBugId === bugId && !isMatch;
+        const isVisible = isMatch || isTemporarilyRevealed;
+        const sidebarLink = document.querySelector('.toc-link[href="#' + bugId + '"]');
+        if (sidebarLink) sidebarLink.hidden = !isVisible;
 
-        if (isMatch) {
-          card.classList.remove('hidden');
-          visibleCount++;
-        } else {
-          card.classList.add('hidden');
+        let revealNotice = card.querySelector('.filter-reveal-notice');
+        if (isTemporarilyRevealed && !revealNotice) {
+          revealNotice = document.createElement('div');
+          revealNotice.className = 'filter-reveal-notice';
+          revealNotice.setAttribute('role', 'status');
+          revealNotice.textContent = 'Normally hidden by active filters.';
+          revealNotice.style.color = revealNoticeTextColor(card);
+          card.querySelector('.bug-guide-card-header')?.before(revealNotice);
+        } else if (!isTemporarilyRevealed) {
+          revealNotice?.remove();
         }
 
-        if (tocRow) {
-          if (isMatch) tocRow.classList.remove('filtered-out');
-          else tocRow.classList.add('filtered-out');
-        }
+        card.classList.toggle('hidden', !isVisible);
+        if (isMatch) matchingCount++;
+        if (isVisible) visibleCount++;
+        if (tocRow) tocRow.classList.toggle('filtered-out', !isVisible);
       });
 
+      if (temporarilyRevealedBugId) {
+        const revealedCard = document.getElementById(temporarilyRevealedBugId);
+        if (revealedCard) {
+          bugCardsContainer.prepend(revealedCard);
+          if (matchingCount) revealedCard.after(matchesDivider);
+          else matchesDivider.remove();
+        }
+      }
+
       if (visibleCountEl) visibleCountEl.textContent = visibleCount;
+      const sidebarCount = document.getElementById('sidebar-result-count');
+      if (sidebarCount) sidebarCount.textContent = visibleCount + ' of ' + bugCards.length + ' bugs';
+      const sidebarClear = document.getElementById('sidebar-clear-filters');
+      if (sidebarClear) sidebarClear.hidden = !isFiltered;
+      const sidebarEmpty = document.getElementById('sidebar-empty');
+      if (sidebarEmpty) sidebarEmpty.hidden = visibleCount !== 0;
 
       if (emptyStateEl) {
         emptyStateEl.classList.toggle('show', visibleCount === 0);
@@ -426,6 +478,7 @@
 
     filterPills.forEach((pill) => {
       pill.addEventListener('click', () => {
+        clearTemporaryReveal();
         filterPills.forEach((p) => p.classList.remove('active'));
         pill.classList.add('active');
 
@@ -434,22 +487,47 @@
       });
     });
 
-    if (typeSelect) typeSelect.addEventListener('change', applyFilters);
-    if (reporterSelect) reporterSelect.addEventListener('change', applyFilters);
+    if (typeSelect) typeSelect.addEventListener('change', () => {
+      clearTemporaryReveal();
+      applyFilters();
+    });
+    if (reporterSelect) reporterSelect.addEventListener('change', () => {
+      clearTemporaryReveal();
+      applyFilters();
+    });
 
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        filterPills.forEach((p) => p.classList.remove('active'));
-        const allPill = toolbar.querySelector('[data-filter="all"]');
-        if (allPill) allPill.classList.add('active');
-        activePreset = 'all';
-
-        if (typeSelect) typeSelect.value = 'all';
-        if (reporterSelect) reporterSelect.value = 'all';
-
-        applyFilters();
-      });
+    function resetFilters() {
+      clearTemporaryReveal();
+      filterPills.forEach((pill) => pill.classList.remove('active'));
+      toolbar.querySelector('[data-filter="all"]')?.classList.add('active');
+      activePreset = 'all';
+      if (typeSelect) typeSelect.value = 'all';
+      if (reporterSelect) reporterSelect.value = 'all';
+      applyFilters();
     }
+    clearBtn?.addEventListener('click', resetFilters);
+    document.getElementById('sidebar-clear-filters')?.addEventListener('click', () => {
+      resetFilters();
+      document.querySelector('.toc-link:not([hidden])')?.focus();
+    });
+
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest('a[href^="#"]');
+      if (!link || event.defaultPrevented || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const card = document.getElementById(link.getAttribute('href').slice(1));
+      if (!card?.classList.contains('bug-guide-card') || card.id === temporarilyRevealedBugId) return;
+      const wasHidden = card.classList.contains('hidden');
+      if (!wasHidden && !temporarilyRevealedBugId) return;
+      clearTemporaryReveal();
+      if (wasHidden) temporarilyRevealedBugId = card.id;
+      applyFilters();
+    });
+
+    window.addEventListener('hashchange', () => {
+      if (!temporarilyRevealedBugId || window.location.hash.slice(1) === temporarilyRevealedBugId) return;
+      clearTemporaryReveal();
+      applyFilters();
+    });
 
     document.addEventListener('change', (event) => {
       if (event.target.classList.contains('triage-value') || event.target.closest('.triage-table')) {
@@ -484,7 +562,7 @@
       });
     }
 
-    const inlineToc = document.getElementById('quick-links') || document.querySelector('.triage-table');
+    const inlineToc = document.getElementById('bug-directory-list') || document.querySelector('.triage-table');
     const drawerToggle = document.getElementById('toc-drawer-toggle');
     const sidebar = document.getElementById('bug-guide-sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -497,7 +575,7 @@
         drawerToggle.setAttribute('aria-expanded', String(isOpen));
 
         if (isOpen) {
-          sidebar.querySelector('.toc-link')?.focus();
+          (sidebar.querySelector('.toc-link:not([hidden])') || document.getElementById('sidebar-clear-filters'))?.focus();
         } else if (sidebar.contains(document.activeElement)) {
           drawerToggle.focus();
         }
@@ -520,6 +598,25 @@
     }
 
     const sectionNav = document.querySelector('.section-nav');
+    const stickyFilters = document.getElementById('bug-filter-toolbar');
+    const syncAnchorSpacing = () => {
+      const navHeight = sectionNav?.getBoundingClientRect().height || 0;
+      const filterHeight = stickyFilters?.getBoundingClientRect().height || 0;
+      document.documentElement.style.setProperty('--bug-nav-height', Math.ceil(navHeight) + 'px');
+      document.documentElement.style.setProperty('--bug-anchor-offset', Math.ceil(navHeight + filterHeight + 20) + 'px');
+    };
+    syncAnchorSpacing();
+    if (typeof ResizeObserver !== 'undefined') {
+      const stickySizeObserver = new ResizeObserver(syncAnchorSpacing);
+      if (sectionNav) stickySizeObserver.observe(sectionNav);
+      if (stickyFilters) stickySizeObserver.observe(stickyFilters);
+    }
+    window.addEventListener('resize', syncAnchorSpacing);
+    // Refresh measurements before native anchor navigation, including drawer links.
+    document.addEventListener('click', (event) => {
+      if (event.target.closest('a[href^="#"]')) syncAnchorSpacing();
+    }, true);
+
 
     const syncTocNavigation = () => {
       const stickyNavBottom = sectionNav ? sectionNav.getBoundingClientRect().bottom : 0;
