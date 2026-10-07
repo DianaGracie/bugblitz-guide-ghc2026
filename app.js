@@ -338,6 +338,20 @@
     const totalCountEl = document.getElementById('total-count');
 
     let activePreset = 'all';
+    const validPresets = Array.from(filterPills, (pill) => pill.dataset.filter);
+    const initialUrl = new URL(window.location.href);
+    const initialFilter = initialUrl.searchParams.get('filter');
+    const initialPriority = initialUrl.searchParams.get('priority');
+    if (validPresets.includes(initialFilter)) activePreset = initialFilter;
+    else if (['P1', 'P2', 'P3'].includes(initialPriority)) activePreset = initialPriority;
+
+    if (typeSelect && Array.from(typeSelect.options, (option) => option.value).includes(initialUrl.searchParams.get('type'))) {
+      typeSelect.value = initialUrl.searchParams.get('type');
+    }
+    if (reporterSelect && Array.from(reporterSelect.options, (option) => option.value).includes(initialUrl.searchParams.get('reporter'))) {
+      reporterSelect.value = initialUrl.searchParams.get('reporter');
+    }
+    filterPills.forEach((pill) => pill.classList.toggle('active', pill.dataset.filter === activePreset));
 
     if (totalCountEl) totalCountEl.textContent = bugCards.length;
 
@@ -384,6 +398,60 @@
     const matchesDivider = document.createElement('h3');
     matchesDivider.className = 'filter-match-divider';
     matchesDivider.textContent = 'Matches your filters';
+    const sidebarBugLinks = Array.from(document.querySelectorAll('.toc-link[href^="#"]'));
+    let lastScrollY = window.scrollY;
+    let scrollDirection = 'down';
+
+    function updateActiveBugLink() {
+      const sectionNavBottom = document.querySelector('.section-nav')?.getBoundingClientRect().bottom || 0;
+      const filterBottom = toolbar.getBoundingClientRect().bottom;
+      const contentTop = Math.max(sectionNavBottom, filterBottom);
+      const availableHeight = Math.max(0, window.innerHeight - contentTop);
+      const activeLine = contentTop + availableHeight * (scrollDirection === 'up' ? 0.62 : 0.35);
+      const visibleCards = Array.from(bugCards).filter((card) => !card.classList.contains('hidden'));
+      let activeCard = null;
+
+      visibleCards.forEach((card) => {
+        if (card.getBoundingClientRect().top <= activeLine) activeCard = card;
+      });
+      if (!activeCard) {
+        activeCard = visibleCards.find((card) => {
+          const bounds = card.getBoundingClientRect();
+          return bounds.top < window.innerHeight && bounds.bottom > sectionNavBottom;
+        }) || null;
+      }
+
+      sidebarBugLinks.forEach((link) => {
+        const isCurrent = activeCard && link.getAttribute('href') === '#' + activeCard.id;
+        if (isCurrent) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    }
+
+    function updateActiveBugLinkOnScroll() {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY !== lastScrollY) {
+        scrollDirection = currentScrollY > lastScrollY ? 'down' : 'up';
+        lastScrollY = currentScrollY;
+      }
+      updateActiveBugLink();
+    }
+
+    window.addEventListener('scroll', updateActiveBugLinkOnScroll, { passive: true });
+    window.addEventListener('resize', updateActiveBugLink);
+
+    function syncFiltersToUrl() {
+      const url = new URL(window.location.href);
+      if (['P1', 'P2', 'P3'].includes(activePreset)) url.searchParams.set('priority', activePreset);
+      else url.searchParams.delete('priority');
+      if (['needs-triage', 'quick-wins'].includes(activePreset)) url.searchParams.set('filter', activePreset);
+      else url.searchParams.delete('filter');
+      if (typeSelect?.value && typeSelect.value !== 'all') url.searchParams.set('type', typeSelect.value);
+      else url.searchParams.delete('type');
+      if (reporterSelect?.value && reporterSelect.value !== 'all') url.searchParams.set('reporter', reporterSelect.value);
+      else url.searchParams.delete('reporter');
+      window.history.replaceState(window.history.state, '', url);
+    }
 
     function revealNoticeTextColor(card) {
       const channels = getComputedStyle(card).borderTopColor.match(/\d+(?:\.\d+)?/g);
@@ -441,7 +509,7 @@
           revealNotice = document.createElement('div');
           revealNotice.className = 'filter-reveal-notice';
           revealNotice.setAttribute('role', 'status');
-          revealNotice.textContent = 'Normally hidden by active filters.';
+          revealNotice.textContent = '**Normally hidden by active filters**';
           revealNotice.style.color = revealNoticeTextColor(card);
           card.querySelector('.bug-guide-card-header')?.before(revealNotice);
         } else if (!isTemporarilyRevealed) {
@@ -474,6 +542,8 @@
       if (emptyStateEl) {
         emptyStateEl.classList.toggle('show', visibleCount === 0);
       }
+      syncFiltersToUrl();
+      updateActiveBugLink();
     }
 
     filterPills.forEach((pill) => {
@@ -536,6 +606,11 @@
     });
 
     applyFilters();
+    const initialHashTarget = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+    if (initialHashTarget?.classList.contains('bug-guide-card') && initialHashTarget.classList.contains('hidden')) {
+      temporarilyRevealedBugId = initialHashTarget.id;
+      applyFilters();
+    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {

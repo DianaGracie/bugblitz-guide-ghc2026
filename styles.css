@@ -1760,6 +1760,13 @@
   color: var(--accent, #2563eb);
 }
 
+.toc-link[aria-current="location"] {
+  border-left: 3px solid var(--accent, #2563eb);
+  background: var(--accent-glow, #eff6ff);
+  color: var(--accent, #2563eb);
+  font-weight: 700;
+}
+
 .toc-bug-id {
   font-family: var(--font-display, sans-serif);
   font-size: 0.72rem;
