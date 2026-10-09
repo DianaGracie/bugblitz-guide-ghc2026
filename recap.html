@@ -6,28 +6,49 @@
 <link rel="stylesheet" href="styles.css">
 <script src="app.js" defer></script>
 
+<header class="site-header">
+  <div class="site-bar">
+    <a class="site-brand" href="index.html"><span aria-hidden="true">🐛</span> BugBlitz</a>
+    <nav class="page-nav" aria-label="Workshop pages">
+      <ul class="page-nav-list">
+        <li class="page-nav-item has-menu">
+          <a href="index.html">Workshop Guide</a>
+          <ul class="page-nav-menu" id="page-menu-guide">
+            <li><a href="index.html#timeline">Timeline</a></li>
+            <li><a href="index.html#setup">Setup</a></li>
+            <li><a href="index.html#exercise">What Success Looks Like</a></li>
+          </ul>
+        </li>
+        <li class="page-nav-item has-menu">
+          <a href="bugs.html">Bug Report</a>
+          <ul class="page-nav-menu" id="page-menu-bugs">
+            <li><a href="bugs.html#quick-links">Bug Directory</a></li>
+            <li><a href="bugs.html#triage-board">Triage Matrix</a></li>
+          </ul>
+        </li>
+        <li class="page-nav-item"><a href="solutions.html">Solutions</a></li>
+        <li class="page-nav-item"><a href="recap.html" aria-current="page">Recap</a></li>
+      </ul>
+    </nav>
+  </div>
+  <nav class="section-nav" aria-label="Page sections">
+    <div class="section-nav-inner">
+      <a href="#goals">Goals</a>
+      <a href="#mindset">Mindset</a>
+      <a href="#severity">Severity &amp; Priority</a>
+      <a href="#bug-types">Bug Types</a>
+      <a href="#ai-tips">AI Tips</a>
+      <a href="#roles">Stakeholders</a>
+      <a href="#hints">Hints</a>
+    </div>
+  </nav>
+</header>
+
 <div class="masthead">
   <div class="masthead-eyebrow">BugBlitz · Workshop Materials</div>
   <h1>Workshop Recap</h1>
   <p class="masthead-sub">Goals, debugging mindset, AI prompting tips, and release day perspectives to support your team during the exercise.</p>
-  <nav class="guide-nav" aria-label="Workshop guides">
-    <a href="index.html">Workshop Guide</a>
-    <a href="bugs.html">Bug Report</a>
-    <a href="solutions.html">Solutions</a>
-    <a href="recap.html" aria-current="page">Recap</a>
-  </nav>
 </div>
-<nav class="section-nav" aria-label="Page sections">
-  <div class="section-nav-inner">
-    <a href="#goals">Goals</a>
-    <a href="#mindset">Mindset</a>
-    <a href="#severity">Severity &amp; Priority</a>
-    <a href="#bug-types">Bug Types</a>
-    <a href="#ai-tips">AI Tips</a>
-    <a href="#roles">Stakeholders</a>
-    <a href="#hints">Hints</a>
-  </div>
-</nav>
 <div class="content">
   <!-- Workshop Goals -->
   <section id="goals">
