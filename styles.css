@@ -119,7 +119,7 @@
 }
 
 /* Shared workshop/report tokens; page-specific differences remain below. */
-@scope (html:is([data-page="bugs"], [data-page="index"], [data-page="reference"])) {
+@scope (html:is([data-page="bugs"], [data-page="index"], [data-page="recap"])) {
   :scope {
     --surface-alt: #E8DCF5;
     --nav-bg: rgba(250, 251, 255, 0.92);
@@ -569,12 +569,6 @@
     scroll-margin-top: 5rem;
   }
 
-  .exercise-goal p {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-    line-height: 1.6;
-  }
-
   .triage-prompts ol {
     list-style: none;
     counter-reset: obj;
@@ -742,7 +736,8 @@
     box-shadow: inset 0 0 0 1px #8b5bb5;
   }
 
-  .triage-board td.drop-target {
+  .triage-board td.drop-target,
+  .needs-triage.drop-target {
     border-radius: 6px;
     box-shadow: inset 0 0 0 2px var(--accent);
   }
@@ -1947,7 +1942,7 @@
 }
 
 /* Shared Workshop Guide and Reference styles. Keep their common components together. */
-@scope (html:is([data-page="index"], [data-page="reference"])) {
+@scope (html:is([data-page="index"], [data-page="recap"])) {
 /* ── Fonts ── */
   :scope {
     --success: #16A34A;
@@ -3467,11 +3462,17 @@
 
   pre { font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; background: var(--code-bg); color: var(--text-primary); padding: 0.9rem 1rem; border-radius: 6px; overflow-x: auto; margin: 0.5rem 0; }
 
-  pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+  /* As wide as the longest line, so diff highlights span the full scroll width. */
+  pre code { display: inline-block; min-width: 100%; background: none; padding: 0; color: inherit; font-size: inherit; }
 
-  .diff-add { background: var(--diff-add-bg); color: var(--diff-add-text); display: block; padding: 0 0.4em; }
+  /* Full-width highlight whose text stays aligned with unchanged lines: the
+     padding is offset by an equal negative margin. Inline-block (not block)
+     so the newline after each highlighted line doesn't add a blank line. */
+  .diff-add, .diff-remove { display: inline-block; width: calc(100% + 0.8em); margin: 0 -0.4em; padding: 0 0.4em; vertical-align: top; }
 
-  .diff-remove { background: var(--diff-remove-bg); color: var(--diff-remove-text); display: block; padding: 0 0.4em; text-decoration: line-through; text-decoration-color: rgba(0,0,0,0.2); }
+  .diff-add { background: var(--diff-add-bg); color: var(--diff-add-text); }
+
+  .diff-remove { background: var(--diff-remove-bg); color: var(--diff-remove-text); text-decoration: line-through; text-decoration-color: rgba(0,0,0,0.2); }
 
   .content { max-width: 60rem; margin: 0 auto; padding: 0 1.5rem 4rem; }
 
@@ -3517,7 +3518,7 @@
 
   .solution ul li { color: var(--text-secondary); font-size: 0.95rem; padding: 0.15rem 0; }
 
-  .solution .file-path { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; }
+  .solution .file-path { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; overflow-wrap: anywhere; }
 
   @media (max-width: 600px) {
     .masthead { padding: 2rem 1rem 1.5rem; }
@@ -3618,7 +3619,9 @@ html[data-page="bugs"] .matrix-effort-label { display: none; }
 
 /* Optional, progressively disclosed help stays with its bug report. */
 @scope (html[data-page="bugs"]) {
-  .hints-intro {
+  /* Goal 2's summary shares the "Stuck?" banner style. */
+  .hints-intro,
+  .exercise-goal p {
     padding: 0.85rem 1rem;
     border-left: 3px solid var(--accent);
     background: var(--surface);
@@ -3704,24 +3707,57 @@ html[data-page="bugs"] .matrix-effort-label { display: none; }
   }
 }
 
-/* Anchor targets clear the navigation and filter toolbar at every viewport size. */
-html[data-page="bugs"] #quick-links {
-  scroll-margin-top: var(--bug-nav-height, 3rem);
-}
-
-html[data-page="bugs"] .bug-reports-heading {
-  margin: 2rem 0 0.75rem;
-}
-
-html[data-page="bugs"] :is(#triage-board, #solve-bugs, #bug-cards-heading, .triage-table tr) {
+html[data-page="bugs"] :is(#triage-board, #quick-links, #solve-bugs, .triage-table tr) {
   scroll-margin-top: var(--bug-anchor-offset, 9rem);
 }
 
 /* The filter toolbar is a sibling of the directory and reports, so it stays
-   sticky throughout the report section instead of stopping at the table. */
+   sticky throughout the report section instead of stopping at the table. The
+   directory intro, toolbar, and list + report viewer join into a single box. */
 html[data-page="bugs"] .directory-intro { margin-bottom: 0; border-bottom: 0; border-radius: 8px 8px 0 0; padding-bottom: 0.5rem; box-shadow: none; }
 html[data-page="bugs"] #bug-filter-toolbar { margin-top: 0; margin-bottom: 0; border-left: 1px solid var(--border-light); border-right: 1px solid var(--border-light); }
-html[data-page="bugs"] .directory-list { margin-top: 0; border-top: 0; border-radius: 0 0 8px 8px; }
+html[data-page="bugs"] .directory-layout { margin-bottom: 1rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--border-light); border-top: 0; border-radius: 0 0 8px 8px; box-shadow: 0 1px 3px var(--card-shadow); }
+html[data-page="bugs"] .directory-layout .directory-list { margin: 0; padding: 0; background: none; border: 0; border-radius: 0; box-shadow: none; }
+
+/* Bug Directory list + report viewer (enabled by app.js). */
+@scope (html[data-page="bugs"]) {
+  /* Two columns while a report is open; the full-width table otherwise. */
+  .directory-layout.is-split { display: grid; grid-template-columns: minmax(16rem, 21rem) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+
+  /* The list is narrow beside the viewer, so stack each row's fields. */
+  .is-split .triage-table thead { display: none; }
+  .is-split .triage-table tr { display: grid; grid-template-columns: 1fr 1fr; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border-light); border-left: 3px solid transparent; }
+  .is-split .triage-table td { border: 0; padding: 0.2rem; min-width: 0; }
+  .is-split .triage-table td:first-child { grid-column: 1 / -1; }
+  .is-split .triage-table td[data-label]::before { content: attr(data-label); display: block; font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 0.15rem; }
+  .is-split .triage-table tr.is-selected { border-left-color: var(--accent); border-radius: 4px; }
+
+  .triage-table tr.is-selected { background: var(--surface); }
+  .triage-table tr.is-selected td:first-child a { color: var(--text-primary); font-weight: 700; }
+
+  .report-viewer { position: sticky; top: calc(var(--bug-anchor-offset, 9rem) - 0.5rem); max-height: calc(100vh - var(--bug-anchor-offset, 9rem)); overflow-y: auto; border-radius: 8px; }
+  .report-viewer[hidden] { display: none; }
+  .bug-guide-cards[hidden] { display: none; }
+  .report-viewer .report-viewer-card { box-shadow: none; }
+  .report-viewer-close { display: none; margin-top: 0.75rem; padding: 0.4rem 0; border: 0; background: none; font: inherit; font-size: 0.85rem; color: var(--accent-link, var(--accent)); cursor: pointer; }
+
+  /* Single column: the report sits in its own table row under the selected bug. */
+  .triage-table tr.report-viewer-row { display: table-row; background: none; }
+  .triage-table tr.report-viewer-row > td { padding: 0 0 1rem; border-bottom: 1px solid var(--border-light); }
+  /* Inside the directory, undo its list and link styles. */
+  .report-viewer li { display: list-item; gap: normal; }
+  .report-viewer :is(p, li) a { text-decoration: underline; text-underline-offset: 0.15em; }
+
+  @media (max-width: 900px) {
+    .report-viewer { position: static; max-height: none; overflow: visible; }
+    .report-viewer-close { display: inline-block; }
+  }
+
+  @media (max-width: 600px) {
+    .triage-table tr.report-viewer-row { display: block; padding: 0 0 1rem; }
+    .triage-table tr.report-viewer-row > td { display: block; padding: 0; border: 0; }
+  }
+}
 
 /* Sidebar mirrors the active report filters. */
 html[data-page="bugs"] .toc-link[hidden] { display: none; }
@@ -3769,3 +3805,81 @@ html[data-page="bugs"] .filter-match-divider::after {
 }
 
 html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { background: var(--accent-glow); text-decoration: none; }
+
+/* Expand/collapse sections, added by app.js on the Recap page. */
+@scope (html[data-page="recap"]) {
+  .collapse-controls { display: flex; justify-content: flex-end; }
+
+  .collapse-all { font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.4rem 0.9rem; border: 1px solid var(--accent); border-radius: 999px; background: transparent; color: var(--accent); cursor: pointer; }
+
+  .collapse-all:hover { background: var(--accent); color: var(--card-bg); }
+
+  .collapse-toggle { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+
+  .collapse-toggle::after { content: ''; flex: none; width: 0.55rem; height: 0.55rem; margin: 0.3rem 0.25rem 0 0; border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-135deg); transition: transform 0.15s ease; }
+
+  .collapsed .collapse-toggle::after { margin-top: -0.3rem; transform: rotate(45deg); }
+
+  .collapse-toggle:hover { color: var(--accent); }
+
+  .collapse-toggle:focus-visible, .collapse-all:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+}
+
+@scope (html[data-page="recap"]) {
+  .collapse-controls { margin-top: 1.5rem; margin-bottom: -1.5rem; }
+
+  section.collapsed { padding-block: 1.75rem; }
+}
+
+/* Solutions list + solution viewer (enabled by app.js). */
+@scope (html[data-page="solutions"]) {
+  .solution-layout { margin: 2rem 0 3rem; }
+  .solution-layout .toc { margin: 0; }
+
+  /* Two columns while a solution is open; the full-width list otherwise. */
+  .solution-layout.is-split { display: grid; grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+  .is-split .toc ol { padding-left: 1.25rem; }
+
+  /* Every item reserves room for the selection bar, so text never shifts or sits under it. */
+  .solution-layout .toc ol > li { padding-inline: 0.6rem 0.5rem; border-left: 3px solid transparent; border-radius: 0 4px 4px 0; }
+  .solution-layout .toc ol > li.is-selected { background: var(--surface); border-left-color: var(--accent); }
+  .toc li.is-selected > a { color: var(--text-primary); font-weight: 700; }
+
+  .report-viewer { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; border-radius: 8px; }
+  .report-viewer[hidden] { display: none; }
+  .report-viewer .solution { margin: 0; box-shadow: none; }
+  .report-viewer-close { display: none; margin-top: 0.75rem; padding: 0.4rem 0; border: 0; background: none; font: inherit; font-size: 0.85rem; color: var(--accent-link, var(--accent)); cursor: pointer; }
+
+  /* Single column: the solution opens in an unnumbered row under its title,
+     lined up with the title's highlight. */
+  .solution-layout .toc ol > li.report-viewer-row { display: block; margin: 0.25rem 0 0.75rem; padding: 0; border-left: 0; }
+  /* Inside the list, undo the list's item and link styles. */
+  .report-viewer li { font-size: 0.95rem; padding: 0.15rem 0; }
+  .report-viewer .solution h2 { font-size: 1.35rem; letter-spacing: normal; text-transform: none; color: var(--text-primary); margin-bottom: 0.35rem; }
+  .report-viewer :is(p, li) a { text-decoration: underline; text-underline-offset: 0.15em; }
+
+  @media (max-width: 900px) {
+    .report-viewer { position: static; max-height: none; overflow: visible; }
+    .report-viewer-close { display: inline-block; }
+    /* Match the Bug Directory's single-column look: highlight only, no bar. */
+    .solution-layout .toc ol > li.is-selected { border-left-color: transparent; }
+  }
+}
+
+/* "Click a title" tip above the Bug Directory list (added by app.js). */
+@scope (html[data-page="bugs"]) {
+  .has-viewer-tip { position: relative; }
+  /* Floats over the column header, just above the first bug title. */
+  .viewer-tip { position: absolute; z-index: 5; left: var(--tip-offset, 3rem); bottom: calc(100% - 0.35rem); display: flex; align-items: center; gap: 0.5rem; width: max-content; max-width: min(22rem, 90vw); margin: 0; padding: 0.5rem 0.5rem 0.5rem 0.85rem; background: var(--accent); color: #ffffff; border-radius: 8px; font-size: 0.85rem; line-height: 1.4; box-shadow: 0 2px 8px var(--card-shadow); }
+  /* Speech-bubble pointer toward the titles below. */
+  .viewer-tip::after { content: ''; position: absolute; left: 1.25rem; bottom: -0.4rem; width: 0.8rem; height: 0.8rem; background: inherit; transform: rotate(45deg); }
+  .viewer-tip-close { flex: none; display: grid; place-items: center; width: 1.6rem; height: 1.6rem; padding: 0; border: 0; border-radius: 50%; background: transparent; color: inherit; font: inherit; font-size: 1rem; line-height: 1; cursor: pointer; }
+  .viewer-tip-close:hover { background: rgba(255, 255, 255, 0.18); }
+  .viewer-tip-close:focus-visible { outline: 2px solid #ffffff; outline-offset: 1px; }
+
+  /* Stacked rows have no header row to float over, so sit in the flow. */
+  @media (max-width: 600px) {
+    .viewer-tip { position: relative; left: auto; bottom: auto; margin: 0 0 0.75rem; }
+  }
+  .is-split .viewer-tip { position: relative; left: auto; bottom: auto; margin: 0 0 0.75rem; }
+}

@@ -4,6 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BugBlitz Solutions</title>
 <link rel="stylesheet" href="styles.css">
+<script src="app.js" defer></script>
 
 <div class="masthead">
   <div class="masthead-eyebrow">BugBlitz · Workshop Materials</div>
@@ -13,13 +14,14 @@
     <a href="index.html">Workshop Guide</a>
     <a href="bugs.html">Bug Report</a>
     <a href="solutions.html" aria-current="page">Solutions</a>
-    <a href="reference.html">Reference</a>
+    <a href="recap.html">Recap</a>
   </nav>
 </div>
 
 <div class="content">
 
-  <nav class="toc" aria-label="Solutions table of contents">
+  <div class="solution-layout">
+  <nav class="toc" id="solution-toc" aria-label="Solutions table of contents">
     <h2>Solutions</h2>
     <ol>
       <li><a href="#welcome-offer-mobile">Welcome offer is overlapped on mobile</a></li>
@@ -35,6 +37,12 @@
       <li><a href="#stale-search">Stale header-search results</a></li>
     </ol>
   </nav>
+  <div class="report-viewer" id="solution-viewer" role="region" aria-label="Selected solution" hidden></div>
+  </div>
+
+  <!-- Full solutions. With JavaScript they are hidden and shown one at a time
+       beside the list above; without it they appear here. -->
+  <div class="solution-list" id="solution-list">
 
   <div class="solution" id="welcome-offer-mobile">
     <span class="solution-tag">CSS · Device-Specific</span>
@@ -296,8 +304,8 @@ if (!pattern.test(this.form.zip.trim())) {
     <p class="file-path">src/app/components/checkout/checkout.component.ts:113–119 (original lines)</p>
     <pre><code><span class="diff-add">get stateRequired(): boolean {
   return ['United States', 'Canada', 'Australia'].includes(this.form.country);
-}
-</span>
+}</span>
+
 onCountryChange(): void {
   const country = this.form.country;
 <span class="diff-add">  this.form.state = '';</span>
@@ -581,6 +589,8 @@ async onSearchChange(query: string) {
       <li>Clear the throttling rule afterward to clean it up.</li>
       <li>Wait for suggestions to appear, then change the query. Confirm the old suggestions disappear while the new search loads.</li>
     </ol>
+  </div>
+
   </div>
 
 </div>
