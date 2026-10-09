@@ -812,8 +812,15 @@
         event.preventDefault();
         const closing = item === selectedItem;
         select(closing ? null : item);
+        if (closing) return;
         // Single column: keep the opened item's title at the top of the screen.
-        if (!closing && singleColumn.matches) item.scrollIntoView({ block: 'start' });
+        // Two columns: if the reader was partway down a long item, start the
+        // new one from its top.
+        if (singleColumn.matches) item.scrollIntoView({ block: 'start' });
+        else {
+          const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--site-header-height')) || 0;
+          if (viewer.getBoundingClientRect().top < headerHeight) viewer.scrollIntoView({ block: 'start' });
+        }
       });
     });
 
@@ -876,6 +883,80 @@
     }
   }
 
+  // "On this page" chips: highlight the section currently being read. On
+  // phones the chips collapse into a dropdown labeled with that section.
+  function setupSectionNav() {
+    const nav = document.querySelector('.site-header .section-nav');
+    const header = document.querySelector('.site-header');
+    const list = nav?.querySelector('.section-nav-inner');
+    if (!nav || !header || !list) return;
+    const links = Array.from(nav.querySelectorAll('a[href^="#"]'))
+      .map((link) => ({ link, target: document.getElementById(link.getAttribute('href').slice(1)) }))
+      .filter(({ target }) => target);
+    if (!links.length) return;
+
+    list.id = list.id || 'section-nav-list';
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'section-nav-toggle';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-controls', list.id);
+    const toggleLabel = document.createElement('span');
+    toggleLabel.className = 'section-nav-toggle-label';
+    toggleLabel.textContent = 'On this page';
+    const toggleCurrent = document.createElement('span');
+    toggleCurrent.className = 'section-nav-toggle-current';
+    toggle.append(toggleLabel, toggleCurrent);
+    nav.prepend(toggle);
+    nav.classList.add('has-dropdown');
+
+    const setOpen = (open) => {
+      nav.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+    };
+    toggle.addEventListener('click', () => setOpen(!nav.classList.contains('is-open')));
+    links.forEach(({ link }) => link.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('click', (event) => {
+      if (!nav.contains(event.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && nav.classList.contains('is-open')) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    let current;
+    const update = () => {
+      // A section is current once it reaches the spot its link scrolls it to
+      // (its scroll margin, which clears the pinned bars); at the very bottom of
+      // the page, the last section is.
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      let active = null;
+      links.forEach((entry) => {
+        const landing = parseFloat(getComputedStyle(entry.target).scrollMarginTop) || header.getBoundingClientRect().bottom;
+        if (entry.target.getBoundingClientRect().top <= landing + 32) active = entry;
+      });
+      if (atBottom) active = links[links.length - 1];
+      if (active === current) return;
+      current = active;
+      toggleCurrent.textContent = active ? active.link.textContent : 'Jump to a section';
+      links.forEach(({ link }) => {
+        if (active && link === active.link) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+      // Keep the highlighted chip visible when the row scrolls sideways.
+      if (active && nav.scrollWidth > nav.clientWidth) {
+        const chip = active.link.getBoundingClientRect();
+        const row = nav.getBoundingClientRect();
+        if (chip.left < row.left || chip.right > row.right) nav.scrollLeft += chip.left - row.left - 16;
+      }
+    };
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     setupLaunchWidget();
     setupBugGuides();
@@ -883,6 +964,7 @@
 
     setupHints(document);
     setupListViewers();
+    setupSectionNav();
 
     const filterPanelToggle = document.getElementById('filter-panel-toggle');
     if (filterPanelToggle) {
@@ -927,11 +1009,14 @@
       });
     }
 
-    const sectionNav = document.querySelector('.section-nav');
+    // The pinned site header (page bar + section links) sets the offsets for
+    // everything else that sticks or scrolls into view below it.
+    const sectionNav = document.querySelector('.site-header') || document.querySelector('.section-nav');
     const stickyFilters = document.getElementById('bug-filter-toolbar');
     const syncAnchorSpacing = () => {
       const navHeight = sectionNav?.getBoundingClientRect().height || 0;
       const filterHeight = stickyFilters?.getBoundingClientRect().height || 0;
+      document.documentElement.style.setProperty('--site-header-height', Math.ceil(navHeight) + 'px');
       document.documentElement.style.setProperty('--bug-nav-height', Math.ceil(navHeight) + 'px');
       document.documentElement.style.setProperty('--bug-anchor-offset', Math.ceil(navHeight + filterHeight + 20) + 'px');
     };

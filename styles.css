@@ -1788,10 +1788,10 @@
 /* Off-canvas Drawer Panel Sliding from the Left */
 .bug-guide-sidebar {
   position: fixed;
-  top: 3.25rem;
+  top: var(--site-header-height, 3.25rem);
   left: -280px; /* Hidden off the left edge */
   width: 260px;
-  height: calc(100vh - 3.25rem);
+  height: calc(100vh - var(--site-header-height, 3.25rem));
   z-index: 200;
   background: var(--card-bg, #ffffff);
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15); /* Shadow extends to the right */
@@ -1837,11 +1837,11 @@
 
   .bug-guide-sidebar {
     position: fixed;
-    top: 6rem;
+    top: calc(var(--site-header-height, 5rem) + 1rem);
     left: calc(50vw - 32rem - 200px);
     width: 180px;
     height: auto;
-    max-height: calc(100vh - 7rem);
+    max-height: calc(100vh - var(--site-header-height, 5rem) - 2rem);
     box-shadow: none;
     background: transparent;
     padding: 0;
@@ -3845,7 +3845,10 @@ html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { b
   .solution-layout .toc ol > li.is-selected { background: var(--surface); border-left-color: var(--accent); }
   .toc li.is-selected > a { color: var(--text-primary); font-weight: 700; }
 
-  .report-viewer { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; border-radius: 8px; }
+  /* The short list stays pinned beside the solution; the solution itself
+     scrolls with the page (no scroll box inside the page). */
+  .solution-layout.is-split .toc { position: sticky; top: calc(var(--site-header-height, 4rem) + 1rem); max-height: calc(100vh - var(--site-header-height, 4rem) - 2rem); overflow-y: auto; }
+  .report-viewer { border-radius: 8px; }
   .report-viewer[hidden] { display: none; }
   .report-viewer .solution { margin: 0; box-shadow: none; }
   .report-viewer-close { display: none; margin-top: 0.75rem; padding: 0.4rem 0; border: 0; background: none; font: inherit; font-size: 0.85rem; color: var(--accent-link, var(--accent)); cursor: pointer; }
@@ -3859,7 +3862,6 @@ html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { b
   .report-viewer :is(p, li) a { text-decoration: underline; text-underline-offset: 0.15em; }
 
   @media (max-width: 900px) {
-    .report-viewer { position: static; max-height: none; overflow: visible; }
     .report-viewer-close { display: inline-block; }
     /* Match the Bug Directory's single-column look: highlight only, no bar. */
     .solution-layout .toc ol > li.is-selected { border-left-color: transparent; }
@@ -3883,3 +3885,78 @@ html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { b
   }
   .is-split .viewer-tip { position: relative; left: auto; bottom: auto; margin: 0 0 0.75rem; }
 }
+
+/* Site header: a pinned bar with the BugBlitz brand and page tabs, plus the
+   current page's section links. Other pages' tabs open a menu of their
+   sections on hover, or when keyboard focus reaches the tab. */
+@scope (html[data-page]) {
+  .site-header { position: sticky; top: 0; z-index: 150; background: var(--nav-bg, var(--ground)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); }
+  .site-bar { display: flex; align-items: center; gap: 1rem; max-width: 64rem; margin: 0 auto; padding: 0.5rem 1rem; }
+  .site-brand { margin-right: auto; font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; line-height: 1.2; color: var(--text-primary); text-decoration: none; white-space: nowrap; }
+  .site-brand:hover { color: var(--accent); }
+  .site-brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+  .page-nav-list { display: flex; align-items: center; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
+  .page-nav-item { position: relative; display: flex; align-items: center; border-radius: 6px; }
+  .page-nav-item > a { display: inline-flex; align-items: center; min-height: 40px; padding: 0.45rem 0.9rem; border-radius: 6px; font-family: var(--font-display); font-size: 0.9375rem; font-weight: 700; letter-spacing: 0.04em; color: var(--text-secondary); text-decoration: none; white-space: nowrap; transition: background-color 0.15s ease, color 0.15s ease; }
+  .page-nav-item > a[aria-current="page"] { background: var(--accent); color: #ffffff; }
+  .page-nav-item:not(:has(> a[aria-current])):hover, .page-nav-item.has-menu:focus-within { background: var(--surface); }
+  .page-nav-item:hover > a:not([aria-current]), .page-nav-item.has-menu:focus-within > a { color: var(--text-primary); }
+
+  .page-nav-menu { display: none; position: absolute; z-index: 10; top: 100%; left: 0; min-width: 14rem; margin: 0; padding: 0.35rem; list-style: none; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px var(--card-shadow); }
+  /* Bridges the gap so the menu stays open while the pointer moves onto it. */
+  .page-nav-menu::before { content: ''; position: absolute; left: 0; right: 0; top: -8px; height: 8px; }
+  /* The last tab's menu opens leftward so it stays on screen. */
+  .page-nav-item:last-child > .page-nav-menu { left: auto; right: 0; }
+  .page-nav-item.has-menu:focus-within > .page-nav-menu { display: block; top: calc(100% + 6px); }
+  @media (hover: hover) {
+    .page-nav-item.has-menu:hover > .page-nav-menu { display: block; top: calc(100% + 6px); }
+  }
+  .page-nav-menu a { display: block; padding: 0.45rem 0.7rem; border-radius: 5px; font-size: 0.92rem; line-height: 1.35; color: var(--text-primary); text-decoration: none; white-space: nowrap; }
+  .page-nav-menu a:hover { background: var(--surface); color: var(--accent); }
+  .page-nav :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* The current page's section links sit inside the pinned header as
+     labeled chips; the section being read is highlighted (app.js). */
+  .site-header .section-nav { position: static; border-top: 1px solid var(--border-light); border-bottom: 0; background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; scrollbar-width: none; }
+  .site-header .section-nav::-webkit-scrollbar { display: none; }
+  .site-header .section-nav-inner { align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; }
+  .site-header .section-nav-inner::before { content: 'On this page'; flex: none; margin-right: 0.25rem; font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); white-space: nowrap; }
+  .site-header .section-nav a { flex: none; padding: 0.35rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: var(--card-bg); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; text-transform: none; color: var(--accent); }
+  .site-header .section-nav a:hover { border-color: var(--accent); color: var(--accent); background: var(--card-bg); }
+  .site-header .section-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+  .site-header .section-nav a[aria-current="location"] { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+
+  /* Phones: the chips collapse into a dropdown (set up by app.js). */
+  .section-nav-toggle { display: none; }
+  @media (max-width: 700px) {
+    .site-header .section-nav.has-dropdown { position: relative; overflow: visible; }
+    .section-nav-toggle { display: flex; align-items: center; gap: 0.6rem; width: 100%; padding: 0.55rem 1rem; border: 0; background: none; font: inherit; color: var(--text-primary); text-align: left; cursor: pointer; }
+    .section-nav-toggle-label { flex: none; font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); }
+    .section-nav-toggle-current { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--accent); }
+    .section-nav-toggle::after { content: ''; flex: none; width: 0.45rem; height: 0.45rem; margin: -0.2rem 0.25rem 0 0; border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(45deg); transition: transform 0.15s ease; }
+    .section-nav.is-open .section-nav-toggle::after { margin-top: 0.25rem; transform: rotate(-135deg); }
+    .section-nav-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+    .site-header .section-nav.has-dropdown .section-nav-inner { display: none; position: absolute; z-index: 5; top: 100%; left: 0.5rem; right: 0.5rem; flex-direction: column; align-items: stretch; gap: 0.15rem; max-height: 60vh; overflow-y: auto; margin: 0; padding: 0.4rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px var(--card-shadow); }
+    .site-header .section-nav.has-dropdown.is-open .section-nav-inner { display: flex; }
+    .site-header .section-nav.has-dropdown .section-nav-inner::before { display: none; }
+    .site-header .section-nav.has-dropdown a { padding: 0.65rem 0.75rem; border: 0; border-radius: 6px; background: none; text-align: left; font-size: 0.95rem; color: var(--text-primary); }
+    .site-header .section-nav.has-dropdown a:hover { background: var(--surface); }
+    .site-header .section-nav.has-dropdown a[aria-current="location"] { background: var(--surface); color: var(--accent); }
+  }
+
+  @media (max-width: 700px) {
+    .site-bar { padding: 0.4rem 0.5rem; }
+    /* Room for all four tabs; the brand already links to the Workshop Guide tab. */
+    .site-brand { display: none; }
+    .page-nav { flex: 1; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .page-nav-list { width: max-content; margin: 0 auto; }
+    .page-nav-item > a { min-height: 36px; padding: 0.4rem 0.7rem; font-size: 0.85rem; }
+    .page-nav-menu { display: none !important; }
+  }
+}
+
+/* Anchors and sticky panels clear the pinned header. */
+html[data-page]:not([data-page="bugs"]) [id] { scroll-margin-top: calc(var(--site-header-height, 7rem) + 1rem); }
+html[data-page="solutions"] .solution-layout li { scroll-margin-top: calc(var(--site-header-height, 4rem) + 1rem); }
