@@ -14,16 +14,15 @@
     <a href="index.html">Workshop Guide</a>
     <a href="bugs.html" aria-current="page">Bug Report</a>
     <a href="solutions.html">Solutions</a>
-    <a href="reference.html">Reference</a>
+    <a href="recap.html">Recap</a>
   </nav>
 </div>
 
 <!-- Section Nav -->
 <nav class="section-nav" aria-label="Page sections">
   <div class="section-nav-inner">
-    <a href="#triage-board">Triage Matrix</a>
     <a href="#quick-links">Bug Directory</a>
-    <a href="#bug-cards-heading">Bug Reports</a>
+    <a href="#triage-board">Triage Matrix</a>
   </div>
 </nav>
     <!-- Floating drawer toggle button (placed outside layout wrapper) -->
@@ -112,22 +111,164 @@
     <div class="triage-prompts">
       <h2>Goal 1: Triage with your team</h2>
       <ol>
-        <li><strong>Reproduce and assess impact.</strong> Who encounters this bug, and how often? Does it affect a
-          common customer journey or an edge case? What can’t the customer do?</li>
-        <li><strong>Weigh severity and options.</strong> How critical is the affected feature? Is there a workaround?
-          What would the company or its customers lose if you temporarily disabled it? Adjust the starting effort
-          estimate if needed.</li>
+        <li><strong>Review bugs.</strong> Read through the incoming bug reports as a team. What was reported, who
+          reported it, and where in the app does it happen?</li>
+        <li><strong>Assess impact and weigh severity.</strong> Who encounters this bug, and how often? Does it affect a
+          common customer journey or an edge case? What can’t the customer do? How critical is the affected feature, and
+          is there a workaround? What would the company or its customers lose if you temporarily disabled it? Adjust the
+          starting effort estimate if needed.
+          <br><em>Tip: try to reproduce the bug yourself. Seeing it happen makes its impact much easier to judge.</em></li>
         <li><strong>Agree on priority and choose a bug.</strong> Assign P1, P2, or P3 and explain why. Which bug should
           your team tackle first, given its impact and the time available?</li>
       </ol>
     </div>
 
+    <div class="toc directory-intro" id="quick-links">
+      <h2>Bug Directory</h2>
+      <p class="board-help">Select a bug to read its report, then set its priority and effort<span class="triage-pointer-copy"> here or by dragging it into the triage matrix below</span><span class="triage-touch-copy">; the matrix updates automatically</span>.</p>
+    </div>
+
+    <div class="bug-filter-toolbar" id="bug-filter-toolbar">
+      <button type="button" class="filter-panel-toggle" id="filter-panel-toggle"
+        aria-controls="filter-panel-content" aria-expanded="false">
+        <span>Filter bugs</span>
+        <span class="filter-panel-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="filter-panel-content" id="filter-panel-content">
+        <div class="filter-group">
+          <span class="filter-label">Filter bugs</span>
+
+          <!-- Unified Triage & Priority Pills -->
+          <div class="filter-pills" id="bug-filter-pills">
+            <button type="button" class="bug-guide-filter active" data-filter="all">All</button>
+            <button type="button" class="bug-guide-filter" data-filter="needs-triage">Needs Triage</button>
+            <button type="button" class="bug-guide-filter" data-filter="P1">P1</button>
+            <button type="button" class="bug-guide-filter" data-filter="P2">P2</button>
+            <button type="button" class="bug-guide-filter" data-filter="P3">P3</button>
+            <button type="button" class="bug-guide-filter" data-filter="quick-wins">⚡ Quick Wins</button>
+          </div>
+
+          <span class="filter-divider">|</span>
+
+          <div class="filter-selects">
+            <select class="filter-dropdown" id="filter-type" aria-label="Filter by Bug Type">
+              <option value="all">Filter by Bug Type</option>
+              <option value="css">CSS</option>
+              <option value="device">Device-Specific</option>
+              <option value="interaction">Interaction</option>
+              <option value="form">Form Validation</option>
+              <option value="search">Search</option>
+              <option value="data">Data</option>
+            </select>
+
+            <select class="filter-dropdown" id="filter-reporter" aria-label="Filter by Reporter">
+              <option value="all">Filter by Reporter</option>
+              <option value="dev">Engineer</option>
+              <option value="qa">QA</option>
+              <option value="pm">Product Manager</option>
+              <option value="support">Customer Support</option>
+              <option value="director">Director</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filter-status">
+          Showing <strong id="visible-count">0</strong> of <span id="total-count">0</span> bugs
+          <button type="button" id="clear-filters-btn" class="clear-filters-btn" hidden>Clear filters</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="directory-layout">
+      <nav class="toc directory-list" aria-label="Bug report table of contents" id="bug-directory-list">
+        <div class="bug-guide-empty" id="bug-guide-empty">No bugs match this filter.</div>
+        <table class="triage-table" aria-label="Bug priorities and effort">
+          <thead>
+            <tr>
+              <th scope="col">Bug</th>
+              <th scope="col">Priority</th>
+              <th scope="col">Effort</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="assignment-welcome-offer-mobile">
+              <td><a href="#welcome-offer-mobile">Welcome offer is overlapped on mobile</a> <span class="toc-types"><span
+                    class="toc-tag cat-css">CSS</span><span class="toc-tag cat-device">Device-Specific</span></span></td>
+              <td data-label="Priority"></td>
+              <td data-label="Effort"></td>
+            </tr>
+            <tr id="assignment-duplicate-order-placed">
+              <td><a href="#duplicate-order-placed">"Charged twice for the same order?"</a> <span class="toc-types"><span
+                    class="toc-tag cat-interaction">Interaction</span></span></td>
+              <td data-label="Priority"></td>
+              <td data-label="Effort"></td>
+            </tr>
+            <tr id="assignment-generic-error">
+              <td><a href="#generic-error">Checkout error message is unhelpful — hurting conversion</a> <span
+                  class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
+              <td data-label="Priority"></td>
+              <td data-label="Effort"></td>
+            </tr>
+            <tr id="assignment-international-postal-code">
+              <td><a href="#international-postal-code">International customers can't check out</a> <span
+                  class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
+              <td data-label="Priority"></td>
+              <td data-label="Effort"></td>
+            </tr>
+            <tr id="assignment-stale-state">
+              <td><a href="#stale-state">State/Province selection carries over when the country changes</a> <span
+                  class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
+              <td data-label="Priority"></td>
+              <td data-label="Effort"></td>
+            </tr>
+            <tr id="assignment-sold-out-feedback">
+              <td><a href="#sold-out-feedback">"The Add to Cart button is broken on some plants"</a> <span
+                  class="toc-types"><span class="toc-tag cat-interaction">Interaction</span></span></td>
+              <td data-label="Priority"></td>
+              <td data-label="Effort"></td>
+            </tr>
+            <tr id="assignment-broken-image">
+              <td><a href="#broken-image">One of the product cards has a missing image</a> <span class="toc-types"><span
+                    class="toc-tag cat-data">Data</span></span></td>
+              <td data-label="Priority"></td>
+              <td data-label="Effort"></td>
+            </tr>
+            <tr id="assignment-dialog-bug">
+              <td><a href="#dialog-bug">Clear Cart dialog locks the page</a> <span class="toc-types"><span
+                    class="toc-tag cat-interaction">Interaction</span><span class="toc-tag cat-css">CSS</span></span></td>
+              <td data-label="Priority"></td>
+              <td data-label="Effort"></td>
+            </tr>
+            <tr id="assignment-promo-duplicate">
+              <td><a href="#promo-duplicate">Same promo code can be applied multiple times</a> <span
+                  class="toc-types"><span class="toc-tag cat-data">Data</span></span></td>
+              <td data-label="Priority"></td>
+              <td data-label="Effort"></td>
+            </tr>
+            <tr id="assignment-sale-price-not-honored">
+              <td><a href="#sale-price-not-honored">Cart and checkout totals ignore the sale price</a> <span
+                  class="toc-types"><span class="toc-tag cat-data">Data</span></span></td>
+              <td data-label="Priority"></td>
+              <td data-label="Effort"></td>
+            </tr>
+            <tr id="assignment-stale-search">
+              <td><a href="#stale-search">Stale search results</a> <span class="toc-types"><span
+                    class="toc-tag cat-search">Search</span></span></td>
+              <td data-label="Priority"></td>
+              <td data-label="Effort"></td>
+            </tr>
+          </tbody>
+        </table>
+      </nav>
+      <div class="report-viewer" id="report-viewer" role="region" aria-label="Selected bug report" hidden></div>
+    </div>
+
     <h3 style="font-size: 1rem; margin-top: 1.75rem;">Priority × Effort — the quick-triage matrix</h3>
     <p style="font-size: 0.92rem; color: var(--text-secondary); margin-top: 0.25rem;">Your bug reporters have provided
       initial effort estimates. Feel free to adjust them based on your team’s experience and what you discover, but
-      assigning priority to the bugs should be your main focus. <span class="triage-pointer-copy">Drag a bug from Needs triage into the matrix, or edit its values in the Bug Directory.</span><span class="triage-touch-copy">Set priority and effort in the <a href="#quick-links">Bug Directory</a>. The matrix updates automatically.</span></p>
+      assigning priority to the bugs should be your main focus. <span class="triage-pointer-copy">Drag a bug from Needs triage into the matrix (or back again to clear its priority), or edit its values in the Bug Directory.</span><span class="triage-touch-copy">Set priority and effort in the <a href="#quick-links">Bug Directory</a>. The matrix updates automatically.</span></p>
 
-    <p class="board-help"><a href="reference.html#severity">About severity and priority</a></p>
+    <p class="board-help"><a href="recap.html#severity">About severity and priority</a></p>
     <div id="triage-board">
       <p class="board-help" id="triage-count"></p>
       <div class="matrix-scroll">
@@ -200,147 +341,10 @@
       </div>
       <div class="needs-triage" id="needs-triage">
         <h4>Needs triage</h4>
-        <p class="board-help" id="needs-triage-help">Set missing values in the Bug Directory below to place these bugs in the matrix.</p>
+        <p class="board-help" id="needs-triage-help">Set missing values in the Bug Directory above to place these bugs in the matrix.</p>
         <div class="board-tiles" id="needs-triage-tiles"></div>
       </div>
     </div>
-
-    <div class="toc directory-intro" id="quick-links">
-      <h2>Bug Directory</h2>
-      <p class="board-help">Set priority and effort below<span class="triage-pointer-copy">, or drag bugs into the triage matrix above</span><span class="triage-touch-copy">; the matrix updates automatically</span>.</p>
-    </div>
-
-    <div class="bug-filter-toolbar" id="bug-filter-toolbar">
-      <button type="button" class="filter-panel-toggle" id="filter-panel-toggle"
-        aria-controls="filter-panel-content" aria-expanded="false">
-        <span>Filter bugs</span>
-        <span class="filter-panel-chevron" aria-hidden="true">⌄</span>
-      </button>
-      <div class="filter-panel-content" id="filter-panel-content">
-        <div class="filter-group">
-          <span class="filter-label">Filter bugs</span>
-
-          <!-- Unified Triage & Priority Pills -->
-          <div class="filter-pills" id="bug-filter-pills">
-            <button type="button" class="bug-guide-filter active" data-filter="all">All</button>
-            <button type="button" class="bug-guide-filter" data-filter="needs-triage">Needs Triage</button>
-            <button type="button" class="bug-guide-filter" data-filter="P1">P1</button>
-            <button type="button" class="bug-guide-filter" data-filter="P2">P2</button>
-            <button type="button" class="bug-guide-filter" data-filter="P3">P3</button>
-            <button type="button" class="bug-guide-filter" data-filter="quick-wins">⚡ Quick Wins</button>
-          </div>
-
-          <span class="filter-divider">|</span>
-
-          <div class="filter-selects">
-            <select class="filter-dropdown" id="filter-type" aria-label="Filter by Bug Type">
-              <option value="all">Filter by Bug Type</option>
-              <option value="css">CSS</option>
-              <option value="device">Device-Specific</option>
-              <option value="interaction">Interaction</option>
-              <option value="form">Form Validation</option>
-              <option value="search">Search</option>
-              <option value="data">Data</option>
-            </select>
-
-            <select class="filter-dropdown" id="filter-reporter" aria-label="Filter by Reporter">
-              <option value="all">Filter by Reporter</option>
-              <option value="dev">Engineer</option>
-              <option value="qa">QA</option>
-              <option value="pm">Product Manager</option>
-              <option value="support">Customer Support</option>
-              <option value="director">Director</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="filter-status">
-          Showing <strong id="visible-count">0</strong> of <span id="total-count">0</span> bugs
-          <button type="button" id="clear-filters-btn" class="clear-filters-btn" hidden>Clear filters</button>
-        </div>
-      </div>
-    </div>
-
-    <nav class="toc directory-list" aria-label="Bug report table of contents" id="bug-directory-list">
-      <table class="triage-table" aria-label="Bug priorities and effort">
-        <thead>
-          <tr>
-            <th scope="col">Bug</th>
-            <th scope="col">Priority</th>
-            <th scope="col">Effort</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr id="assignment-welcome-offer-mobile">
-            <td><a href="#welcome-offer-mobile">Welcome offer is overlapped on mobile</a> <span class="toc-types"><span
-                  class="toc-tag cat-css">CSS</span><span class="toc-tag cat-device">Device-Specific</span></span></td>
-            <td data-label="Priority"></td>
-            <td data-label="Effort"></td>
-          </tr>
-          <tr id="assignment-duplicate-order-placed">
-            <td><a href="#duplicate-order-placed">"Charged twice for the same order?"</a> <span class="toc-types"><span
-                  class="toc-tag cat-interaction">Interaction</span></span></td>
-            <td data-label="Priority"></td>
-            <td data-label="Effort"></td>
-          </tr>
-          <tr id="assignment-generic-error">
-            <td><a href="#generic-error">Checkout error message is unhelpful — hurting conversion</a> <span
-                class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
-            <td data-label="Priority"></td>
-            <td data-label="Effort"></td>
-          </tr>
-          <tr id="assignment-international-postal-code">
-            <td><a href="#international-postal-code">International customers can't check out</a> <span
-                class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
-            <td data-label="Priority"></td>
-            <td data-label="Effort"></td>
-          </tr>
-          <tr id="assignment-stale-state">
-            <td><a href="#stale-state">State/Province selection carries over when the country changes</a> <span
-                class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
-            <td data-label="Priority"></td>
-            <td data-label="Effort"></td>
-          </tr>
-          <tr id="assignment-sold-out-feedback">
-            <td><a href="#sold-out-feedback">"The Add to Cart button is broken on some plants"</a> <span
-                class="toc-types"><span class="toc-tag cat-interaction">Interaction</span></span></td>
-            <td data-label="Priority"></td>
-            <td data-label="Effort"></td>
-          </tr>
-          <tr id="assignment-broken-image">
-            <td><a href="#broken-image">One of the product cards has a missing image</a> <span class="toc-types"><span
-                  class="toc-tag cat-data">Data</span></span></td>
-            <td data-label="Priority"></td>
-            <td data-label="Effort"></td>
-          </tr>
-          <tr id="assignment-dialog-bug">
-            <td><a href="#dialog-bug">Clear Cart dialog locks the page</a> <span class="toc-types"><span
-                  class="toc-tag cat-interaction">Interaction</span><span class="toc-tag cat-css">CSS</span></span></td>
-            <td data-label="Priority"></td>
-            <td data-label="Effort"></td>
-          </tr>
-          <tr id="assignment-promo-duplicate">
-            <td><a href="#promo-duplicate">Same promo code can be applied multiple times</a> <span
-                class="toc-types"><span class="toc-tag cat-data">Data</span></span></td>
-            <td data-label="Priority"></td>
-            <td data-label="Effort"></td>
-          </tr>
-          <tr id="assignment-sale-price-not-honored">
-            <td><a href="#sale-price-not-honored">Cart and checkout totals ignore the sale price</a> <span
-                class="toc-types"><span class="toc-tag cat-data">Data</span></span></td>
-            <td data-label="Priority"></td>
-            <td data-label="Effort"></td>
-          </tr>
-          <tr id="assignment-stale-search">
-            <td><a href="#stale-search">Stale search results</a> <span class="toc-types"><span
-                  class="toc-tag cat-search">Search</span></span></td>
-            <td data-label="Priority"></td>
-            <td data-label="Effort"></td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="board-status" id="triage-status" role="status"></p>
-    </nav>
 
     <div class="exercise-goal" id="solve-bugs">
       <h2>Goal 2: Solve bugs together</h2>
@@ -348,9 +352,9 @@
         your reasoning.</p>
     </div>
 
-    <h2 id="bug-cards-heading" class="bug-reports-heading">Bug Reports</h2>
-    <div class="bug-guide-empty" id="bug-guide-empty">No bugs match this filter.</div>
 
+    <!-- Full bug reports. With JavaScript they are hidden and shown one at a time
+         in the Bug Directory's report viewer; without it they appear here. -->
     <div class="bug-guide-cards" id="bug-guide-cards">
 
       <div class="bug-guide-card" id="welcome-offer-mobile" data-types="css device" data-reporter="design"
