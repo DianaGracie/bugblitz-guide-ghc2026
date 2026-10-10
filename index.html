@@ -13,10 +13,17 @@
     <a class="site-brand" href="index.html"><span aria-hidden="true">🐛</span> BugBlitz</a>
     <nav class="page-nav" aria-label="Workshop pages">
       <ul class="page-nav-list">
-        <li class="page-nav-item"><a href="index.html" aria-current="page">Workshop Guide</a></li>
+        <li class="page-nav-item has-menu">
+          <a href="index.html" aria-current="page">Workshop Guide</a>
+          <ul class="page-nav-menu" id="page-menu-guide" aria-label="Workshop Guide sections">
+            <li><a href="#timeline">Timeline</a></li>
+            <li><a href="#setup">Setup</a></li>
+            <li><a href="#exercise">What Success Looks Like</a></li>
+          </ul>
+        </li>
         <li class="page-nav-item has-menu">
           <a href="bugs.html">Bug Report</a>
-          <ul class="page-nav-menu" id="page-menu-bugs">
+          <ul class="page-nav-menu" id="page-menu-bugs" aria-label="Bug Report sections">
             <li><a href="bugs.html#quick-links">Bug Directory</a></li>
             <li><a href="bugs.html#triage-board">Triage Matrix</a></li>
           </ul>
@@ -24,7 +31,7 @@
         <li class="page-nav-item"><a href="solutions.html">Solutions</a></li>
         <li class="page-nav-item has-menu">
           <a href="recap.html">Recap</a>
-          <ul class="page-nav-menu" id="page-menu-recap">
+          <ul class="page-nav-menu" id="page-menu-recap" aria-label="Recap sections">
             <li><a href="recap.html#goals">Goals</a></li>
             <li><a href="recap.html#mindset">Mindset</a></li>
             <li><a href="recap.html#severity">Severity &amp; Priority</a></li>
@@ -39,6 +46,7 @@
   </div>
   <nav class="section-nav" aria-label="Page sections">
     <div class="section-nav-inner">
+      <span class="section-nav-page">Workshop Guide</span>
       <a href="#timeline">Timeline</a>
       <a href="#setup">Setup</a>
       <a href="#exercise">What Success Looks Like</a>

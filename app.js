@@ -126,12 +126,6 @@
         entry.priorityBadge.textContent = priorityLabels[value.priority] || 'Priority unassigned';
         entry.priorityBadge.dataset.priority = value.priority;
         entry.priorityBadge.className = value.priority ? 'priority-badge' : '';
-        if (entry.indexBadge) {
-          entry.indexBadge.textContent = value.priority || '—';
-          entry.indexBadge.dataset.priority = value.priority;
-          entry.indexBadge.classList.toggle('priority-badge', Boolean(value.priority));
-          entry.indexBadge.title = priorityLabels[value.priority] || 'Priority unassigned';
-        }
         entry.effortText.textContent = value.effort ? value.effort + ' effort' : ' · Effort unassigned';
         entry.effortText.className = value.effort ? 'effort-badge' : '';
 
@@ -203,7 +197,6 @@
       const badge = document.createElement('a');
       badge.className = 'triage-summary';
       badge.href = '#assignment-' + card.id;
-      const indexBadge = document.querySelector('.toc-link[href="#' + card.id + '"] .toc-bug-id');
       const priorityBadge = document.createElement('span');
       const effortText = document.createElement('span');
       badge.append(priorityBadge);
@@ -212,7 +205,7 @@
       const reporterLine = card.querySelector('.reporter-line');
       if (reporterLine) reporterLine.after(badge);
 
-      const entry = { card, title, tile, badge, priorityBadge, effortText, missing, indexBadge, controls: {} };
+      const entry = { card, title, tile, badge, priorityBadge, effortText, missing, controls: {} };
       entries.push(entry);
 
       handle.addEventListener('dragstart', (event) => {
@@ -389,18 +382,6 @@
     const matchesDivider = document.createElement('h3');
     matchesDivider.className = 'filter-match-divider';
     matchesDivider.textContent = 'Matches your filters';
-    const sidebarBugLinks = Array.from(document.querySelectorAll('.toc-link[href^="#"]'));
-
-    // Highlight the bug that is open in the Bug Directory's report viewer.
-    function updateActiveBugLink() {
-      const openId = document.querySelector('.triage-table tr.is-selected')?.id.replace('assignment-', '');
-      sidebarBugLinks.forEach((link) => {
-        if (openId && link.getAttribute('href') === '#' + openId) link.setAttribute('aria-current', 'location');
-        else link.removeAttribute('aria-current');
-      });
-    }
-
-    document.addEventListener('reportviewerchange', updateActiveBugLink);
 
     function syncFiltersToUrl() {
       const url = new URL(window.location.href);
@@ -465,8 +446,6 @@
         if (temporarilyRevealedBugId === bugId && isMatch) clearTemporaryReveal();
         const isTemporarilyRevealed = temporarilyRevealedBugId === bugId && !isMatch;
         const isVisible = isMatch || isTemporarilyRevealed;
-        const sidebarLink = document.querySelector('.toc-link[href="#' + bugId + '"]');
-        if (sidebarLink) sidebarLink.hidden = !isVisible;
 
         let revealNotice = card.querySelector('.filter-reveal-notice');
         if (isTemporarilyRevealed && !revealNotice) {
@@ -496,18 +475,11 @@
       }
 
       if (visibleCountEl) visibleCountEl.textContent = visibleCount;
-      const sidebarCount = document.getElementById('sidebar-result-count');
-      if (sidebarCount) sidebarCount.textContent = visibleCount + ' of ' + bugCards.length + ' bugs';
-      const sidebarClear = document.getElementById('sidebar-clear-filters');
-      if (sidebarClear) sidebarClear.hidden = !isFiltered;
-      const sidebarEmpty = document.getElementById('sidebar-empty');
-      if (sidebarEmpty) sidebarEmpty.hidden = visibleCount !== 0;
 
       if (emptyStateEl) {
         emptyStateEl.classList.toggle('show', visibleCount === 0);
       }
       syncFiltersToUrl();
-      updateActiveBugLink();
     }
 
     filterPills.forEach((pill) => {
@@ -540,10 +512,6 @@
       applyFilters();
     }
     clearBtn?.addEventListener('click', resetFilters);
-    document.getElementById('sidebar-clear-filters')?.addEventListener('click', () => {
-      resetFilters();
-      document.querySelector('.toc-link:not([hidden])')?.focus();
-    });
 
     document.addEventListener('click', (event) => {
       const link = event.target.closest('a[href^="#"]');
@@ -686,7 +654,7 @@
   // serve as the source, and every link to one (#id) opens it here. Clicking
   // the selected item again closes it and the list returns to full width.
   // Without JavaScript the content blocks stay visible and links jump to them.
-  function setupListViewer({ layout, list, items, viewer, sources, closeLabel, tip, openFirst = true }) {
+  function setupListViewer({ layout, list, items, viewer, sources, closeLabel, tip, openFirst = true, popupLinks }) {
     if (!layout || !list || !viewer || !sources || !items.length) return;
 
     // Optional tip bubble pointing at the titles. It appears only on a
@@ -742,17 +710,25 @@
     inlineSlot.className = 'report-viewer-row';
     const inlineTarget = inlineSlot.firstElementChild || inlineSlot;
 
-    // Long content: close from the bottom without scrolling back to the title.
-    const closeButton = document.createElement('button');
-    closeButton.type = 'button';
-    closeButton.className = 'report-viewer-close';
-    closeButton.textContent = closeLabel;
-    closeButton.addEventListener('click', () => {
+    // Close controls: an × in the corner at every width (clicking the selected
+    // title again also works), plus, in the single-column layout, a link at
+    // the bottom of long content so readers needn't scroll back up.
+    const closeViewer = () => {
       const item = selectedItem;
       select(null);
       item?.scrollIntoView({ block: 'nearest' });
       linkFor(item)?.focus({ preventScroll: true });
-    });
+    };
+    const dismissButton = document.createElement('button');
+    dismissButton.type = 'button';
+    dismissButton.className = 'report-viewer-dismiss';
+    dismissButton.setAttribute('aria-label', closeLabel.replace(/^\W+/, ''));
+    dismissButton.addEventListener('click', closeViewer);
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'report-viewer-close';
+    closeButton.textContent = closeLabel;
+    closeButton.addEventListener('click', closeViewer);
 
     const copyOf = (source) => {
       const copy = source.cloneNode(true);
@@ -782,26 +758,90 @@
       layout.classList.toggle('is-split', Boolean(selectedItem) && !singleColumn.matches);
     };
 
-    function select(item) {
+    // Keep the address in step with what's open (so a refresh or shared link
+    // reopens it), without adding history entries.
+    const syncUrl = (item) => {
+      const hash = item ? '#' + idFor(item) : '';
+      if (window.location.hash === hash) return;
+      history.replaceState(history.state, '', window.location.pathname + window.location.search + hash);
+    };
+
+    function select(item, { updateUrl = true } = {}) {
       selectedItem = item;
+      if (updateUrl) syncUrl(item);
       items.forEach((candidate) => {
         const isSelected = candidate === item;
         candidate.classList.toggle('is-selected', isSelected);
         linkFor(candidate)?.setAttribute('aria-expanded', String(isSelected));
       });
       const source = item && document.getElementById(idFor(item));
-      viewer.replaceChildren(...(source ? [copyOf(source), closeButton] : []));
+      viewer.replaceChildren(...(source ? [dismissButton, copyOf(source), closeButton] : []));
       viewer.scrollTop = 0;
       placeViewer();
-      document.dispatchEvent(new Event('reportviewerchange'));
     }
 
-    // Open an item from anywhere (other pages, matrix tiles, the Bug List
-    // drawer) and bring it to the top of the screen.
+    // Open an item from anywhere (other pages, matrix tiles) and bring it to
+    // the top of the screen.
     const open = (item, { behavior } = {}) => {
       if (item !== selectedItem) select(item);
       item.scrollIntoView({ block: 'start', behavior });
     };
+
+    // Links matching popupLinks (e.g. cards on the triage board) open the item
+    // in a pop-up over the page, so readers keep their place instead of
+    // jumping back up to the list. "Open in Bug Directory" still offers that.
+    if (popupLinks) {
+      const dialog = document.createElement('dialog');
+      dialog.className = 'report-dialog';
+      const dialogBody = document.createElement('div');
+      dialogBody.className = 'report-dialog-body';
+      const dialogClose = document.createElement('button');
+      dialogClose.type = 'button';
+      dialogClose.className = 'report-viewer-dismiss';
+      dialogClose.setAttribute('aria-label', 'Close');
+      const openInList = document.createElement('button');
+      openInList.type = 'button';
+      openInList.className = 'report-dialog-open-list';
+      openInList.textContent = 'Open in Bug Directory';
+      dialog.append(dialogClose, dialogBody);
+      document.body.append(dialog);
+
+      let dialogItem = null;
+      let returnFocusTo = null;
+      dialogClose.addEventListener('click', () => dialog.close());
+      // Back to the card that opened it (unless moving on to the directory).
+      dialog.addEventListener('close', () => {
+        returnFocusTo?.focus({ preventScroll: true });
+        returnFocusTo = null;
+      });
+      // A click on the dimmed backdrop lands on the dialog element itself.
+      dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+      openInList.addEventListener('click', () => {
+        returnFocusTo = null;
+        dialog.close();
+        if (dialogItem) open(dialogItem);
+      });
+
+      // Capture phase, so this runs before the handlers that would jump to the list.
+      document.addEventListener('click', (event) => {
+        const link = event.target.closest(popupLinks);
+        if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        const item = itemFor(link.getAttribute('href').slice(1));
+        const source = item && document.getElementById(idFor(item));
+        if (!source) return;
+        event.preventDefault();
+        dialogItem = item;
+        returnFocusTo = link;
+        const copy = copyOf(source);
+        const footer = copy.querySelector('.bug-guide-card-footer');
+        if (footer) footer.prepend(openInList);
+        else copy.append(openInList);
+        dialogBody.replaceChildren(copy);
+        dialog.setAttribute('aria-label', copy.querySelector('h3, h2')?.textContent.trim() || 'Details');
+        dialog.showModal();
+        dialogBody.scrollTop = 0;
+      }, true);
+    }
 
     items.forEach((item) => {
       const link = linkFor(item);
@@ -851,7 +891,8 @@
     } else {
       // Optionally open the first item in two columns so the viewer isn't
       // empty. One column always starts closed so the list stays scannable.
-      select(openFirst && !singleColumn.matches ? items.find((item) => !item.classList.contains('filtered-out')) || null : null);
+      // This default isn't the reader's choice, so it leaves the address alone.
+      select(openFirst && !singleColumn.matches ? items.find((item) => !item.classList.contains('filtered-out')) || null : null, { updateUrl: false });
     }
   }
 
@@ -867,6 +908,8 @@
         sources: document.getElementById('bug-guide-cards'),
         closeLabel: '↑ Close report',
         tip: 'Click a bug’s title to see its full report.',
+        // Cards on the triage board open the report in a pop-up.
+        popupLinks: '.board-tile a[href^="#"]',
         // Start with just the list, so the tip makes sense.
         openFirst: false,
       });
@@ -881,6 +924,41 @@
         closeLabel: '↑ Close solution',
       });
     }
+  }
+
+  // Bug Directory filter bar: pinned while scrolling through the bug list.
+  // Once the last bug passes the middle of the screen, the bar scrolls away
+  // with the content instead of staying pinned: --filter-shift moves it (and
+  // the report viewer pinned beside the list) up by however far the reader has
+  // scrolled past that point.
+  function setupFilterBarRelease() {
+    const scope = document.querySelector('.directory-sticky-scope');
+    const lastRow = () => Array.from(document.querySelectorAll('#bug-directory-list tbody tr[id^="assignment-"]')).pop();
+    if (!scope || !lastRow()) return;
+    const update = () => {
+      const pastMiddle = lastRow().getBoundingClientRect().top - window.innerHeight / 2;
+      // Clamp once it's well off screen; there's nothing further to move.
+      const shift = Math.max(-1000, Math.min(0, pastMiddle));
+      scope.style.setProperty('--filter-shift', Math.round(shift) + 'px');
+    };
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+  }
+
+  // Show the secondary bar once the main bar has scrolled out of view.
+  function setupHeaderScroll() {
+    const bar = document.querySelector('.site-bar');
+    if (!bar) return;
+    const update = () => {
+      const scrolled = bar.getBoundingClientRect().bottom <= 0;
+      document.documentElement.classList.toggle('is-scrolled', scrolled);
+      // Don't leave keyboard focus in the main bar once it's off screen.
+      if (scrolled && bar.contains(document.activeElement)) document.activeElement.blur();
+    };
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
   }
 
   // "On this page" chips: highlight the section currently being read. On
@@ -945,11 +1023,18 @@
         if (active && link === active.link) link.setAttribute('aria-current', 'location');
         else link.removeAttribute('aria-current');
       });
-      // Keep the highlighted chip visible when the row scrolls sideways.
-      if (active && nav.scrollWidth > nav.clientWidth) {
-        const chip = active.link.getBoundingClientRect();
-        const row = nav.getBoundingClientRect();
-        if (chip.left < row.left || chip.right > row.right) nav.scrollLeft += chip.left - row.left - 16;
+      // When the chip row is wider than the bar, slide it to follow the reader:
+      // center the highlighted chip, or return to the start above the first
+      // section. Runs only when the highlighted section changes.
+      if (nav.scrollWidth > nav.clientWidth) {
+        let left = 0;
+        if (active) {
+          const chip = active.link.getBoundingClientRect();
+          const row = nav.getBoundingClientRect();
+          left = nav.scrollLeft + (chip.left + chip.width / 2) - (row.left + row.width / 2);
+        }
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        nav.scrollTo({ left: Math.max(0, left), behavior: reduceMotion ? 'auto' : 'smooth' });
       }
     };
     update();
@@ -965,6 +1050,8 @@
     setupHints(document);
     setupListViewers();
     setupSectionNav();
+    setupHeaderScroll();
+    setupFilterBarRelease();
 
     const filterPanelToggle = document.getElementById('filter-panel-toggle');
     if (filterPanelToggle) {
@@ -974,44 +1061,9 @@
       });
     }
 
-    const inlineToc = document.getElementById('bug-directory-list') || document.querySelector('.triage-table');
-    const drawerToggle = document.getElementById('toc-drawer-toggle');
-    const sidebar = document.getElementById('bug-guide-sidebar');
-    const sidebarOverlay = document.getElementById('sidebar-overlay');
-    const closeDrawerButton = document.getElementById('close-drawer-btn');
-
-    if (drawerToggle && sidebar && sidebarOverlay) {
-      const setSidebarOpen = (isOpen) => {
-        sidebar.classList.toggle('open', isOpen);
-        sidebarOverlay.classList.toggle('show', isOpen);
-        drawerToggle.setAttribute('aria-expanded', String(isOpen));
-
-        if (isOpen) {
-          (sidebar.querySelector('.toc-link:not([hidden])') || document.getElementById('sidebar-clear-filters'))?.focus();
-        } else if (sidebar.contains(document.activeElement)) {
-          drawerToggle.focus();
-        }
-      };
-
-      drawerToggle.setAttribute('aria-expanded', 'false');
-      drawerToggle.addEventListener('click', () => {
-        setSidebarOpen(!sidebar.classList.contains('open'));
-      });
-      closeDrawerButton?.addEventListener('click', () => setSidebarOpen(false));
-      sidebarOverlay.addEventListener('click', () => setSidebarOpen(false));
-      sidebar.querySelectorAll('.toc-link').forEach((link) => {
-        link.addEventListener('click', () => setSidebarOpen(false));
-      });
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && sidebar.classList.contains('open')) {
-          setSidebarOpen(false);
-        }
-      });
-    }
-
-    // The pinned site header (page bar + section links) sets the offsets for
-    // everything else that sticks or scrolls into view below it.
-    const sectionNav = document.querySelector('.site-header') || document.querySelector('.section-nav');
+    // The pinned secondary bar (page name + section links) sets the offsets
+    // for everything else that sticks or scrolls into view below it.
+    const sectionNav = document.querySelector('.site-header .section-nav') || document.querySelector('.section-nav');
     const stickyFilters = document.getElementById('bug-filter-toolbar');
     const syncAnchorSpacing = () => {
       const navHeight = sectionNav?.getBoundingClientRect().height || 0;
@@ -1027,25 +1079,10 @@
       if (stickyFilters) stickySizeObserver.observe(stickyFilters);
     }
     window.addEventListener('resize', syncAnchorSpacing);
-    // Refresh measurements before native anchor navigation, including drawer links.
+    // Refresh measurements before native anchor navigation.
     document.addEventListener('click', (event) => {
       if (event.target.closest('a[href^="#"]')) syncAnchorSpacing();
     }, true);
 
-
-    const syncTocNavigation = () => {
-      const stickyNavBottom = sectionNav ? sectionNav.getBoundingClientRect().bottom : 0;
-      const isPastToc = Boolean(inlineToc && inlineToc.getBoundingClientRect().bottom <= stickyNavBottom);
-      drawerToggle?.classList.toggle('visible', isPastToc);
-      sidebar?.classList.toggle('past-toc', isPastToc);
-    };
-
-    syncTocNavigation();
-    window.addEventListener('scroll', syncTocNavigation, { passive: true });
-    window.addEventListener('resize', syncTocNavigation);
-
-    if (sectionNav && sidebar) {
-      syncTocNavigation();
-    }
   });
 })();

@@ -12,17 +12,23 @@
       <ul class="page-nav-list">
         <li class="page-nav-item has-menu">
           <a href="index.html">Workshop Guide</a>
-          <ul class="page-nav-menu" id="page-menu-guide">
+          <ul class="page-nav-menu" id="page-menu-guide" aria-label="Workshop Guide sections">
             <li><a href="index.html#timeline">Timeline</a></li>
             <li><a href="index.html#setup">Setup</a></li>
             <li><a href="index.html#exercise">What Success Looks Like</a></li>
           </ul>
         </li>
-        <li class="page-nav-item"><a href="bugs.html" aria-current="page">Bug Report</a></li>
+        <li class="page-nav-item has-menu">
+          <a href="bugs.html" aria-current="page">Bug Report</a>
+          <ul class="page-nav-menu" id="page-menu-bugs" aria-label="Bug Report sections">
+            <li><a href="#quick-links">Bug Directory</a></li>
+            <li><a href="#triage-board">Triage Matrix</a></li>
+          </ul>
+        </li>
         <li class="page-nav-item"><a href="solutions.html">Solutions</a></li>
         <li class="page-nav-item has-menu">
           <a href="recap.html">Recap</a>
-          <ul class="page-nav-menu" id="page-menu-recap">
+          <ul class="page-nav-menu" id="page-menu-recap" aria-label="Recap sections">
             <li><a href="recap.html#goals">Goals</a></li>
             <li><a href="recap.html#mindset">Mindset</a></li>
             <li><a href="recap.html#severity">Severity &amp; Priority</a></li>
@@ -37,6 +43,7 @@
   </div>
   <nav class="section-nav" aria-label="Page sections">
     <div class="section-nav-inner">
+      <span class="section-nav-page">Bug Report</span>
       <a href="#quick-links">Bug Directory</a>
       <a href="#triage-board">Triage Matrix</a>
     </div>
@@ -50,77 +57,6 @@
     steps, a working comparison case, and the acceptance criteria a fix must meet.</p>
 </div>
 
-    <!-- Floating drawer toggle button (placed outside layout wrapper) -->
-<button type="button" class="toc-drawer-toggle" id="toc-drawer-toggle" aria-label="Toggle Bug List"
-  aria-controls="bug-guide-sidebar" aria-expanded="false" title="Open Bug List">
-  <span class="drawer-tab-mark" aria-hidden="true">
-    <span class="drawer-tab-icon-frame"><span>🐛</span></span>
-    <span class="drawer-tab-arrow">›</span>
-  </span>
-</button>
-
-<!-- Overlay backdrop for off-canvas mode on split/small screens -->
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-<!-- Side Nav / Drawer matching your bug list -->
-<aside class="bug-guide-sidebar" id="bug-guide-sidebar">
-  <div class="sidebar-header">
-    <h3 class="sidebar-title">Bug List</h3>
-    <button type="button" class="close-drawer-btn" id="close-drawer-btn" aria-label="Close Bug List">✕</button>
-  </div>
-
-  <div class="sidebar-filter-summary">
-    <span id="sidebar-result-count" role="status"></span>
-    <button type="button" id="sidebar-clear-filters" hidden>Clear filters</button>
-  </div>
-  <p class="sidebar-empty" id="sidebar-empty" hidden>No bugs match these filters.</p>
-  <nav class="toc-links" aria-label="Bug Quick Index">
-    <a href="#welcome-offer-mobile" class="toc-link">
-      <span class="toc-bug-id">—</span>
-      <span class="toc-bug-title">Welcome offer mobile overlap</span>
-    </a>
-    <a href="#duplicate-order-placed" class="toc-link">
-      <span class="toc-bug-id">—</span>
-      <span class="toc-bug-title">Charged twice for same order</span>
-    </a>
-    <a href="#generic-error" class="toc-link">
-      <span class="toc-bug-id">—</span>
-      <span class="toc-bug-title">Checkout error unhelpful</span>
-    </a>
-    <a href="#international-postal-code" class="toc-link">
-      <span class="toc-bug-id">—</span>
-      <span class="toc-bug-title">International postal code block</span>
-    </a>
-    <a href="#stale-state" class="toc-link">
-      <span class="toc-bug-id">—</span>
-      <span class="toc-bug-title">State selection carries over</span>
-    </a>
-    <a href="#sold-out-feedback" class="toc-link">
-      <span class="toc-bug-id">—</span>
-      <span class="toc-bug-title">Add to Cart broken on plants</span>
-    </a>
-    <a href="#broken-image" class="toc-link">
-      <span class="toc-bug-id">—</span>
-      <span class="toc-bug-title">Missing product card image</span>
-    </a>
-    <a href="#dialog-bug" class="toc-link">
-      <span class="toc-bug-id">—</span>
-      <span class="toc-bug-title">Clear Cart dialog locks page</span>
-    </a>
-    <a href="#promo-duplicate" class="toc-link">
-      <span class="toc-bug-id">—</span>
-      <span class="toc-bug-title">Duplicate promo code stack</span>
-    </a>
-    <a href="#sale-price-not-honored" class="toc-link">
-      <span class="toc-bug-id">—</span>
-      <span class="toc-bug-title">Totals ignore sale price</span>
-    </a>
-    <a href="#stale-search" class="toc-link">
-      <span class="toc-bug-id">—</span>
-      <span class="toc-bug-title">Stale search results</span>
-    </a>
-  </nav>
-</aside>
 <div class="content">
 
   <!-- Bug report and triage tools -->
@@ -153,139 +89,142 @@
       <p class="board-help">Select a bug to read its report, then set its priority and effort<span class="triage-pointer-copy"> here or by dragging it into the triage matrix below</span><span class="triage-touch-copy">; the matrix updates automatically</span>.</p>
     </div>
 
-    <div class="bug-filter-toolbar" id="bug-filter-toolbar">
-      <button type="button" class="filter-panel-toggle" id="filter-panel-toggle"
-        aria-controls="filter-panel-content" aria-expanded="false">
-        <span>Filter bugs</span>
-        <span class="filter-panel-chevron" aria-hidden="true">⌄</span>
-      </button>
-      <div class="filter-panel-content" id="filter-panel-content">
-        <div class="filter-group">
-          <span class="filter-label">Filter bugs</span>
+    <!-- The filter bar stays pinned only while the bug list is on screen. -->
+    <div class="directory-sticky-scope">
+      <div class="bug-filter-toolbar" id="bug-filter-toolbar">
+        <button type="button" class="filter-panel-toggle" id="filter-panel-toggle"
+          aria-controls="filter-panel-content" aria-expanded="false">
+          <span>Filter bugs</span>
+          <span class="filter-panel-chevron" aria-hidden="true">⌄</span>
+        </button>
+        <div class="filter-panel-content" id="filter-panel-content">
+          <div class="filter-group">
+            <span class="filter-label">Filter bugs</span>
 
-          <!-- Unified Triage & Priority Pills -->
-          <div class="filter-pills" id="bug-filter-pills">
-            <button type="button" class="bug-guide-filter active" data-filter="all">All</button>
-            <button type="button" class="bug-guide-filter" data-filter="needs-triage">Needs Triage</button>
-            <button type="button" class="bug-guide-filter" data-filter="P1">P1</button>
-            <button type="button" class="bug-guide-filter" data-filter="P2">P2</button>
-            <button type="button" class="bug-guide-filter" data-filter="P3">P3</button>
-            <button type="button" class="bug-guide-filter" data-filter="quick-wins">⚡ Quick Wins</button>
+            <!-- Unified Triage & Priority Pills -->
+            <div class="filter-pills" id="bug-filter-pills">
+              <button type="button" class="bug-guide-filter active" data-filter="all">All</button>
+              <button type="button" class="bug-guide-filter" data-filter="needs-triage">Needs Triage</button>
+              <button type="button" class="bug-guide-filter" data-filter="P1">P1</button>
+              <button type="button" class="bug-guide-filter" data-filter="P2">P2</button>
+              <button type="button" class="bug-guide-filter" data-filter="P3">P3</button>
+              <button type="button" class="bug-guide-filter" data-filter="quick-wins">⚡ Quick Wins</button>
+            </div>
+
+            <span class="filter-divider">|</span>
+
+            <div class="filter-selects">
+              <select class="filter-dropdown" id="filter-type" aria-label="Filter by Bug Type">
+                <option value="all">Filter by Bug Type</option>
+                <option value="css">CSS</option>
+                <option value="device">Device-Specific</option>
+                <option value="interaction">Interaction</option>
+                <option value="form">Form Validation</option>
+                <option value="search">Search</option>
+                <option value="data">Data</option>
+              </select>
+
+              <select class="filter-dropdown" id="filter-reporter" aria-label="Filter by Reporter">
+                <option value="all">Filter by Reporter</option>
+                <option value="dev">Engineer</option>
+                <option value="qa">QA</option>
+                <option value="pm">Product Manager</option>
+                <option value="support">Customer Support</option>
+                <option value="director">Director</option>
+              </select>
+            </div>
           </div>
 
-          <span class="filter-divider">|</span>
-
-          <div class="filter-selects">
-            <select class="filter-dropdown" id="filter-type" aria-label="Filter by Bug Type">
-              <option value="all">Filter by Bug Type</option>
-              <option value="css">CSS</option>
-              <option value="device">Device-Specific</option>
-              <option value="interaction">Interaction</option>
-              <option value="form">Form Validation</option>
-              <option value="search">Search</option>
-              <option value="data">Data</option>
-            </select>
-
-            <select class="filter-dropdown" id="filter-reporter" aria-label="Filter by Reporter">
-              <option value="all">Filter by Reporter</option>
-              <option value="dev">Engineer</option>
-              <option value="qa">QA</option>
-              <option value="pm">Product Manager</option>
-              <option value="support">Customer Support</option>
-              <option value="director">Director</option>
-            </select>
+          <div class="filter-status">
+            Showing <strong id="visible-count">0</strong> of <span id="total-count">0</span> bugs
+            <button type="button" id="clear-filters-btn" class="clear-filters-btn" hidden>Clear filters</button>
           </div>
-        </div>
-
-        <div class="filter-status">
-          Showing <strong id="visible-count">0</strong> of <span id="total-count">0</span> bugs
-          <button type="button" id="clear-filters-btn" class="clear-filters-btn" hidden>Clear filters</button>
         </div>
       </div>
-    </div>
 
-    <div class="directory-layout">
-      <nav class="toc directory-list" aria-label="Bug report table of contents" id="bug-directory-list">
-        <div class="bug-guide-empty" id="bug-guide-empty">No bugs match this filter.</div>
-        <table class="triage-table" aria-label="Bug priorities and effort">
-          <thead>
-            <tr>
-              <th scope="col">Bug</th>
-              <th scope="col">Priority</th>
-              <th scope="col">Effort</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr id="assignment-welcome-offer-mobile">
-              <td><a href="#welcome-offer-mobile">Welcome offer is overlapped on mobile</a> <span class="toc-types"><span
-                    class="toc-tag cat-css">CSS</span><span class="toc-tag cat-device">Device-Specific</span></span></td>
-              <td data-label="Priority"></td>
-              <td data-label="Effort"></td>
-            </tr>
-            <tr id="assignment-duplicate-order-placed">
-              <td><a href="#duplicate-order-placed">"Charged twice for the same order?"</a> <span class="toc-types"><span
-                    class="toc-tag cat-interaction">Interaction</span></span></td>
-              <td data-label="Priority"></td>
-              <td data-label="Effort"></td>
-            </tr>
-            <tr id="assignment-generic-error">
-              <td><a href="#generic-error">Checkout error message is unhelpful — hurting conversion</a> <span
-                  class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
-              <td data-label="Priority"></td>
-              <td data-label="Effort"></td>
-            </tr>
-            <tr id="assignment-international-postal-code">
-              <td><a href="#international-postal-code">International customers can't check out</a> <span
-                  class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
-              <td data-label="Priority"></td>
-              <td data-label="Effort"></td>
-            </tr>
-            <tr id="assignment-stale-state">
-              <td><a href="#stale-state">State/Province selection carries over when the country changes</a> <span
-                  class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
-              <td data-label="Priority"></td>
-              <td data-label="Effort"></td>
-            </tr>
-            <tr id="assignment-sold-out-feedback">
-              <td><a href="#sold-out-feedback">"The Add to Cart button is broken on some plants"</a> <span
-                  class="toc-types"><span class="toc-tag cat-interaction">Interaction</span></span></td>
-              <td data-label="Priority"></td>
-              <td data-label="Effort"></td>
-            </tr>
-            <tr id="assignment-broken-image">
-              <td><a href="#broken-image">One of the product cards has a missing image</a> <span class="toc-types"><span
-                    class="toc-tag cat-data">Data</span></span></td>
-              <td data-label="Priority"></td>
-              <td data-label="Effort"></td>
-            </tr>
-            <tr id="assignment-dialog-bug">
-              <td><a href="#dialog-bug">Clear Cart dialog locks the page</a> <span class="toc-types"><span
-                    class="toc-tag cat-interaction">Interaction</span><span class="toc-tag cat-css">CSS</span></span></td>
-              <td data-label="Priority"></td>
-              <td data-label="Effort"></td>
-            </tr>
-            <tr id="assignment-promo-duplicate">
-              <td><a href="#promo-duplicate">Same promo code can be applied multiple times</a> <span
-                  class="toc-types"><span class="toc-tag cat-data">Data</span></span></td>
-              <td data-label="Priority"></td>
-              <td data-label="Effort"></td>
-            </tr>
-            <tr id="assignment-sale-price-not-honored">
-              <td><a href="#sale-price-not-honored">Cart and checkout totals ignore the sale price</a> <span
-                  class="toc-types"><span class="toc-tag cat-data">Data</span></span></td>
-              <td data-label="Priority"></td>
-              <td data-label="Effort"></td>
-            </tr>
-            <tr id="assignment-stale-search">
-              <td><a href="#stale-search">Stale search results</a> <span class="toc-types"><span
-                    class="toc-tag cat-search">Search</span></span></td>
-              <td data-label="Priority"></td>
-              <td data-label="Effort"></td>
-            </tr>
-          </tbody>
-        </table>
-      </nav>
-      <div class="report-viewer" id="report-viewer" role="region" aria-label="Selected bug report" hidden></div>
+      <div class="directory-layout">
+        <nav class="toc directory-list" aria-label="Bug report table of contents" id="bug-directory-list">
+          <div class="bug-guide-empty" id="bug-guide-empty">No bugs match this filter.</div>
+          <table class="triage-table" aria-label="Bug priorities and effort">
+            <thead>
+              <tr>
+                <th scope="col">Bug</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Effort</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr id="assignment-welcome-offer-mobile">
+                <td><a href="#welcome-offer-mobile">Welcome offer is overlapped on mobile</a> <span class="toc-types"><span
+                      class="toc-tag cat-css">CSS</span><span class="toc-tag cat-device">Device-Specific</span></span></td>
+                <td data-label="Priority"></td>
+                <td data-label="Effort"></td>
+              </tr>
+              <tr id="assignment-duplicate-order-placed">
+                <td><a href="#duplicate-order-placed">"Charged twice for the same order?"</a> <span class="toc-types"><span
+                      class="toc-tag cat-interaction">Interaction</span></span></td>
+                <td data-label="Priority"></td>
+                <td data-label="Effort"></td>
+              </tr>
+              <tr id="assignment-generic-error">
+                <td><a href="#generic-error">Checkout error message is unhelpful — hurting conversion</a> <span
+                    class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
+                <td data-label="Priority"></td>
+                <td data-label="Effort"></td>
+              </tr>
+              <tr id="assignment-international-postal-code">
+                <td><a href="#international-postal-code">International customers can't check out</a> <span
+                    class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
+                <td data-label="Priority"></td>
+                <td data-label="Effort"></td>
+              </tr>
+              <tr id="assignment-stale-state">
+                <td><a href="#stale-state">State/Province selection carries over when the country changes</a> <span
+                    class="toc-types"><span class="toc-tag cat-form">Form Validation</span></span></td>
+                <td data-label="Priority"></td>
+                <td data-label="Effort"></td>
+              </tr>
+              <tr id="assignment-sold-out-feedback">
+                <td><a href="#sold-out-feedback">"The Add to Cart button is broken on some plants"</a> <span
+                    class="toc-types"><span class="toc-tag cat-interaction">Interaction</span></span></td>
+                <td data-label="Priority"></td>
+                <td data-label="Effort"></td>
+              </tr>
+              <tr id="assignment-broken-image">
+                <td><a href="#broken-image">One of the product cards has a missing image</a> <span class="toc-types"><span
+                      class="toc-tag cat-data">Data</span></span></td>
+                <td data-label="Priority"></td>
+                <td data-label="Effort"></td>
+              </tr>
+              <tr id="assignment-dialog-bug">
+                <td><a href="#dialog-bug">Clear Cart dialog locks the page</a> <span class="toc-types"><span
+                      class="toc-tag cat-interaction">Interaction</span><span class="toc-tag cat-css">CSS</span></span></td>
+                <td data-label="Priority"></td>
+                <td data-label="Effort"></td>
+              </tr>
+              <tr id="assignment-promo-duplicate">
+                <td><a href="#promo-duplicate">Same promo code can be applied multiple times</a> <span
+                    class="toc-types"><span class="toc-tag cat-data">Data</span></span></td>
+                <td data-label="Priority"></td>
+                <td data-label="Effort"></td>
+              </tr>
+              <tr id="assignment-sale-price-not-honored">
+                <td><a href="#sale-price-not-honored">Cart and checkout totals ignore the sale price</a> <span
+                    class="toc-types"><span class="toc-tag cat-data">Data</span></span></td>
+                <td data-label="Priority"></td>
+                <td data-label="Effort"></td>
+              </tr>
+              <tr id="assignment-stale-search">
+                <td><a href="#stale-search">Stale search results</a> <span class="toc-types"><span
+                      class="toc-tag cat-search">Search</span></span></td>
+                <td data-label="Priority"></td>
+                <td data-label="Effort"></td>
+              </tr>
+            </tbody>
+          </table>
+        </nav>
+        <div class="report-viewer" id="report-viewer" role="region" aria-label="Selected bug report" hidden></div>
+      </div>
     </div>
 
     <h3 style="font-size: 1rem; margin-top: 1.75rem;">Priority × Effort — the quick-triage matrix</h3>
