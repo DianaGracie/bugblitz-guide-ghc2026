@@ -13,7 +13,7 @@
       <ul class="page-nav-list">
         <li class="page-nav-item has-menu">
           <a href="index.html">Workshop Guide</a>
-          <ul class="page-nav-menu" id="page-menu-guide">
+          <ul class="page-nav-menu" id="page-menu-guide" aria-label="Workshop Guide sections">
             <li><a href="index.html#timeline">Timeline</a></li>
             <li><a href="index.html#setup">Setup</a></li>
             <li><a href="index.html#exercise">What Success Looks Like</a></li>
@@ -21,18 +21,30 @@
         </li>
         <li class="page-nav-item has-menu">
           <a href="bugs.html">Bug Report</a>
-          <ul class="page-nav-menu" id="page-menu-bugs">
+          <ul class="page-nav-menu" id="page-menu-bugs" aria-label="Bug Report sections">
             <li><a href="bugs.html#quick-links">Bug Directory</a></li>
             <li><a href="bugs.html#triage-board">Triage Matrix</a></li>
           </ul>
         </li>
         <li class="page-nav-item"><a href="solutions.html">Solutions</a></li>
-        <li class="page-nav-item"><a href="recap.html" aria-current="page">Recap</a></li>
+        <li class="page-nav-item has-menu">
+          <a href="recap.html" aria-current="page">Recap</a>
+          <ul class="page-nav-menu" id="page-menu-recap" aria-label="Recap sections">
+            <li><a href="#goals">Goals</a></li>
+            <li><a href="#mindset">Mindset</a></li>
+            <li><a href="#severity">Severity &amp; Priority</a></li>
+            <li><a href="#bug-types">Bug Types</a></li>
+            <li><a href="#ai-tips">AI Tips</a></li>
+            <li><a href="#roles">Stakeholders</a></li>
+            <li><a href="#hints">Hints</a></li>
+          </ul>
+        </li>
       </ul>
     </nav>
   </div>
   <nav class="section-nav" aria-label="Page sections">
     <div class="section-nav-inner">
+      <span class="section-nav-page">Workshop Recap</span>
       <a href="#goals">Goals</a>
       <a href="#mindset">Mindset</a>
       <a href="#severity">Severity &amp; Priority</a>

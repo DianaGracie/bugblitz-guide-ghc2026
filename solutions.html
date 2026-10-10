@@ -13,7 +13,7 @@
       <ul class="page-nav-list">
         <li class="page-nav-item has-menu">
           <a href="index.html">Workshop Guide</a>
-          <ul class="page-nav-menu" id="page-menu-guide">
+          <ul class="page-nav-menu" id="page-menu-guide" aria-label="Workshop Guide sections">
             <li><a href="index.html#timeline">Timeline</a></li>
             <li><a href="index.html#setup">Setup</a></li>
             <li><a href="index.html#exercise">What Success Looks Like</a></li>
@@ -21,7 +21,7 @@
         </li>
         <li class="page-nav-item has-menu">
           <a href="bugs.html">Bug Report</a>
-          <ul class="page-nav-menu" id="page-menu-bugs">
+          <ul class="page-nav-menu" id="page-menu-bugs" aria-label="Bug Report sections">
             <li><a href="bugs.html#quick-links">Bug Directory</a></li>
             <li><a href="bugs.html#triage-board">Triage Matrix</a></li>
           </ul>
@@ -29,7 +29,7 @@
         <li class="page-nav-item"><a href="solutions.html" aria-current="page">Solutions</a></li>
         <li class="page-nav-item has-menu">
           <a href="recap.html">Recap</a>
-          <ul class="page-nav-menu" id="page-menu-recap">
+          <ul class="page-nav-menu" id="page-menu-recap" aria-label="Recap sections">
             <li><a href="recap.html#goals">Goals</a></li>
             <li><a href="recap.html#mindset">Mindset</a></li>
             <li><a href="recap.html#severity">Severity &amp; Priority</a></li>
@@ -42,6 +42,11 @@
       </ul>
     </nav>
   </div>
+  <nav class="section-nav" aria-label="Page sections">
+    <div class="section-nav-inner">
+      <span class="section-nav-page">Solutions &amp; Best Practices</span>
+    </div>
+  </nav>
 </header>
 
 <div class="masthead">
@@ -79,7 +84,7 @@
   <div class="solution" id="welcome-offer-mobile">
     <span class="solution-tag">CSS · Device-Specific</span>
     <h2>1. Welcome offer is overlapped on mobile</h2>
-    <a class="solution-bug-link" href="bugs.html#welcome-offer-mobile">← back to bug</a>
+    <a class="solution-bug-link" href="bugs.html#welcome-offer-mobile">View bug report →</a>
 
     <div class="solution-section-label">Root Cause</div>
     <p>On mobile, the offer is positioned with <code>84px</code> below it, but the <code>.consent-banner</code> is taller and has a higher stacking order. It can partially cover the welcome offer.</p>
@@ -103,12 +108,16 @@
       <li>If you have multiple fixed or absolutely-positioned elements, ensure their positioning and sizing are coordinated to avoid overlap.</li>
       <li>Don't forget to test your work in the mobile viewport because some issues only appear on smaller screens.</li>
     </ul>
+
+    <div class="solution-footer">
+      <a class="solution-footer-link" href="bugs.html#welcome-offer-mobile">View bug report →</a>
+    </div>
   </div>
 
   <div class="solution" id="duplicate-order-placed">
     <span class="solution-tag">Interaction</span>
     <h2>2. "Charged twice for the same order?"</h2>
-    <a class="solution-bug-link" href="bugs.html#duplicate-order-placed">← back to bug</a>
+    <a class="solution-bug-link" href="bugs.html#duplicate-order-placed">View bug report →</a>
 
     <div class="solution-section-label">Root Cause</div>
     <p>
@@ -207,12 +216,16 @@ export class CheckoutComponent {
         <strong>Backend protection:</strong> In production, assign a unique ID to each checkout attempt and reuse it when retrying. The backend uses this ID—known as an <strong>idempotency key</strong>—to ensure that duplicate requests create only one order.
       </li>
     </ul>
+
+    <div class="solution-footer">
+      <a class="solution-footer-link" href="bugs.html#duplicate-order-placed">View bug report →</a>
+    </div>
   </div>
 
   <div class="solution" id="generic-error">
     <span class="solution-tag">Form Validation</span>
     <h2>3. Checkout error message is unhelpful — hurting conversion</h2>
-    <a class="solution-bug-link" href="bugs.html#generic-error">← back to bug</a>
+    <a class="solution-bug-link" href="bugs.html#generic-error">View bug report →</a>
 
     <div class="solution-section-label">Root Cause</div>
     <p>The submit handler in <code>checkout.component.ts</code> checks all required fields in a single boolean expression and, if any are missing, sets one generic error string. Users can't tell which field failed.</p>
@@ -267,12 +280,16 @@ async onSubmit(event: Event) {
       <li>Trim required text fields before checking them—a value containing only spaces should still count as missing.</li>
       <li>For accessibility, associate error text with the input via <code>aria-describedby</code> and mark the input <code>aria-invalid="true"</code>.</li>
     </ul>
+
+    <div class="solution-footer">
+      <a class="solution-footer-link" href="bugs.html#generic-error">View bug report →</a>
+    </div>
   </div>
 
   <div class="solution" id="international-postal-code">
     <span class="solution-tag">Form Validation</span>
     <h2>4. International customers can't check out</h2>
-    <a class="solution-bug-link" href="bugs.html#international-postal-code">← back to bug</a>
+    <a class="solution-bug-link" href="bugs.html#international-postal-code">View bug report →</a>
 
     <div class="solution-section-label">Root Cause</div>
     <p>The submit handler always tests the ZIP against <code>US_ZIP_PATTERN</code>, regardless of the selected country. Valid international postal codes that do not match the US format, such as Canadian or UK codes, are rejected.</p>
@@ -320,12 +337,16 @@ if (!pattern.test(this.form.zip.trim())) {
       <li>For validating established patterns like postal codes, you don't need to reinvent the wheel. Consider existing validation libraries like <a href="https://github.com/Cimpress-MCP/postal-codes-js" target="_blank" rel="noopener noreferrer"><code>postal-codes-js</code></a> or <a href="https://github.com/melwynfurtado/postcode-validator" target="_blank" rel="noopener noreferrer"><code>postcode-validator</code></a>.</li>
       <li>For full-address validation, consider API validation like <a href="https://developers.google.com/maps/documentation/address-validation/overview" target="_blank" rel="noopener noreferrer">Google Address Validation API</a> or <a href="https://www.smarty.com/docs/apis/international-street-api/reference" target="_blank" rel="noopener noreferrer">Smarty address verification</a>.</li>
     </ul>
+
+    <div class="solution-footer">
+      <a class="solution-footer-link" href="bugs.html#international-postal-code">View bug report →</a>
+    </div>
   </div>
 
   <div class="solution" id="stale-state">
     <span class="solution-tag">Form Validation</span>
     <h2>5. State/Province carries over on country change</h2>
-    <a class="solution-bug-link" href="bugs.html#stale-state">← back to bug</a>
+    <a class="solution-bug-link" href="bugs.html#stale-state">View bug report →</a>
 
     <div class="solution-section-label">Root Cause</div>
     <p>The <code>onCountryChange</code> handler updates the region list, label, and ZIP label — but never clears <code>form.state</code>. A previous value (e.g., <code>"CA"</code>) silently persists and passes the required-field check. Additionally, the validation logic doesn't account for countries that do not require states, provinces, or regions in valid mailing addresses.</p>
@@ -377,12 +398,16 @@ onCountryChange(): void {
     <ul>
       <li><strong>Dependent fields must be reset when their parent changes.</strong> This is a universal form pattern — country → state, category → subcategory, product → variant, and so on.</li>
     </ul>
+
+    <div class="solution-footer">
+      <a class="solution-footer-link" href="bugs.html#stale-state">View bug report →</a>
+    </div>
   </div>
 
   <div class="solution" id="promo-duplicate">
     <span class="solution-tag">Data · Logic</span>
     <h2>6. The same promo code can be applied multiple times</h2>
-    <a class="solution-bug-link" href="bugs.html#promo-duplicate">← back to bug</a>
+    <a class="solution-bug-link" href="bugs.html#promo-duplicate">View bug report →</a>
 
     <div class="solution-section-label">Root Cause</div>
     <p><code>applyCoupon()</code> in <code>cart.service.ts</code> validates that a code exists and is not expired, then unconditionally appends it to <code>appliedCoupons</code> and persists to <code>localStorage</code> (<code>cart_coupons</code>). There is no check for an already-applied code, so each click of <strong>Apply</strong> stacks and the discount total grows.</p>
@@ -410,12 +435,16 @@ this.appliedCoupons.set([
     <ul>
       <li>In a production system, add a server-side guard against duplicate coupon codes when creating an order; a modified request can bypass the client-side check.</li>
     </ul>
+
+    <div class="solution-footer">
+      <a class="solution-footer-link" href="bugs.html#promo-duplicate">View bug report →</a>
+    </div>
   </div>
 
   <div class="solution" id="sold-out-feedback">
     <span class="solution-tag">Interaction</span>
     <h2>7. "The Add to Cart button is broken on some plants"</h2>
-    <a class="solution-bug-link" href="bugs.html#sold-out-feedback">← back to bug</a>
+    <a class="solution-bug-link" href="bugs.html#sold-out-feedback">View bug report →</a>
 
     <div class="solution-section-label">Root Cause</div>
     <p>The button is correctly disabled with <code>[disabled]="!product.in_stock"</code>, but it still says "Add to Cart" and the styling is ambiguous. Shoppers may overlook the "Out of Stock" badge in the upper corner, making the button seem broken.</p>
@@ -454,12 +483,16 @@ this.appliedCoupons.set([
         <li><strong>The button label is the truth.</strong> A button that reads "Sold Out" makes the unavailability clear to users.</li>
         <li><strong><code>aria-label</code> + <code>title</code></strong> covers screen-reader and hover-tooltip users.</li>
       </ul>
+
+    <div class="solution-footer">
+      <a class="solution-footer-link" href="bugs.html#sold-out-feedback">View bug report →</a>
     </div>
+  </div>
 
   <div class="solution" id="broken-image">
     <span class="solution-tag">Data</span>
     <h2>8. One of the product cards has a missing image</h2>
-    <a class="solution-bug-link" href="bugs.html#broken-image">← back to bug</a>
+    <a class="solution-bug-link" href="bugs.html#broken-image">View bug report →</a>
 
     <div class="solution-section-label">Root Cause</div>
     <p>The <code>heartleaf-philodendron</code> entry in <code>PRODUCT_IMAGES</code> uses the Pexels website hostname, <code>pexels.com</code>, instead of the image-hosting hostname, <code>images.pexels.com</code>.
@@ -490,12 +523,16 @@ this.appliedCoupons.set([
 
     <div class="solution-section-label">Confirming the Fix</div>
     <p>Check that the photo loads. Temporarily use an invalid URL to check that the placeholder appears, then restore the correct URL.</p>
+
+    <div class="solution-footer">
+      <a class="solution-footer-link" href="bugs.html#broken-image">View bug report →</a>
+    </div>
   </div>
 
   <div class="solution" id="dialog-bug">
     <span class="solution-tag">DOM &amp; Overlays</span>
     <h2>9. Clear Cart dialog locks the page</h2>
-    <a class="solution-bug-link" href="bugs.html#dialog-bug">← back to bug</a>
+    <a class="solution-bug-link" href="bugs.html#dialog-bug">View bug report →</a>
 
     <div class="solution-section-label">Root Cause</div>
     <p>The component appends <code>confirmOverlayEl</code> to <code>document.body</code>. Closing the dialog destroys the Angular component, but leaves that overlay behind, blocking clicks.</p>
@@ -522,12 +559,16 @@ this.appliedCoupons.set([
       <li>Open the dialog again and click the shaded area outside it. Confirm the same behavior.</li>
       <li>Open the dialog again and click the <strong>Clear Cart</strong> button inside the dialog. Confirm the cart is emptied and the page still responds to clicks.</li>
     </ol>
+
+    <div class="solution-footer">
+      <a class="solution-footer-link" href="bugs.html#dialog-bug">View bug report →</a>
+    </div>
   </div>
 
   <div class="solution" id="sale-price-not-honored">
     <span class="solution-tag">Data · Logic</span>
     <h2>10. Cart and checkout totals ignore the sale price</h2>
-    <a class="solution-bug-link" href="bugs.html#sale-price-not-honored">← back to bug</a>
+    <a class="solution-bug-link" href="bugs.html#sale-price-not-honored">View bug report →</a>
 
     <div class="solution-section-label">Root Cause</div>
     <p>In the domain, <code>price</code> is the amount the shopper pays (the sale price when there is one), and <code>compare_at_price</code> is a display-only "was this much" reference — the crossed-out number shown next to the sale price on the product card. The presence of a <code>compare_at_price</code> is also what tags an item "on sale" in the shop filter.</p>
@@ -561,12 +602,16 @@ subtotal = computed(() =&gt;
       <li>Add a non-sale item too. The cart's totals should still be the sum of each line's <code>price × quantity</code>.</li>
       <li>Place a test order, go to <strong>My Orders</strong>, and search by the checkout email. Confirm the order total matches checkout and the sum of its items.</li>
     </ul>
+
+    <div class="solution-footer">
+      <a class="solution-footer-link" href="bugs.html#sale-price-not-honored">View bug report →</a>
+    </div>
   </div>
 
   <div class="solution" id="stale-search">
     <span class="solution-tag">Search</span>
     <h2>11. Stale search results</h2>
-    <a class="solution-bug-link" href="bugs.html#stale-search">← back to bug</a>
+    <a class="solution-bug-link" href="bugs.html#stale-search">View bug report →</a>
 
     <div class="solution-section-label">Root Cause</div>
     <p>Each keystroke fires a new search request, but responses are applied in the order they arrive, not the order they were requested. On a slow network, the response for <code>mon</code> can land <em>after</em> the response for <code>snake</code>, overwriting the correct results.</p>
@@ -621,6 +666,10 @@ async onSearchChange(query: string) {
       <li>Clear the throttling rule afterward to clean it up.</li>
       <li>Wait for suggestions to appear, then change the query. Confirm the old suggestions disappear while the new search loads.</li>
     </ol>
+
+    <div class="solution-footer">
+      <a class="solution-footer-link" href="bugs.html#stale-search">View bug report →</a>
+    </div>
   </div>
 
   </div>

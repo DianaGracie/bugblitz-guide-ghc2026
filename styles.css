@@ -3506,9 +3506,17 @@
 
   .solution h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem; }
 
-  .solution-bug-link { font-size: 0.88rem; color: var(--text-muted); text-decoration: none; }
+  /* End-of-solution link back to its bug, matching the Bug Report's
+     "View full solution" pill. */
+  .solution-footer { display: flex; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-light); }
+  .solution-footer-link { font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent); border-radius: 100px; transition: background-color 0.15s ease, color 0.15s ease; }
+  .solution-footer-link:hover { background: var(--accent); color: #ffffff; }
+  .solution-footer-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  .solution-bug-link:hover { color: var(--accent); }
+  /* Link to this solution's own bug in the Bug Report. */
+  .solution-bug-link { display: inline-block; margin-top: 0.15rem; font-size: 0.9rem; font-weight: 700; color: var(--accent-link, var(--accent)); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+
+  .solution-bug-link:hover { color: var(--accent-bright, var(--accent)); text-decoration-thickness: 2px; }
 
   .solution-section-label { font-family: var(--font-display); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin: 1.5rem 0 0.35rem; }
 
@@ -3707,17 +3715,30 @@ html[data-page="bugs"] .matrix-effort-label { display: none; }
   }
 }
 
-html[data-page="bugs"] :is(#triage-board, #quick-links, #solve-bugs, .triage-table tr) {
+/* Rows in the bug list land below the header and the pinned filter bar;
+   everything else only needs to clear the header. */
+html[data-page="bugs"] .triage-table tr {
   scroll-margin-top: var(--bug-anchor-offset, 9rem);
 }
 
-/* The filter toolbar is a sibling of the directory and reports, so it stays
-   sticky throughout the report section instead of stopping at the table. The
-   directory intro, toolbar, and list + report viewer join into a single box. */
+html[data-page="bugs"] :is(#triage-board, #quick-links, #solve-bugs) {
+  scroll-margin-top: calc(var(--site-header-height, 4rem) + 1rem);
+}
+
+/* The filter toolbar shares a wrapper (.directory-sticky-scope) with the bug
+   list + report viewer, so it stays pinned only while the list is on screen.
+   The directory intro, toolbar, and list + viewer join into a single box. */
 html[data-page="bugs"] .directory-intro { margin-bottom: 0; border-bottom: 0; border-radius: 8px 8px 0 0; padding-bottom: 0.5rem; box-shadow: none; }
 html[data-page="bugs"] #bug-filter-toolbar { margin-top: 0; margin-bottom: 0; border-left: 1px solid var(--border-light); border-right: 1px solid var(--border-light); }
 html[data-page="bugs"] .directory-layout { margin-bottom: 1rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--border-light); border-top: 0; border-radius: 0 0 8px 8px; box-shadow: 0 1px 3px var(--card-shadow); }
 html[data-page="bugs"] .directory-layout .directory-list { margin: 0; padding: 0; background: none; border: 0; border-radius: 0; box-shadow: none; }
+/* Past the end of the list the filter bar scrolls away with the content:
+   app.js sets --filter-shift (0 or negative px) to move it, and the report
+   viewer pinned beside the list, up as the reader keeps scrolling. */
+html[data-page="bugs"] #bug-filter-toolbar { top: calc(var(--bug-nav-height, 2.8rem) + var(--filter-shift, 0px)); }
+@media (min-width: 901px) {
+  html[data-page="bugs"] .directory-sticky-scope .report-viewer { top: max(calc(var(--site-header-height, 4rem) + 0.75rem), calc(var(--bug-anchor-offset, 9rem) - 0.5rem + var(--filter-shift, 0px))); }
+}
 
 /* Bug Directory list + report viewer (enabled by app.js). */
 @scope (html[data-page="bugs"]) {
@@ -3886,11 +3907,13 @@ html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { b
   .is-split .viewer-tip { position: relative; left: auto; bottom: auto; margin: 0 0 0.75rem; }
 }
 
-/* Site header: a pinned bar with the BugBlitz brand and page tabs, plus the
-   current page's section links. Other pages' tabs open a menu of their
-   sections on hover, or when keyboard focus reaches the tab. */
+/* Site header. At the top of the page: the main bar with the BugBlitz brand
+   and page tabs, each opening a menu of that page's sections on hover or
+   keyboard focus. Once the main bar scrolls away, a secondary bar with the
+   page name and its "On this page" links slides in, pinned to the top
+   (html.is-scrolled, set by app.js). */
 @scope (html[data-page]) {
-  .site-header { position: sticky; top: 0; z-index: 150; background: var(--nav-bg, var(--ground)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); }
+  .site-header { position: relative; z-index: 150; background: var(--nav-bg, var(--ground)); border-bottom: 1px solid var(--border-light); }
   .site-bar { display: flex; align-items: center; gap: 1rem; max-width: 64rem; margin: 0 auto; padding: 0.5rem 1rem; }
   .site-brand { margin-right: auto; font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; line-height: 1.2; color: var(--text-primary); text-decoration: none; white-space: nowrap; }
   .site-brand:hover { color: var(--accent); }
@@ -3916,13 +3939,20 @@ html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { b
   .page-nav-menu a:hover { background: var(--surface); color: var(--accent); }
   .page-nav :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  /* The current page's section links sit inside the pinned header as
-     labeled chips; the section being read is highlighted (app.js). */
-  .site-header .section-nav { position: static; border-top: 1px solid var(--border-light); border-bottom: 0; background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; scrollbar-width: none; }
+  /* Secondary bar: page name, then the section chips; the section being read
+     is highlighted (app.js). Hidden above the viewport until scrolled. */
+  .site-header .section-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 160; border-bottom: 1px solid var(--border); background: var(--surface); box-shadow: 0 2px 10px var(--card-shadow); backdrop-filter: none; -webkit-backdrop-filter: none; scrollbar-width: none; transform: translateY(-100%); visibility: hidden; transition: transform 0.2s ease, visibility 0s linear 0.2s; }
+  :scope.is-scrolled .site-header .section-nav { transform: none; visibility: visible; transition: transform 0.2s ease, visibility 0s; }
+  @media (prefers-reduced-motion: reduce) {
+    .site-header .section-nav, :scope.is-scrolled .site-header .section-nav { transition: none; }
+  }
   .site-header .section-nav::-webkit-scrollbar { display: none; }
   .site-header .section-nav-inner { align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; }
-  .site-header .section-nav-inner::before { content: 'On this page'; flex: none; margin-right: 0.25rem; font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); white-space: nowrap; }
-  .site-header .section-nav a { flex: none; padding: 0.35rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: var(--card-bg); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; text-transform: none; color: var(--accent); }
+  .site-header .section-nav-page { order: 0; flex: none; padding-right: 0.85rem; margin-right: 0.35rem; border-right: 1px solid var(--border); font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+  .site-header .section-nav-inner:not(:has(a)) .section-nav-page { border-right: 0; }
+  .site-header .section-nav-inner::before { content: 'On this page'; order: 1; flex: none; margin-right: 0.25rem; font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); white-space: nowrap; }
+  .site-header .section-nav-inner:not(:has(a))::before { display: none; }
+  .site-header .section-nav a { order: 2; flex: none; padding: 0.35rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: var(--card-bg); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; text-transform: none; color: var(--accent); }
   .site-header .section-nav a:hover { border-color: var(--accent); color: var(--accent); background: var(--card-bg); }
   .site-header .section-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
   .site-header .section-nav a[aria-current="location"] { background: var(--accent); border-color: var(--accent); color: #ffffff; }
@@ -3930,7 +3960,8 @@ html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { b
   /* Phones: the chips collapse into a dropdown (set up by app.js). */
   .section-nav-toggle { display: none; }
   @media (max-width: 700px) {
-    .site-header .section-nav.has-dropdown { position: relative; overflow: visible; }
+    .site-header .section-nav.has-dropdown { overflow: visible; }
+    .site-header .section-nav.has-dropdown .section-nav-page { display: none; }
     .section-nav-toggle { display: flex; align-items: center; gap: 0.6rem; width: 100%; padding: 0.55rem 1rem; border: 0; background: none; font: inherit; color: var(--text-primary); text-align: left; cursor: pointer; }
     .section-nav-toggle-label { flex: none; font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); }
     .section-nav-toggle-current { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--accent); }
@@ -3960,3 +3991,41 @@ html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { b
 /* Anchors and sticky panels clear the pinned header. */
 html[data-page]:not([data-page="bugs"]) [id] { scroll-margin-top: calc(var(--site-header-height, 7rem) + 1rem); }
 html[data-page="solutions"] .solution-layout li { scroll-margin-top: calc(var(--site-header-height, 4rem) + 1rem); }
+
+/* Close (×) button in the corner of an open bug report or solution (app.js).
+   The X is drawn with two lines so it sits exactly centered at any size. */
+@scope (html:is([data-page="bugs"], [data-page="solutions"])) {
+  .report-viewer-dismiss { position: absolute; z-index: 2; top: 0.85rem; right: 0.85rem; width: 2rem; height: 2rem; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--text-muted); cursor: pointer; transition: background-color 0.15s ease, color 0.15s ease; }
+  .report-viewer-dismiss::before, .report-viewer-dismiss::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0.95rem; height: 2px; border-radius: 1px; background: currentColor; }
+  .report-viewer-dismiss::before { transform: translate(-50%, -50%) rotate(45deg); }
+  .report-viewer-dismiss::after { transform: translate(-50%, -50%) rotate(-45deg); }
+  .report-viewer-dismiss:hover { background: var(--surface); color: var(--accent); }
+  .report-viewer-dismiss:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  /* Keep the first row of the card (type tags) clear of the ×. */
+  .report-viewer .bug-guide-card-header { padding-right: 2.25rem; }
+}
+
+/* The × is positioned against the viewer: the Bug Report's wide viewer is
+   already sticky; otherwise make it relative (dropping the pinned offset). */
+@scope (html[data-page="solutions"]) {
+  .report-viewer { position: relative; }
+}
+@media (max-width: 900px) {
+  html[data-page="bugs"] .report-viewer { position: relative; top: auto; }
+}
+
+/* Bug report pop-up, opened from cards on the triage board (app.js). */
+@scope (html[data-page="bugs"]) {
+  .report-dialog { width: min(46rem, calc(100vw - 2rem)); max-height: calc(100vh - 3rem); margin: auto; padding: 0; border: 0; border-radius: 10px; background: transparent; overflow: visible; }
+  .report-dialog::backdrop { background: rgba(27, 10, 46, 0.5); }
+  .report-dialog-body { max-height: calc(100vh - 3rem); overflow-y: auto; border-radius: 10px; }
+  .report-dialog .bug-guide-card { margin: 0; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3); }
+  .report-dialog .bug-guide-card-header { padding-right: 2.25rem; }
+  .report-dialog .bug-guide-card-footer { align-items: center; gap: 1rem; }
+  .report-dialog-open-list { margin-right: auto; padding: 0; border: 0; background: none; font: inherit; font-size: 0.9rem; font-weight: 700; color: var(--accent-link, var(--accent)); text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
+  .report-dialog-open-list:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 600px) {
+    .report-dialog { width: calc(100vw - 1rem); max-height: calc(100vh - 1rem); }
+    .report-dialog-body { max-height: calc(100vh - 1rem); }
+  }
+}
