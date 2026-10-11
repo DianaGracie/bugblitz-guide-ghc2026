@@ -71,6 +71,11 @@
 
     <div class="triage-prompts">
       <h2>Goal 1: Triage with your team</h2>
+      <p>Read each report in the Bug Directory and assign a priority. Then use the Triage Matrix to compare your choices and agree on what to tackle first.</p>
+      <nav class="triage-actions" aria-label="Triage tools">
+        <a href="#quick-links">Review bug reports ↓</a>
+        <a href="#triage-board">View triage matrix ↓</a>
+      </nav>
       <ol>
         <li><strong>Review bugs.</strong> Read through the incoming bug reports as a team. What was reported, who
           reported it, and where in the app does it happen?</li>
@@ -86,7 +91,7 @@
 
     <div class="toc directory-intro" id="quick-links">
       <h2>Bug Directory</h2>
-      <p class="board-help">Select a bug to read its report, then set its priority and effort<span class="triage-pointer-copy"> here or by dragging it into the triage matrix below</span><span class="triage-touch-copy">; the matrix updates automatically</span>.</p>
+      <p class="board-help">Select a bug to read its report, then set its priority and effort<span class="triage-pointer-copy"> here or by dragging it into the <a href="#triage-board">triage matrix ↓</a></span><span class="triage-touch-copy">; the <a href="#triage-board">triage matrix ↓</a> updates automatically</span>.</p>
     </div>
 
     <!-- The filter bar stays pinned only while the bug list is on screen. -->
@@ -101,41 +106,46 @@
           <div class="filter-group">
             <span class="filter-label">Filter bugs</span>
 
-            <!-- Unified Triage & Priority Pills -->
+            <!-- Triage and curated starting points -->
             <div class="filter-pills" id="bug-filter-pills">
-              <button type="button" class="bug-guide-filter active" data-filter="all">All</button>
-              <button type="button" class="bug-guide-filter" data-filter="needs-triage">Needs Triage</button>
-              <button type="button" class="bug-guide-filter" data-filter="P1">P1</button>
-              <button type="button" class="bug-guide-filter" data-filter="P2">P2</button>
-              <button type="button" class="bug-guide-filter" data-filter="P3">P3</button>
-              <button type="button" class="bug-guide-filter" data-filter="quick-wins">⚡ Quick Wins</button>
+              <label class="bug-filter-check"><input type="checkbox" id="needs-triage-toggle"> Needs triage</label>
+              <label class="bug-filter-check"><input type="checkbox" id="starter-bugs-toggle" aria-describedby="starter-bugs-help"> Starter bugs</label>
             </div>
 
             <span class="filter-divider">|</span>
 
             <div class="filter-selects">
+              <select class="filter-dropdown" id="filter-priority" aria-label="Filter by Priority">
+                <option value="all">Filter by Priority</option>
+                <option value="P1">P1 (High)</option>
+                <option value="P2">P2 (Medium)</option>
+                <option value="P3">P3 (Low)</option>
+              </select>
               <select class="filter-dropdown" id="filter-type" aria-label="Filter by Bug Type">
                 <option value="all">Filter by Bug Type</option>
                 <option value="css">CSS</option>
-                <option value="device">Device-Specific</option>
-                <option value="interaction">Interaction</option>
-                <option value="form">Form Validation</option>
-                <option value="search">Search</option>
                 <option value="data">Data</option>
+                <option value="device">Device-Specific</option>
+                <option value="form">Form Validation</option>
+                <option value="interaction">Interaction</option>
+                <option value="search">Search</option>
               </select>
 
               <select class="filter-dropdown" id="filter-reporter" aria-label="Filter by Reporter">
                 <option value="all">Filter by Reporter</option>
-                <option value="dev">Engineer</option>
-                <option value="qa">QA</option>
-                <option value="pm">Product Manager</option>
                 <option value="support">Customer Support</option>
+                <option value="design">Design</option>
                 <option value="director">Director</option>
+                <option value="dev">Engineer</option>
+                <option value="pm">Product Manager</option>
+                <option value="qa">QA</option>
               </select>
             </div>
           </div>
 
-          <div class="filter-status">
+          <p class="board-help" id="starter-bugs-help" hidden>Starter bugs: Selected by the facilitators as good starting points for newer debuggers.</p>
+          <div class="filter-status" role="status" aria-live="polite">
+            <span id="active-filter-summary" hidden></span>
             Showing <strong id="visible-count">0</strong> of <span id="total-count">0</span> bugs
             <button type="button" id="clear-filters-btn" class="clear-filters-btn" hidden>Clear filters</button>
           </div>
@@ -144,7 +154,10 @@
 
       <div class="directory-layout">
         <nav class="toc directory-list" aria-label="Bug report table of contents" id="bug-directory-list">
-          <div class="bug-guide-empty" id="bug-guide-empty">No bugs match this filter.</div>
+          <div class="bug-guide-empty" id="bug-guide-empty">
+            <p>No bugs match these filters.</p>
+            <button type="button" id="empty-clear-filters-btn" class="clear-filters-btn">Clear filters</button>
+          </div>
           <table class="triage-table" aria-label="Bug priorities and effort">
             <thead>
               <tr>
@@ -227,13 +240,14 @@
       </div>
     </div>
 
-    <h3 style="font-size: 1rem; margin-top: 1.75rem;">Priority × Effort — the quick-triage matrix</h3>
+    <div id="triage-board">
+    <h2 class="triage-matrix-heading">Triage Matrix</h2>
+    <p class="board-help">Compare priority × effort to choose what to tackle first. Select a bug in the matrix or Needs triage to read its report before assigning priority.</p>
     <p style="font-size: 0.92rem; color: var(--text-secondary); margin-top: 0.25rem;">Your bug reporters have provided
       initial effort estimates. Feel free to adjust them based on your team’s experience and what you discover, but
       assigning priority to the bugs should be your main focus. <span class="triage-pointer-copy">Drag a bug from Needs triage into the matrix (or back again to clear its priority), or edit its values in the Bug Directory.</span><span class="triage-touch-copy">Set priority and effort in the <a href="#quick-links">Bug Directory</a>. The matrix updates automatically.</span></p>
 
     <p class="board-help"><a href="recap.html#severity">About severity and priority</a></p>
-    <div id="triage-board">
       <p class="board-help" id="triage-count"></p>
       <div class="matrix-scroll">
         <table class="effort-matrix triage-board" aria-label="Priority × Effort matrix">
@@ -312,8 +326,21 @@
 
     <div class="exercise-goal" id="solve-bugs">
       <h2>Goal 2: Solve bugs together</h2>
-      <p>Reproduce your chosen bug, investigate its cause, make a fix or workaround, and verify it. Be ready to explain
-        your reasoning.</p>
+      <p>Based on your triage results, choose your first bug and then work through these steps:</p>
+      <ol>
+        <li><strong>Reproduce the bug.</strong> Follow the report’s steps in the app. Agree on what should happen and what actually happens.</li>
+        <li><strong>Investigate and choose an approach.</strong> Use the code, DevTools, and optionally AI to trace the cause. Decide whether a fix or workaround fits your remaining time.</li>
+        <li><strong>Make and verify your change.</strong> Repeat the reproduction steps and check related behavior for unintended effects.</li>
+        <li><strong>Share with your team.</strong> Explain what you changed, why you chose that approach, and anything still unresolved.</li>
+      </ol>
+      <p>Have time for another bug? Return to your triage results, choose your next prioritized bug, and repeat these steps.</p>
+      <p class="exercise-tip">💡 You don’t need to fix every bug—focus on making and verifying changes you can explain.</p>
+      <nav class="board-help" aria-label="Workshop resources">
+        <span>Need to revisit the workshop instructions? </span>
+        <a href="index.html#setup">Setup</a>
+        <span aria-hidden="true"> · </span>
+        <a href="index.html#exercise">What success looks like</a>
+      </nav>
     </div>
 
 

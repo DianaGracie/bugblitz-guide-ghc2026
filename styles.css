@@ -554,6 +554,31 @@
     margin: 1.5rem 0;
   }
 
+  .triage-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .triage-actions a {
+    display: inline-block;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    font-weight: 700;
+  }
+
+  .triage-matrix-heading {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 1.75rem 0 1rem;
+  }
+
   .triage-prompts h2,
   .exercise-goal h2 {
     font-family: var(--font-display);
@@ -569,7 +594,8 @@
     scroll-margin-top: 5rem;
   }
 
-  .triage-prompts ol {
+  .triage-prompts ol,
+  .exercise-goal ol {
     list-style: none;
     counter-reset: obj;
     padding: 0;
@@ -578,7 +604,8 @@
     gap: 0.85rem;
   }
 
-  .triage-prompts ol li {
+  .triage-prompts ol li,
+  .exercise-goal ol li {
     counter-increment: obj;
     position: relative;
     padding: 1rem 1.25rem 1rem 3.25rem;
@@ -589,7 +616,8 @@
     line-height: 1.55;
   }
 
-  .triage-prompts ol li::before {
+  .triage-prompts ol li::before,
+  .exercise-goal ol li::before {
     content: counter(obj);
     position: absolute;
     left: 1rem;
@@ -606,7 +634,8 @@
     place-items: center;
   }
 
-  .triage-prompts ol li strong {
+  .triage-prompts ol li strong,
+  .exercise-goal ol li strong {
     color: var(--text-primary);
     display: block;
     margin-bottom: 0.15rem;
@@ -1417,6 +1446,7 @@
 
   .filter-pills {
     display: flex;
+    align-items: center;
     gap: 0.35rem;
     flex-wrap: wrap;
   }
@@ -1429,6 +1459,7 @@
 
   .filter-selects {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
   }
 
@@ -1492,8 +1523,25 @@
   }
 
   .triage-table tbody tr.filtered-out {
-    opacity: 0.25;
-    transition: opacity 0.2s ease;
+    display: none !important;
+  }
+
+  #bug-directory-list .triage-table[hidden] { display: none !important; }
+  #bug-guide-empty .clear-filters-btn {
+    margin: 0.75rem 0 0;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    background: transparent;
+    font-style: normal;
+  }
+  #bug-guide-empty .clear-filters-btn:hover {
+    background: var(--accent-glow);
+    text-decoration: none;
+  }
+  #bug-guide-empty .clear-filters-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 
   .triage-table tbody tr.filtered-out .triage-value {
@@ -1509,7 +1557,50 @@
   .filter-status {
     font-size: 0.82rem;
     color: var(--text-secondary);
-    white-space: nowrap;
+    white-space: normal;
+  }
+
+  .filter-status.is-filtered {
+    padding: 0.75rem 1rem;
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+  }
+
+  .bug-filter-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .bug-filter-check input { margin: 0; accent-color: var(--accent); }
+  .bug-filter-check:has(input:checked) {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, var(--card-bg));
+    color: var(--accent);
+  }
+  .bug-filter-check:hover { border-color: var(--accent); }
+  .bug-filter-check:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  #active-filter-summary:not([hidden]) { display: block; }
+  #starter-bugs-help[hidden] { display: none; }
+  #starter-bugs-help { flex-basis: 100%; margin: 0.5rem 0; }
+  .starter-bug-badge {
+    display: inline-block;
+    margin: 0.35rem 0.5rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    vertical-align: middle;
   }
 
   .filter-status strong {
@@ -2778,6 +2869,10 @@
     gap: 0.85rem;
   }
 
+  #exercise .objectives-list + .lead {
+    margin-top: 1.5rem;
+  }
+
   .objectives-list li {
     counter-increment: obj;
     position: relative;
@@ -3627,13 +3722,18 @@ html[data-page="bugs"] .matrix-effort-label { display: none; }
 
 /* Optional, progressively disclosed help stays with its bug report. */
 @scope (html[data-page="bugs"]) {
-  /* Goal 2's summary shares the "Stuck?" banner style. */
+  /* Optional guidance shares the "Stuck?" banner style. */
   .hints-intro,
-  .exercise-goal p {
+  .exercise-tip {
     padding: 0.85rem 1rem;
     border-left: 3px solid var(--accent);
     background: var(--surface);
     color: var(--text-primary);
+  }
+
+  .exercise-goal ol + p,
+  .exercise-goal p + .exercise-tip {
+    margin-top: 1.5rem;
   }
 
   .bug-hints {
@@ -4015,12 +4115,42 @@ html[data-page="solutions"] .solution-layout li { scroll-margin-top: calc(var(--
 }
 
 /* Bug report pop-up, opened from cards on the triage board (app.js). */
+html[data-page="bugs"] { scrollbar-gutter: stable; }
+html[data-page="bugs"].report-dialog-open,
+html[data-page="bugs"].report-dialog-open body { overflow: hidden; }
 @scope (html[data-page="bugs"]) {
+  .report-directory-header {
+    position: relative;
+    z-index: 3;
+    margin: -1.75rem -1.75rem 1rem;
+    padding: 1rem 3.75rem 1rem 1.75rem;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-light);
+    border-radius: 8px 8px 0 0;
+  }
+  .report-directory-header h3 { margin: 0; overflow-wrap: anywhere; }
+  .report-viewer:has(.report-directory-header) .bug-guide-card-header { padding-right: 0; }
+  @media (min-width: 901px) {
+    .report-directory-header { position: sticky; top: 0; }
+  }
   .report-dialog { width: min(46rem, calc(100vw - 2rem)); max-height: calc(100vh - 3rem); margin: auto; padding: 0; border: 0; border-radius: 10px; background: transparent; overflow: visible; }
   .report-dialog::backdrop { background: rgba(27, 10, 46, 0.5); }
-  .report-dialog-body { max-height: calc(100vh - 3rem); overflow-y: auto; border-radius: 10px; }
+  .report-dialog-body { max-height: calc(100vh - 3rem); overflow-y: auto; overscroll-behavior: contain; border-radius: 10px; }
   .report-dialog .bug-guide-card { margin: 0; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3); }
-  .report-dialog .bug-guide-card-header { padding-right: 2.25rem; }
+  .report-dialog-header {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    margin: -1.75rem -1.75rem 1rem;
+    padding: 1rem 3.75rem 0.85rem 1.75rem;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-light);
+    border-radius: 8px 8px 0 0;
+  }
+  .report-dialog-header h3 { margin: 0 0 0.5rem; overflow-wrap: anywhere; }
+  .report-dialog .bug-guide-card-header { padding-right: 0; margin-bottom: 0; }
+  .report-dialog-header .starter-bug-badge { margin: 0; }
+  .report-dialog-header .report-viewer-dismiss { top: 0.85rem; right: 0.85rem; }
   .report-dialog .bug-guide-card-footer { align-items: center; gap: 1rem; }
   .report-dialog-open-list { margin-right: auto; padding: 0; border: 0; background: none; font: inherit; font-size: 0.9rem; font-weight: 700; color: var(--accent-link, var(--accent)); text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
   .report-dialog-open-list:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

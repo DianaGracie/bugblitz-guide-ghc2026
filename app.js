@@ -39,7 +39,7 @@
   }
 
   function setupBugGuides() {
-    const filters = document.querySelectorAll('.bug-guide-filter');
+    const filters = document.querySelectorAll('.bug-guide-filter[data-group]');
     const bugCardsContainer = document.getElementById('bug-guide-cards');
     if (!bugCardsContainer) return;
     const cards = bugCardsContainer.querySelectorAll('.bug-guide-card');
@@ -312,8 +312,12 @@
     const toolbar = document.getElementById('bug-filter-toolbar');
     if (!toolbar) return;
 
-    const filterPills = toolbar.querySelectorAll('.bug-guide-filter');
+    const needsToggle = document.getElementById('needs-triage-toggle');
+    const starterToggle = document.getElementById('starter-bugs-toggle');
     const typeSelect = document.getElementById('filter-type');
+    const prioritySelect = document.getElementById('filter-priority');
+    const starterHelp = document.getElementById('starter-bugs-help');
+    const starterBugs = new Set(['welcome-offer-mobile', 'sold-out-feedback', 'broken-image']);
     const reporterSelect = document.getElementById('filter-reporter');
     const clearBtn = document.getElementById('clear-filters-btn');
     const emptyStateEl = document.getElementById('bug-guide-empty');
@@ -322,12 +326,12 @@
     const totalCountEl = document.getElementById('total-count');
 
     let activePreset = 'all';
-    const validPresets = Array.from(filterPills, (pill) => pill.dataset.filter);
     const initialUrl = new URL(window.location.href);
     const initialFilter = initialUrl.searchParams.get('filter');
     const initialPriority = initialUrl.searchParams.get('priority');
-    if (validPresets.includes(initialFilter)) activePreset = initialFilter;
-    else if (['P1', 'P2', 'P3'].includes(initialPriority)) activePreset = initialPriority;
+    let starterOnly = initialUrl.searchParams.get('starter') === 'true' || initialFilter === 'starter-bugs';
+    if (initialFilter === 'needs-triage') activePreset = initialFilter;
+    if (prioritySelect && ['P1', 'P2', 'P3'].includes(initialPriority)) prioritySelect.value = initialPriority;
 
     if (typeSelect && Array.from(typeSelect.options, (option) => option.value).includes(initialUrl.searchParams.get('type'))) {
       typeSelect.value = initialUrl.searchParams.get('type');
@@ -335,14 +339,26 @@
     if (reporterSelect && Array.from(reporterSelect.options, (option) => option.value).includes(initialUrl.searchParams.get('reporter'))) {
       reporterSelect.value = initialUrl.searchParams.get('reporter');
     }
-    filterPills.forEach((pill) => pill.classList.toggle('active', pill.dataset.filter === activePreset));
+    starterBugs.forEach((id) => {
+      const card = document.getElementById(id);
+      const title = card?.querySelector('h3');
+      const directoryTitle = document.querySelector(`#assignment-${id} td:first-child a`);
+      [title, directoryTitle].forEach((target) => {
+        if (!target) return;
+        const badge = document.createElement('span');
+        badge.className = 'starter-bug-badge';
+        badge.textContent = 'Starter Bug';
+        badge.title = 'Selected by workshop facilitators. Independent of your priority and effort choices.';
+        target.after(badge);
+      });
+    });
 
     if (totalCountEl) totalCountEl.textContent = bugCards.length;
 
     function getBugData(card) {
       const bugId = card.id;
 
-      let type = (card.getAttribute('data-type') || '').toLowerCase();
+      let type = (card.getAttribute('data-types') || card.getAttribute('data-type') || '').toLowerCase();
       if (!type) {
         const typeEl = card.querySelector('.bug-guide-card-type');
         if (typeEl) {
@@ -373,9 +389,7 @@
       }
 
       const isTriaged = Boolean(priority && priority !== 'SELECT' && effort && effort !== 'SELECT');
-      const isQuickWin = (priority === 'P1' && (effort === 'low' || effort === 'l' || effort === 'quick'));
-
-      return { type, reporter, priority, effort, isTriaged, isQuickWin };
+      return { type, reporter, priority, effort, isTriaged };
     }
 
     let temporarilyRevealedBugId = null;
@@ -385,10 +399,12 @@
 
     function syncFiltersToUrl() {
       const url = new URL(window.location.href);
-      if (['P1', 'P2', 'P3'].includes(activePreset)) url.searchParams.set('priority', activePreset);
+      if (prioritySelect?.value && prioritySelect.value !== 'all') url.searchParams.set('priority', prioritySelect.value);
       else url.searchParams.delete('priority');
-      if (['needs-triage', 'quick-wins'].includes(activePreset)) url.searchParams.set('filter', activePreset);
+      if (activePreset === 'needs-triage') url.searchParams.set('filter', activePreset);
       else url.searchParams.delete('filter');
+      if (starterOnly) url.searchParams.set('starter', 'true');
+      else url.searchParams.delete('starter');
       if (typeSelect?.value && typeSelect.value !== 'all') url.searchParams.set('type', typeSelect.value);
       else url.searchParams.delete('type');
       if (reporterSelect?.value && reporterSelect.value !== 'all') url.searchParams.set('reporter', reporterSelect.value);
@@ -423,12 +439,29 @@
       let matchingCount = 0;
       const selectedType = typeSelect ? typeSelect.value : 'all';
       const selectedReporter = reporterSelect ? reporterSelect.value : 'all';
+      const selectedPriority = prioritySelect ? prioritySelect.value : 'all';
+      if (starterHelp) starterHelp.hidden = !starterOnly;
+      if (starterToggle) starterToggle.checked = starterOnly;
+      if (needsToggle) needsToggle.checked = activePreset === 'needs-triage';
 
       if (typeSelect) typeSelect.classList.toggle('active', selectedType !== 'all');
       if (reporterSelect) reporterSelect.classList.toggle('active', selectedReporter !== 'all');
+      if (prioritySelect) prioritySelect.classList.toggle('active', selectedPriority !== 'all');
 
-      const isFiltered = (activePreset !== 'all') || (selectedType !== 'all') || (selectedReporter !== 'all');
+      const isFiltered = starterOnly || (activePreset !== 'all') || (selectedType !== 'all') || (selectedReporter !== 'all') || (selectedPriority !== 'all');
       if (clearBtn) clearBtn.hidden = !isFiltered;
+      const summary = document.getElementById('active-filter-summary');
+      const labels = [];
+      if (activePreset !== 'all') labels.push('Needs triage');
+      if (starterOnly) labels.push('Starter Bugs');
+      [prioritySelect, typeSelect, reporterSelect].forEach((select) => {
+        if (select && select.value !== 'all') labels.push(select.selectedOptions[0].textContent.trim());
+      });
+      if (summary) {
+        summary.hidden = !isFiltered;
+        summary.textContent = 'Filtered by: ' + labels.join(' · ') + '. ';
+        summary.parentElement.classList.toggle('is-filtered', isFiltered);
+      }
 
       bugCards.forEach((card) => {
         const bugId = card.id;
@@ -437,12 +470,12 @@
 
         let matchesPreset = true;
         if (activePreset === 'needs-triage') matchesPreset = !data.isTriaged;
-        else if (activePreset === 'quick-wins') matchesPreset = data.isQuickWin;
-        else if (['P1', 'P2', 'P3'].includes(activePreset)) matchesPreset = (data.priority === activePreset);
+        if (starterOnly) matchesPreset = matchesPreset && starterBugs.has(bugId);
 
-        const matchesType = (selectedType === 'all') || (data.type === selectedType) || data.type.includes(selectedType);
+        const matchesType = selectedType === 'all' || data.type.split(/\s+/).includes(selectedType);
         const matchesReporter = (selectedReporter === 'all') || (data.reporter === selectedReporter) || data.reporter.includes(selectedReporter);
-        const isMatch = matchesPreset && matchesType && matchesReporter;
+        const matchesPriority = selectedPriority === 'all' || data.priority === selectedPriority;
+        const isMatch = matchesPreset && matchesType && matchesReporter && matchesPriority;
         if (temporarilyRevealedBugId === bugId && isMatch) clearTemporaryReveal();
         const isTemporarilyRevealed = temporarilyRevealedBugId === bugId && !isMatch;
         const isVisible = isMatch || isTemporarilyRevealed;
@@ -479,18 +512,22 @@
       if (emptyStateEl) {
         emptyStateEl.classList.toggle('show', visibleCount === 0);
       }
+      const directoryTable = document.querySelector('#bug-directory-list .triage-table');
+      if (directoryTable) directoryTable.hidden = visibleCount === 0;
       syncFiltersToUrl();
+      document.dispatchEvent(new Event('bug-filters-changed'));
     }
 
-    filterPills.forEach((pill) => {
-      pill.addEventListener('click', () => {
-        clearTemporaryReveal();
-        filterPills.forEach((p) => p.classList.remove('active'));
-        pill.classList.add('active');
+    needsToggle?.addEventListener('change', () => {
+      clearTemporaryReveal();
+      activePreset = needsToggle.checked ? 'needs-triage' : 'all';
+      applyFilters();
+    });
 
-        activePreset = pill.getAttribute('data-filter');
-        applyFilters();
-      });
+    starterToggle?.addEventListener('change', () => {
+      clearTemporaryReveal();
+      starterOnly = starterToggle.checked;
+      applyFilters();
     });
 
     if (typeSelect) typeSelect.addEventListener('change', () => {
@@ -501,17 +538,22 @@
       clearTemporaryReveal();
       applyFilters();
     });
+    if (prioritySelect) prioritySelect.addEventListener('change', () => {
+      clearTemporaryReveal();
+      applyFilters();
+    });
 
     function resetFilters() {
       clearTemporaryReveal();
-      filterPills.forEach((pill) => pill.classList.remove('active'));
-      toolbar.querySelector('[data-filter="all"]')?.classList.add('active');
       activePreset = 'all';
+      starterOnly = false;
       if (typeSelect) typeSelect.value = 'all';
       if (reporterSelect) reporterSelect.value = 'all';
+      if (prioritySelect) prioritySelect.value = 'all';
       applyFilters();
     }
     clearBtn?.addEventListener('click', resetFilters);
+    document.getElementById('empty-clear-filters-btn')?.addEventListener('click', resetFilters);
 
     document.addEventListener('click', (event) => {
       const link = event.target.closest('a[href^="#"]');
@@ -775,7 +817,18 @@
         linkFor(candidate)?.setAttribute('aria-expanded', String(isSelected));
       });
       const source = item && document.getElementById(idFor(item));
-      viewer.replaceChildren(...(source ? [dismissButton, copyOf(source), closeButton] : []));
+      if (source && document.documentElement.dataset.page === 'bugs') {
+        const copy = copyOf(source);
+        const title = copy.querySelector('h3');
+        const header = document.createElement('header');
+        header.className = 'report-directory-header';
+        if (title) header.append(title);
+        header.append(dismissButton);
+        copy.prepend(header);
+        viewer.replaceChildren(copy, closeButton);
+      } else {
+        viewer.replaceChildren(...(source ? [dismissButton, copyOf(source), closeButton] : []));
+      }
       viewer.scrollTop = 0;
       placeViewer();
     }
@@ -803,7 +856,7 @@
       openInList.type = 'button';
       openInList.className = 'report-dialog-open-list';
       openInList.textContent = 'Open in Bug Directory';
-      dialog.append(dialogClose, dialogBody);
+      dialog.append(dialogBody);
       document.body.append(dialog);
 
       let dialogItem = null;
@@ -811,6 +864,7 @@
       dialogClose.addEventListener('click', () => dialog.close());
       // Back to the card that opened it (unless moving on to the directory).
       dialog.addEventListener('close', () => {
+        document.documentElement.classList.remove('report-dialog-open');
         returnFocusTo?.focus({ preventScroll: true });
         returnFocusTo = null;
       });
@@ -833,12 +887,25 @@
         dialogItem = item;
         returnFocusTo = link;
         const copy = copyOf(source);
+        const title = copy.querySelector('h3, h2');
+        const tags = copy.querySelector('.bug-guide-card-header');
+        const starterBadge = copy.querySelector('.starter-bug-badge');
+        const header = document.createElement('header');
+        header.className = 'report-dialog-header';
+        if (title) header.append(title);
+        if (tags) {
+          if (starterBadge) tags.append(starterBadge);
+          header.append(tags);
+        }
+        header.append(dialogClose);
+        copy.prepend(header);
         const footer = copy.querySelector('.bug-guide-card-footer');
         if (footer) footer.prepend(openInList);
         else copy.append(openInList);
         dialogBody.replaceChildren(copy);
-        dialog.setAttribute('aria-label', copy.querySelector('h3, h2')?.textContent.trim() || 'Details');
+        dialog.setAttribute('aria-label', title?.textContent.trim() || 'Details');
         dialog.showModal();
+        document.documentElement.classList.add('report-dialog-open');
         dialogBody.scrollTop = 0;
       }, true);
     }
@@ -879,6 +946,11 @@
     });
 
     sources.hidden = true;
+    if (document.documentElement.dataset.page === 'bugs') {
+      document.addEventListener('bug-filters-changed', () => {
+        if (selectedItem?.classList.contains('filtered-out')) select(null);
+      });
+    }
     layout.classList.add('has-viewer');
     singleColumn.addEventListener('change', placeViewer);
 
