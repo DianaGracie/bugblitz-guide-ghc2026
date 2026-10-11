@@ -513,6 +513,10 @@
       }
 
       if (visibleCountEl) visibleCountEl.textContent = visibleCount;
+      const mobileCount = document.getElementById('mobile-filter-count');
+      if (mobileCount) mobileCount.textContent = (isFiltered ? 'Filtered · ' : '') + visibleCount + ' of ' + bugCards.length + ' bugs';
+      const mobileClear = document.getElementById('mobile-clear-filters-btn');
+      if (mobileClear) mobileClear.hidden = !isFiltered;
 
       if (emptyStateEl) {
         emptyStateEl.classList.toggle('show', visibleCount === 0);
@@ -558,6 +562,7 @@
       applyFilters();
     }
     clearBtn?.addEventListener('click', resetFilters);
+    document.getElementById('mobile-clear-filters-btn')?.addEventListener('click', resetFilters);
     document.getElementById('empty-clear-filters-btn')?.addEventListener('click', resetFilters);
 
     document.addEventListener('click', (event) => {

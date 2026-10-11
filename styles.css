@@ -1591,6 +1591,7 @@
   }
 
   .filter-results-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+  .mobile-filter-status { display: none; }
   #active-filter-summary:not([hidden]) { margin-bottom: 0.2rem; }
 
   .bug-filter-check {
@@ -1996,6 +1997,11 @@
     display: block;
     padding: 0.5rem 1rem;
   }
+  .mobile-filter-status { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 0.35rem; padding: 0 0.75rem; font-size: 0.82rem; color: var(--text-secondary); }
+  .filter-status .filter-results-line { display: none; }
+  #active-filter-summary:not([hidden]) { display: none; }
+  .filter-status { display: none; }
+  .filter-status.is-filtered { padding: 0; border: 0; background: transparent; }
 
   .filter-panel-toggle {
     display: flex;
