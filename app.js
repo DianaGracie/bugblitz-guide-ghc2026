@@ -705,7 +705,8 @@
     if (!layout || !list || !viewer || !sources || !items.length) return;
 
     // Optional tip bubble pointing at the titles. It appears only on a
-    // reader's first visit and stays until they close it.
+    // reader's first visit and disappears when they open a report or dismiss it.
+    let dismissTip = () => {};
     if (tip) {
       const tipKey = 'bugblitz-viewer-tip-seen-' + viewer.id;
       let tipSeen = false;
@@ -723,7 +724,13 @@
         tipClose.className = 'viewer-tip-close';
         tipClose.setAttribute('aria-label', 'Dismiss tip');
         tipClose.textContent = '×';
-        tipClose.addEventListener('click', () => tipBubble.remove());
+        let tipObserver;
+        dismissTip = () => {
+          tipBubble.remove();
+          firstLink.parentElement.classList.remove('has-viewer-tip');
+          tipObserver?.disconnect();
+        };
+        tipClose.addEventListener('click', dismissTip);
         tipBubble.append(tipText, tipClose);
         // Sit just above the first title, pointing at it.
         const firstLink = items[0].querySelector('a[href^="#"]');
@@ -732,7 +739,10 @@
         // Point at the end of the first title rather than its start.
         const alignTip = () => tipBubble.style.setProperty('--tip-offset', Math.max(0, firstLink.offsetWidth - 30) + 'px');
         alignTip();
-        if (typeof ResizeObserver !== 'undefined') new ResizeObserver(alignTip).observe(firstLink);
+        if (typeof ResizeObserver !== 'undefined') {
+          tipObserver = new ResizeObserver(alignTip);
+          tipObserver.observe(firstLink);
+        }
       }
     }
 
@@ -814,6 +824,7 @@
     };
 
     function select(item, { updateUrl = true } = {}) {
+      if (item) dismissTip();
       selectedItem = item;
       if (updateUrl) syncUrl(item);
       items.forEach((candidate) => {
@@ -890,6 +901,7 @@
         if (!source) return;
         event.preventDefault();
         dialogItem = item;
+        dismissTip();
         returnFocusTo = link;
         const copy = copyOf(source);
         const title = copy.querySelector('h3, h2');
