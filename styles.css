@@ -12,6 +12,8 @@
     --text-secondary: #4A3A5C;
     --text-muted: #7A6B8A;
     --accent: #7B2FBE;
+    --accent-text: #7B2FBE;
+    --accent-fill: #7B2FBE;
     --accent-bright: #E040A0;
     --accent-glow: rgba(123, 47, 190, 0.12);
     --border: #D8C8EE;
@@ -28,7 +30,9 @@
     --ground: #0D0815;
     --surface: #1A1230;
     --text-primary: #F0E6FF;
-    --accent: #A855F7;
+    --accent: #D1A4FF;
+    --accent-text: #D1A4FF;
+    --accent-fill: #5B21B6;
     --accent-bright: #F472B6;
     --accent-glow: rgba(168, 85, 247, 0.15);
     --border: #2D2050;
@@ -43,7 +47,9 @@
     --ground: #0D0815;
     --surface: #1A1230;
     --text-primary: #F0E6FF;
-    --accent: #A855F7;
+    --accent: #D1A4FF;
+    --accent-text: #D1A4FF;
+    --accent-fill: #5B21B6;
     --accent-bright: #F472B6;
     --accent-glow: rgba(168, 85, 247, 0.15);
     --border: #2D2050;
@@ -625,7 +631,7 @@
     width: 1.65rem;
     height: 1.65rem;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--accent-fill);
     color: #ffffff;
     font-family: var(--font-display);
     font-weight: 700;
@@ -914,7 +920,7 @@
   }
 
   .bug-guide-filter.active {
-    background: var(--accent);
+    background: var(--accent-fill);
     border-color: var(--accent);
     color: #fff;
   }
@@ -1138,7 +1144,7 @@
   }
 
   .solution-link:hover {
-    background: var(--accent);
+    background: var(--accent-fill);
     color: #fff;
   }
 
@@ -1591,16 +1597,26 @@
   #active-filter-summary:not([hidden]) { display: block; }
   #starter-bugs-help[hidden] { display: none; }
   #starter-bugs-help { flex-basis: 100%; margin: 0.5rem 0; }
-  .starter-bug-badge {
+  .starter-bug-badge.toc-tag,
+  .starter-bug-badge.bug-guide-card-type {
     display: inline-block;
-    margin: 0.35rem 0.5rem;
-    padding: 0.2rem 0.5rem;
+    margin: 0;
+    background: var(--accent-fill);
+    color: #FFFFFF;
     border: 1px solid var(--accent);
-    border-radius: 999px;
-    color: var(--accent);
-    font-size: 0.75rem;
-    font-weight: 700;
     vertical-align: middle;
+  }
+
+  :scope[data-theme="dark"] .starter-bug-badge {
+    background: #5B21B6;
+    border-color: #5B21B6;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :scope:not([data-theme="light"]) .starter-bug-badge {
+      background: #5B21B6;
+      border-color: #5B21B6;
+    }
   }
 
   .filter-status strong {
@@ -1812,7 +1828,7 @@
 .close-drawer-btn:hover,
 .close-drawer-btn:focus-visible {
   border-color: var(--accent);
-  background: var(--accent);
+  background: var(--accent-fill);
   color: #ffffff;
 }
 
@@ -2061,7 +2077,7 @@
     --code-bg: #0a0518c2;
     --success: #4ADE80;
     --accent-link: #D8B4FE;
-    --accent-text: #F0E6FF;
+    --accent-text: #D1A4FF;
   }
 }
 
@@ -2085,7 +2101,7 @@
     --code-bg: #0a0518c2;
     --success: #4ADE80;
     --accent-link: #D8B4FE;
-    --accent-text: #F0E6FF;
+    --accent-text: #D1A4FF;
   }
 
   /* ── Global link treatment ── */
@@ -2176,7 +2192,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--accent-fill);
     margin-right: 0.5rem;
     vertical-align: middle;
   }
@@ -2558,7 +2574,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--accent);
+    background: var(--accent-fill);
     color: #fff;
     font-family: var(--font-display);
     font-size: 0.85rem;
@@ -2844,7 +2860,7 @@
   }
 
   .effort-matrix td.quick-win {
-    background: var(--accent);
+    background: var(--accent-fill);
     color: #ffffff;
     font-weight: 600;
   }
@@ -2892,7 +2908,7 @@
     width: 1.65rem;
     height: 1.65rem;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--accent-fill);
     color: #ffffff;
     font-family: var(--font-display);
     font-weight: 700;
@@ -3094,7 +3110,7 @@
   }
 
   .bug-guide-filter.active {
-    background: var(--accent);
+    background: var(--accent-fill);
     border-color: var(--accent);
     color: #fff;
   }
@@ -3300,7 +3316,7 @@
 }
 
 .table-launcher-row button {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: #ffffff;
   font-family: var(--font-display);
   font-size: 0.85rem;
@@ -3605,7 +3621,7 @@
      "View full solution" pill. */
   .solution-footer { display: flex; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-light); }
   .solution-footer-link { font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--accent); border-radius: 100px; transition: background-color 0.15s ease, color 0.15s ease; }
-  .solution-footer-link:hover { background: var(--accent); color: #ffffff; }
+  .solution-footer-link:hover { background: var(--accent-fill); color: #ffffff; }
   .solution-footer-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* Link to this solution's own bug in the Bug Report. */
@@ -3933,7 +3949,7 @@ html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { b
 
   .collapse-all { font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.4rem 0.9rem; border: 1px solid var(--accent); border-radius: 999px; background: transparent; color: var(--accent); cursor: pointer; }
 
-  .collapse-all:hover { background: var(--accent); color: var(--card-bg); }
+  .collapse-all:hover { background: var(--accent-fill); color: var(--card-bg); }
 
   .collapse-toggle { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
 
@@ -3993,7 +4009,7 @@ html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { b
 @scope (html[data-page="bugs"]) {
   .has-viewer-tip { position: relative; }
   /* Floats over the column header, just above the first bug title. */
-  .viewer-tip { position: absolute; z-index: 5; left: var(--tip-offset, 3rem); bottom: calc(100% - 0.35rem); display: flex; align-items: center; gap: 0.5rem; width: max-content; max-width: min(22rem, 90vw); margin: 0; padding: 0.5rem 0.5rem 0.5rem 0.85rem; background: var(--accent); color: #ffffff; border-radius: 8px; font-size: 0.85rem; line-height: 1.4; box-shadow: 0 2px 8px var(--card-shadow); }
+  .viewer-tip { position: absolute; z-index: 5; left: var(--tip-offset, 3rem); bottom: calc(100% - 0.35rem); display: flex; align-items: center; gap: 0.5rem; width: max-content; max-width: min(22rem, 90vw); margin: 0; padding: 0.5rem 0.5rem 0.5rem 0.85rem; background: var(--accent-fill); color: #ffffff; border-radius: 8px; font-size: 0.85rem; line-height: 1.4; box-shadow: 0 2px 8px var(--card-shadow); }
   /* Speech-bubble pointer toward the titles below. */
   .viewer-tip::after { content: ''; position: absolute; left: 1.25rem; bottom: -0.4rem; width: 0.8rem; height: 0.8rem; background: inherit; transform: rotate(45deg); }
   .viewer-tip-close { flex: none; display: grid; place-items: center; width: 1.6rem; height: 1.6rem; padding: 0; border: 0; border-radius: 50%; background: transparent; color: inherit; font: inherit; font-size: 1rem; line-height: 1; cursor: pointer; }
@@ -4022,7 +4038,7 @@ html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { b
   .page-nav-list { display: flex; align-items: center; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
   .page-nav-item { position: relative; display: flex; align-items: center; border-radius: 6px; }
   .page-nav-item > a { display: inline-flex; align-items: center; min-height: 40px; padding: 0.45rem 0.9rem; border-radius: 6px; font-family: var(--font-display); font-size: 0.9375rem; font-weight: 700; letter-spacing: 0.04em; color: var(--text-secondary); text-decoration: none; white-space: nowrap; transition: background-color 0.15s ease, color 0.15s ease; }
-  .page-nav-item > a[aria-current="page"] { background: var(--accent); color: #ffffff; }
+  .page-nav-item > a[aria-current="page"] { background: var(--accent-fill); color: #ffffff; }
   .page-nav-item:not(:has(> a[aria-current])):hover, .page-nav-item.has-menu:focus-within { background: var(--surface); }
   .page-nav-item:hover > a:not([aria-current]), .page-nav-item.has-menu:focus-within > a { color: var(--text-primary); }
 
@@ -4055,7 +4071,20 @@ html[data-page="bugs"] :is(#sidebar-clear-filters, #clear-filters-btn):hover { b
   .site-header .section-nav a { order: 2; flex: none; padding: 0.35rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: var(--card-bg); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; text-transform: none; color: var(--accent); }
   .site-header .section-nav a:hover { border-color: var(--accent); color: var(--accent); background: var(--card-bg); }
   .site-header .section-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
-  .site-header .section-nav a[aria-current="location"] { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+  .site-header .section-nav a[aria-current="location"] { background: var(--accent-fill); border-color: var(--accent); color: #ffffff; }
+
+  :scope[data-theme="dark"] .site-header .section-nav a[aria-current="location"] {
+    background: #5B21B6;
+    border-color: #5B21B6;
+    color: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :scope:not([data-theme="light"]) .site-header .section-nav a[aria-current="location"] {
+      background: #5B21B6;
+      border-color: #5B21B6;
+      color: #ffffff;
+    }
+  }
 
   /* Phones: the chips collapse into a dropdown (set up by app.js). */
   .section-nav-toggle { display: none; }

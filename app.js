@@ -346,10 +346,15 @@
       [title, directoryTitle].forEach((target) => {
         if (!target) return;
         const badge = document.createElement('span');
-        badge.className = 'starter-bug-badge';
-        badge.textContent = 'Starter Bug';
-        badge.title = 'Selected by workshop facilitators. Independent of your priority and effort choices.';
-        target.after(badge);
+        badge.className = 'starter-bug-badge ' + (target === title ? 'bug-guide-card-type' : 'toc-tag');
+        const star = document.createElement('span');
+        star.textContent = '★ ';
+        star.setAttribute('aria-hidden', 'true');
+        badge.append(star, 'Starter Bug');
+        badge.title = 'Suggested by workshop facilitators as a starting point for newer debuggers.';
+        const tagGroup = target === title ? card.querySelector('.bug-guide-card-header') : target.parentElement.querySelector('.toc-types');
+        if (tagGroup) tagGroup.append(badge);
+        else target.after(badge);
       });
     });
 
