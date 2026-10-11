@@ -63,27 +63,18 @@
   <section id="bug-list">
     <div class="section-label">Bug Report</div>
     <h2>Release-Day Priorities</h2>
-    <p class="lead">These tickets come from several release day stakeholders — some brief, some deeply technical. Part
-      of your job is to weigh what's said, what's missing, and what the reporter's perspective is telling you. Filter by
-      bug type or reporter, and follow the solution link once your team has attempted a fix.</p>
-
-    <p class="hints-intro">Stuck? Each bug includes optional hints you can reveal one at a time. Start with a small nudge and ask for more when you need it.</p>
+    <p class="lead">These tickets come from several release-day stakeholders—some brief, some deeply technical.
+      As a team, weigh what’s reported, what’s missing, and how the reporter’s perspective shapes the report.</p>
 
     <div class="triage-prompts">
       <h2>Goal 1: Triage with your team</h2>
-      <p>Read each report in the Bug Directory and assign a priority. Then use the Triage Matrix to compare your choices and agree on what to tackle first.</p>
-      <nav class="triage-actions" aria-label="Triage tools">
-        <a href="#quick-links">Review bug reports ↓</a>
-        <a href="#triage-board">View triage matrix ↓</a>
-      </nav>
       <ol>
         <li><strong>Review bugs.</strong> Read through the incoming bug reports as a team. What was reported, who
           reported it, and where in the app does it happen?</li>
-        <li><strong>Assess impact and weigh severity.</strong> Who encounters this bug, and how often? Does it affect a
-          common customer journey or an edge case? What can’t the customer do? How critical is the affected feature, and
-          is there a workaround? What would the company or its customers lose if you temporarily disabled it? Adjust the
-          starting effort estimate if needed.
-          <br><em>Tip: try to reproduce the bug yourself. Seeing it happen makes its impact much easier to judge.</em></li>
+        <li><strong>Assess impact and effort.</strong> Who is affected, how often, and what can’t they do? Consider
+          customer and business impact, available workarounds, and the time needed to address it. Adjust the starting
+          effort estimate as you learn more.
+          <br><em>Tip: reproduce the bug to better understand its impact.</em></li>
         <li><strong>Agree on priority and choose a bug.</strong> Assign P1, P2, or P3 and explain why. Which bug should
           your team tackle first, given its impact and the time available?</li>
       </ol>
@@ -91,6 +82,7 @@
 
     <div class="toc directory-intro" id="quick-links">
       <h2>Bug Directory</h2>
+      <p class="board-help"><strong>Discuss priorities and effort as a team.</strong> Choices are saved only in your current browser and won’t sync with teammates, so compare your results and agree on which bug to tackle first.</p>
       <p class="board-help">Select a bug to read its report, then set its priority and effort<span class="triage-pointer-copy"> here or by dragging it into the <a href="#triage-board">triage matrix ↓</a></span><span class="triage-touch-copy">; the <a href="#triage-board">triage matrix ↓</a> updates automatically</span>.</p>
     </div>
 
@@ -242,10 +234,11 @@
 
     <div id="triage-board">
     <h2 class="triage-matrix-heading">Triage Matrix</h2>
-    <p class="board-help">Compare priority × effort to choose what to tackle first. Select a bug in the matrix or Needs triage to read its report before assigning priority.</p>
+    <p class="board-help">Compare priority × effort to choose what to tackle first.</p>
     <p style="font-size: 0.92rem; color: var(--text-secondary); margin-top: 0.25rem;">Your bug reporters have provided
       initial effort estimates. Feel free to adjust them based on your team’s experience and what you discover, but
-      assigning priority to the bugs should be your main focus. <span class="triage-pointer-copy">Drag a bug from Needs triage into the matrix (or back again to clear its priority), or edit its values in the Bug Directory.</span><span class="triage-touch-copy">Set priority and effort in the <a href="#quick-links">Bug Directory</a>. The matrix updates automatically.</span></p>
+      assigning priority to the bugs should be your main focus.</p>
+    <p class="board-help">Select a bug to read its report. <span class="triage-pointer-copy">Drag it from <strong>Needs triage</strong> into the matrix, or edit its values in the <a href="#quick-links">Bug Directory</a>. Drag the bug back to <strong>Needs triage</strong> to clear its priority.</span><span class="triage-touch-copy">Set priority and effort in the <a href="#quick-links">Bug Directory</a>. The matrix updates automatically.</span></p>
 
     <p class="board-help"><a href="recap.html#severity">About severity and priority</a></p>
       <p class="board-help" id="triage-count"></p>
@@ -329,8 +322,9 @@
       <p>Based on your triage results, choose your first bug and then work through these steps:</p>
       <ol>
         <li><strong>Reproduce the bug.</strong> Follow the report’s steps in the app. Agree on what should happen and what actually happens.</li>
-        <li><strong>Investigate and choose an approach.</strong> Use the code, DevTools, and optionally AI to trace the cause. Decide whether a fix or workaround fits your remaining time.</li>
-        <li><strong>Make and verify your change.</strong> Repeat the reproduction steps and check related behavior for unintended effects.</li>
+        <li><strong>Investigate and choose an approach.</strong> Use the code, DevTools, and optionally AI to trace the cause. Decide whether a fix or workaround fits your remaining time.
+          <br><em>Stuck? Open your bug report’s hints one at a time. Stop when you have enough to try your next step.</em></li>
+        <li><strong>Make and verify your change.</strong> Repeat the reproduction steps and then test related actions to make sure the user flow works as expected.</li>
         <li><strong>Share with your team.</strong> Explain what you changed, why you chose that approach, and anything still unresolved.</li>
       </ol>
       <p>Have time for another bug? Return to your triage results, choose your next prioritized bug, and repeat these steps.</p>

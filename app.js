@@ -1022,10 +1022,17 @@
   // scrolled past that point.
   function setupFilterBarRelease() {
     const scope = document.querySelector('.directory-sticky-scope');
-    const lastRow = () => Array.from(document.querySelectorAll('#bug-directory-list tbody tr[id^="assignment-"]')).pop();
-    if (!scope || !lastRow()) return;
+    if (!scope) return;
+    const lastVisibleRow = () => Array.from(scope.querySelectorAll('#bug-directory-list tbody tr[id^="assignment-"]:not(.filtered-out)')).pop();
     const update = () => {
-      const pastMiddle = lastRow().getBoundingClientRect().top - window.innerHeight / 2;
+      const lastRow = lastVisibleRow();
+      const endMarker = lastRow || scope.querySelector('#bug-guide-empty');
+      if (!endMarker) {
+        scope.style.setProperty('--filter-shift', '0px');
+        return;
+      }
+      const bounds = endMarker.getBoundingClientRect();
+      const pastMiddle = (lastRow ? bounds.top : bounds.bottom) - window.innerHeight / 2;
       // Clamp once it's well off screen; there's nothing further to move.
       const shift = Math.max(-1000, Math.min(0, pastMiddle));
       scope.style.setProperty('--filter-shift', Math.round(shift) + 'px');
@@ -1033,6 +1040,7 @@
     update();
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
+    document.addEventListener('bug-filters-changed', update);
   }
 
   // Show the secondary bar once the main bar has scrolled out of view.
@@ -1062,6 +1070,14 @@
       .filter(({ target }) => target);
     if (!links.length) return;
 
+    header.id = header.id || 'page-top';
+    const topLink = document.createElement('a');
+    topLink.className = 'section-nav-top';
+    topLink.href = '#' + header.id;
+    topLink.textContent = 'Top ↑';
+    topLink.setAttribute('aria-label', 'Back to top');
+    list.append(topLink);
+
     list.id = list.id || 'section-nav-list';
     const toggle = document.createElement('button');
     toggle.type = 'button';
@@ -1076,6 +1092,12 @@
     toggle.append(toggleLabel, toggleCurrent);
     nav.prepend(toggle);
     nav.classList.add('has-dropdown');
+    const mobileNav = window.matchMedia('(max-width: 700px)');
+    const placeTopLink = () => {
+      (mobileNav.matches ? nav : list).append(topLink);
+    };
+    placeTopLink();
+    mobileNav.addEventListener('change', placeTopLink);
 
     const setOpen = (open) => {
       nav.classList.toggle('is-open', open);
@@ -1083,6 +1105,10 @@
     };
     toggle.addEventListener('click', () => setOpen(!nav.classList.contains('is-open')));
     links.forEach(({ link }) => link.addEventListener('click', () => setOpen(false)));
+    topLink.addEventListener('click', () => {
+      setOpen(false);
+      header.querySelector('a')?.focus({ preventScroll: true });
+    });
     document.addEventListener('click', (event) => {
       if (!nav.contains(event.target)) setOpen(false);
     });
@@ -1095,14 +1121,15 @@
 
     let current;
     const update = () => {
-      // A section is current once it reaches the spot its link scrolls it to
-      // (its scroll margin, which clears the pinned bars); at the very bottom of
-      // the page, the last section is.
+      // Highlight sections as they reach the upper quarter of the viewport,
+      // while respecting the landing offset below pinned navigation.
+      // At the very bottom of the page, the last section is current.
       const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
       let active = null;
       links.forEach((entry) => {
         const landing = parseFloat(getComputedStyle(entry.target).scrollMarginTop) || header.getBoundingClientRect().bottom;
-        if (entry.target.getBoundingClientRect().top <= landing + 32) active = entry;
+        const threshold = Math.max(landing + 32, window.innerHeight * 0.25);
+        if (entry.target.getBoundingClientRect().top <= threshold) active = entry;
       });
       if (atBottom) active = links[links.length - 1];
       if (active === current) return;
