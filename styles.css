@@ -1444,7 +1444,7 @@
     width: 100%;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
   }
 
@@ -1585,10 +1585,13 @@
   }
 
   .filter-status.is-filtered {
-    padding: 0.75rem 1rem;
+    padding: 0.35rem 0.65rem;
     border-left: 3px solid var(--accent);
     background: var(--surface);
   }
+
+  .filter-results-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+  #active-filter-summary:not([hidden]) { margin-bottom: 0.2rem; }
 
   .bug-filter-check {
     display: inline-flex;
@@ -1614,7 +1617,7 @@
 
   #active-filter-summary:not([hidden]) { display: block; }
   #starter-bugs-help[hidden] { display: none; }
-  #starter-bugs-help { flex-basis: 100%; margin: 0.5rem 0; }
+  #starter-bugs-help { flex-basis: 100%; margin: 0; }
   .starter-bug-badge.toc-tag,
   .starter-bug-badge.bug-guide-card-type {
     display: inline-block;

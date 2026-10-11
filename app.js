@@ -464,7 +464,7 @@
       });
       if (summary) {
         summary.hidden = !isFiltered;
-        summary.textContent = 'Filtered by: ' + labels.join(' · ') + '. ';
+        summary.textContent = 'Filtered by: ' + labels.join(' · ');
         summary.parentElement.classList.toggle('is-filtered', isFiltered);
       }
 
@@ -1016,31 +1016,31 @@
   }
 
   // Bug Directory filter bar: pinned while scrolling through the bug list.
-  // Once the last bug passes the middle of the screen, the bar scrolls away
-  // with the content instead of staying pinned: --filter-shift moves it (and
-  // the report viewer pinned beside the list) up by however far the reader has
-  // scrolled past that point.
+  // Release the bar when the last visible bug reaches its pinned bottom.
   function setupFilterBarRelease() {
     const scope = document.querySelector('.directory-sticky-scope');
-    if (!scope) return;
-    const lastVisibleRow = () => Array.from(scope.querySelectorAll('#bug-directory-list tbody tr[id^="assignment-"]:not(.filtered-out)')).pop();
+    const toolbar = scope?.querySelector('#bug-filter-toolbar');
+    const directory = scope?.querySelector('.directory-layout');
+    if (!scope || !toolbar || !directory) return;
     const update = () => {
-      const lastRow = lastVisibleRow();
-      const endMarker = lastRow || scope.querySelector('#bug-guide-empty');
-      if (!endMarker) {
-        scope.style.setProperty('--filter-shift', '0px');
-        return;
-      }
-      const bounds = endMarker.getBoundingClientRect();
-      const pastMiddle = (lastRow ? bounds.top : bounds.bottom) - window.innerHeight / 2;
+      const pinnedTop = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bug-nav-height')) || 44.8;
+      const pinnedBottom = pinnedTop + toolbar.getBoundingClientRect().height;
+      const lastVisibleBug = Array.from(directory.querySelectorAll('tr[id^="assignment-"]:not(.filtered-out)')).pop();
+      const releaseMarker = lastVisibleBug || directory.querySelector('#bug-guide-empty');
+      const pastEnd = releaseMarker ? releaseMarker.getBoundingClientRect().top - pinnedBottom : 0;
       // Clamp once it's well off screen; there's nothing further to move.
-      const shift = Math.max(-1000, Math.min(0, pastMiddle));
+      const shift = Math.max(-1000, Math.min(0, pastEnd));
       scope.style.setProperty('--filter-shift', Math.round(shift) + 'px');
     };
     update();
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     document.addEventListener('bug-filters-changed', update);
+    if (typeof ResizeObserver !== 'undefined') {
+      const observer = new ResizeObserver(update);
+      observer.observe(directory);
+      observer.observe(toolbar);
+    }
   }
 
   // Show the secondary bar once the main bar has scrolled out of view.
